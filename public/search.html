@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>検索 | 週末、どこへ行く？</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+  <link rel="stylesheet" href="/css/home.css">
+  <style>
+    .toolbar{max-width:1100px;margin:12px auto 0;padding:0 16px;display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center}
+    .profile-link{justify-self:end;background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:8px 12px;font-weight:600;text-decoration:none}
+    .search-area{max-width:1100px;margin:8px auto 0;padding:0 16px}
+    .search-row .search-box{background:#fff}
+    .control-row{display:flex;gap:10px;margin-top:10px}
+    .btn{border-radius:12px;padding:10px 14px;font-weight:700}
+    .btn-outline{background:#fff;border:1px solid #e5e7eb}
+    .sort{margin-left:auto;position:relative}
+    .sort select{appearance:none;background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:10px 36px 10px 12px;font-weight:700}
+    .sort .chev{position:absolute;right:12px;top:50%;transform:translateY(-50%);pointer-events:none;color:#64748b}
+    .result-meta{max-width:1100px;margin:10px auto 0;padding:0 16px;color:#64748b;font-weight:600}
+    .grid{max-width:1100px;margin:10px auto 90px;padding:0 16px;display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+    @media (max-width:1020px){.grid{grid-template-columns:repeat(2,1fr)}}
+    @media (max-width:680px){.grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<header class="hero">
+  <div class="hero-inner">
+    <div class="hero-top">
+      <div class="brand">検索<span class="sub">スポットを探す</span></div>
+      <a class="profile-btn" href="/profile">プロフィール</a>
+    </div>
+    <div class="search-area">
+      <div class="search-row">
+        <div class="search-box">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input id="q" type="text" placeholder="スポット名・カテゴリで検索（公園・博物館 など）"/>
+        </div>
+      </div>
+      <div class="control-row">
+        <button id="openAdvanced" class="btn btn-outline">詳細フィルタ</button>
+        <div class="sort">
+          <select id="sort">
+            <option value="popularity">おすすめ順</option>
+            <option value="newest">新着順</option>
+            <option value="distance">距離順</option>
+            <option value="rating">評価順</option>
+          </select>
+          <i class="fa-solid fa-chevron-down chev"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="toolbar">
+  <div id="count" class="result-meta"></div>
+  <a class="profile-link" href="/profile">プロフィール</a>
+</div>
+
+<main id="grid" class="grid"></main>
+
+<nav class="tabbar">
+  <a class="tab" href="/"><i class="fa-solid fa-house"></i><span>ホーム</span></a>
+  <a class="tab" href="/search"><i class="fa-solid fa-magnifying-glass"></i><span>検索</span></a>
+  <a class="tab" href="/favorites"><i class="fa-regular fa-heart"></i><span>お気に入り</span></a>
+  <a class="tab" href="/schedule"><i class="fa-regular fa-calendar"></i><span>スケジュール</span></a>
+  <a class="tab" href="/kids"><i class="fa-regular fa-user"></i><span>設定</span></a>
+  <a class="tab" href="/profile"><i class="fa-solid fa-robot"></i><span>キッド</span></a>
+  <a class="tab logout-btn"><i class="fa-solid fa-right-from-bracket"></i><span>ログアウト</span></a>
+</nav>
+
+
+<script src="/js/search.js"></script>
+</body>
+</html>
