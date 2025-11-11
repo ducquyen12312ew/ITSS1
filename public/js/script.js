@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                     
                     setTimeout(() => {
-                        window.location.href = '/dashboard.html';
+                        window.location.href = '/home.html';
                     }, 1000);
                 } else {
                     const messageDiv = document.createElement('div');
