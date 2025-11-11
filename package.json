@@ -1,16 +1,37 @@
 {
-  "name": "itss1",
+  "name": "kodomo-weekend-navi",
   "version": "1.0.0",
-  "main": "server.js",
+  "description": "Backend API cho ứng dụng Cẩm nang đi chơi cuối tuần cùng con",
+  "main": "src/server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "migrate": "node src/database/migrate.js",
+    "seed": "node src/database/seed.js",
+    "db:reset": "node src/database/reset.js"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "kodomo",
+    "family",
+    "weekend",
+    "nodejs",
+    "express",
+    "mysql"
+  ],
+  "author": "ITSS1 Team",
   "license": "ISC",
-  "description": "",
   "dependencies": {
-    "express": "^5.1.0"
+    "axios": "^1.6.2",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "joi": "^17.11.0",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^1.4.5-lts.1",
+    "mysql2": "^3.6.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
   }
 }
