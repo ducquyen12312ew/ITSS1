@@ -28,9 +28,11 @@ app.get('/health', (req, res) => {
 
 // Import routes
 const authRoutes = require('./routes/authRoutes');
+const spotsRoutes = require('./routes/spotsRoutes');
 
 // API routes
 app.use('/api/auth', authRoutes);
+app.use('/api/spots', spotsRoutes);
 
 app.get('/api', (req, res) => {
   res.json({
@@ -43,6 +45,11 @@ app.get('/api', (req, res) => {
         login: 'POST /api/auth/login',
         logout: 'POST /api/auth/logout',
         profile: 'GET /api/auth/profile'
+      },
+      spots: {
+        search: 'GET /api/spots/search?keyword=&category=&sort=',
+        suggestions: 'GET /api/spots/suggestions?keyword=',
+        detail: 'GET /api/spots/:id'
       }
     }
   });

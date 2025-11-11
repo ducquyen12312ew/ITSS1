@@ -147,11 +147,26 @@ curl http://localhost:3000/api
 
 | Method | Endpoint                  | Mô tả                 | Auth | Status |
 |--------|---------------------------|-----------------------|------|--------|
-| GET    | `/api/spots`              | Lấy danh sách địa điểm | ❌   | ⏳ TODO |
+| GET    | `/api/spots`              | Lấy danh sách địa điểm với search & filter | ❌   | ⏳ TODO |
+| GET    | `/api/spots/search`       | Tìm kiếm theo keyword (tên/category) | ❌   | ⏳ TODO |
 | GET    | `/api/spots/:id`          | Chi tiết địa điểm     | ❌   | ⏳ TODO |
 | POST   | `/api/spots`              | Tạo địa điểm mới      | 🔐 Admin | ⏳ TODO |
 | PUT    | `/api/spots/:id`          | Cập nhật địa điểm     | 🔐 Admin | ⏳ TODO |
 | DELETE | `/api/spots/:id`          | Xóa địa điểm          | 🔐 Admin | ⏳ TODO |
+
+**Query Parameters cho GET `/api/spots`:**
+- `keyword` - Tìm kiếm theo tên hoặc mô tả
+- `category` - Lọc theo loại (PARK, MUSEUM, ZOO, AQUARIUM, THEME_PARK, INDOOR_PLAY)
+- `min_age`, `max_age` - Lọc theo độ tuổi
+- `price_range` - Lọc theo giá (FREE, UNDER_1000, 1000_3000, 3000_5000, OVER_5000)
+- `is_indoor` - Lọc trong nhà/ngoài trời (true/false)
+- `weather` - Lọc theo thời tiết (ALL_WEATHER, SUNNY_ONLY, RAIN_OK)
+- `facilities` - Lọc theo tiện nghi (parking, nursing_room, stroller, cafe)
+- `min_rating` - Lọc theo đánh giá tối thiểu
+- `lat`, `lng`, `distance` - Lọc theo khoảng cách (km)
+- `sort` - Sắp xếp: `recommended` (default), `distance`, `rating`, `age_match`
+- `child_id` - Dùng cho age_match sorting
+- `limit`, `offset` - Phân trang
 
 #### 👶 Kids Swipe Feature - TODO
 
