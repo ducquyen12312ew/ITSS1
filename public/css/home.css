@@ -1,6 +1,10 @@
 :root{--bg:#f7f8fb;--card:#fff;--text:#222;--muted:#6b7280;--brand1:#3ba1df;--brand2:#27c1a5;--line:#e5e7eb;--chip:#f0f3f8}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
-.hero{background:linear-gradient(135deg,var(--brand1),var(--brand2));color:#fff}
+.hero {
+  background: linear-gradient(90deg, #1DA1F2 0%, #03e78c 100%);
+  color: #fff;
+}
+
 .hero-inner{max-width:1100px;margin:0 auto;padding:22px 16px 18px}
 .hero-top{display:flex;align-items:center;justify-content:space-between}
 .brand{font-size:22px;font-weight:800}
@@ -57,3 +61,43 @@
 .sm{padding:10px 14px;border-radius:12px}
 .scrim{position:fixed;inset:0;background:rgba(15,23,42,.35);backdrop-filter:blur(1px);opacity:0;pointer-events:none;transition:opacity .2s;z-index:40}
 .scrim.open{opacity:1;pointer-events:auto}
+.tabbar {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  background: #fff;
+  border-top: 1px solid var(--line);
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  padding: 8px 6px calc(8px + env(safe-area-inset-bottom));
+  z-index: 20;
+}
+
+.tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  text-decoration: none;
+  color: #6b7280;
+  font-size: 11px;
+  min-height: 50px;
+}
+
+.tab i {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.tab.active, .tab.active i, .tab.active span {
+  color: #2563eb;
+}
+
+.logout-btn {
+  cursor: pointer;
+  color: #ef4444;
+}
+.logout-btn:hover {
+  opacity: 0.8;
+}
+.card{cursor:pointer}

@@ -23,3 +23,17 @@ qs("#nearbyBtn").addEventListener("click",()=>{});
 qs("#searchInput").addEventListener("input",e=>{S.q=e.target.value.trim();emit()});
 window.addEventListener("filters:changed",applyFilter);
 window.addEventListener("DOMContentLoaded",applyFilter);
+
+function bindLogout(){const b=document.querySelector('.logout-btn');if(b){b.addEventListener('click',async()=>{if(confirm('ログアウトしますか？')){const r=await fetch('/api/auth/logout',{method:'POST'});const d=await r.json();if(d.success)location.href='/login';}})}}
+document.addEventListener('DOMContentLoaded',bindLogout);
+function bindCardNavigate(){
+  qsa('.card[data-id]').forEach(el=>{
+    el.addEventListener('click', e=>{
+      // nếu sau này có <a> bên trong card thì không chặn
+      if (e.target.closest('a')) return;
+      const id = el.dataset.id;
+      if (id) location.href = `/spot/${id}`;
+    });
+  });
+}
+document.addEventListener('DOMContentLoaded', bindCardNavigate);
