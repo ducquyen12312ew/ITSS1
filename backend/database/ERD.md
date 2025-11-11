@@ -1,279 +1,495 @@
-# 📊 ERD Diagram - Kodomo Weekend Navi Database
+# 🗄️ Database ERD - Kodomo Weekend Navi
 
-## Sơ đồ quan hệ cơ sở dữ liệu
+> Cẩm nang đi chơi cuối tuần cùng con - Database Schema Documentation
 
-```mermaid
-erDiagram
-    USERS ||--o{ CHILDREN : "có"
-    USERS ||--o{ REVIEWS : "viết"
-    USERS ||--o{ FAVORITES : "lưu"
-    USERS ||--o{ SCHEDULES : "lên lịch"
-    USERS ||--o{ KIDSWIPE_HISTORY : "swipe"
-    USERS ||--o{ RECOMMENDATIONS : "nhận gợi ý"
-    USERS ||--o{ ADMIN_ACTIVITY_LOGS : "thực hiện"
-    
-    CHILDREN ||--o{ CHILD_PREFERENCES : "có sở thích"
-    CHILDREN ||--o{ KIDSWIPE_HISTORY : "swipe"
-    CHILDREN ||--o{ RECOMMENDATIONS : "dành cho"
-    
-    SPOTS ||--o{ SPOT_IMAGES : "có ảnh"
-    SPOTS ||--o{ SPOT_FACILITIES : "có tiện nghi"
-    SPOTS ||--o{ SPOT_TAGS : "có tag"
-    SPOTS ||--o{ REVIEWS : "được đánh giá"
-    SPOTS ||--o{ FAVORITES : "được yêu thích"
-    SPOTS ||--o{ SCHEDULES : "trong lịch"
-    SPOTS ||--o{ KIDSWIPE_HISTORY : "được swipe"
-    SPOTS ||--o{ RECOMMENDATIONS : "được đề xuất"
-    
-    REVIEWS ||--o{ REVIEW_IMAGES : "có ảnh"
-    REVIEWS ||--o{ REVIEW_FACILITIES : "đánh giá tiện nghi"
+---
 
-    USERS {
-        int user_id PK
-        varchar email UK
-        varchar password_hash
-        varchar first_name
-        varchar last_name
-        enum role
-        enum status
-        decimal location_lat
-        decimal location_lng
-        varchar location_name
-        boolean agreement
-        timestamp created_at
-        timestamp last_login_at
-    }
+## 📊 Database Overview
 
-    CHILDREN {
-        int child_id PK
-        int user_id FK
-        varchar name
-        date birth_date
-        int age "computed"
-        varchar avatar_url
-        text notes
-        timestamp created_at
-    }
+| Property | Value |
+|----------|-------|
+| **Database Name** | `kodomo_weekend_navi` |
+| **Character Set** | `utf8mb4` |
+| **Collation** | `utf8mb4_unicode_ci` |
+| **Total Tables** | 17 |
+| **Total Views** | 2 |
+| **Total Triggers** | 3 |
+| **Engine** | InnoDB |
 
-    CHILD_PREFERENCES {
-        int preference_id PK
-        int child_id FK
-        enum preference_type
-        varchar tag_name
-        timestamp created_at
-    }
+---
 
-    SPOTS {
-        int spot_id PK
-        varchar name
-        text description
-        enum category
-        int min_age
-        int max_age
-        enum price_range
-        boolean is_indoor
-        varchar address
-        decimal latitude
-        decimal longitude
-        varchar google_maps_url
-        json operating_hours
-        boolean is_open_today
-        enum weather_suitable
-        int estimated_visit_duration
-        decimal average_rating
-        int total_reviews
-        enum status
-        int created_by_admin_id FK
-        timestamp created_at
-    }
+## 🎨 Visual ERD Diagram
 
-    SPOT_IMAGES {
-        int image_id PK
-        int spot_id FK
-        varchar image_url
-        boolean is_main
-        int display_order
-        timestamp uploaded_at
-    }
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                          KODOMO WEEKEND NAVI                            │
+│                        Database Architecture                            │
+└─────────────────────────────────────────────────────────────────────────┘
 
-    SPOT_FACILITIES {
-        int facility_id PK
-        int spot_id FK
-        varchar facility_name
-        boolean is_available
-        text notes
-    }
+┌────────────────┐
+│     USERS      │◄─────────────────┐
+│ ============== │                  │
+│ •user_id (PK)  │                  │
+│  email (UQ)    │                  │
+│  password_hash │                  │
+│  first_name    │                  │
+│  last_name     │                  │
+│  role (ENUM)   │                  │
+│  status        │                  │
+│  location_lat  │                  │
+│  location_lng  │                  │
+└────────┬───────┘                  │
+         │                          │
+         │ 1:N                      │ 1:N (Admin creates)
+         │                          │
+         ▼                          │
+┌────────────────┐          ┌───────────────┐
+│   CHILDREN     │          │    SPOTS      │◄──────┐
+│ ============== │          │ ============= │       │
+│ •child_id (PK) │          │ •spot_id (PK) │       │
+│  user_id (FK)  │          │  name         │       │
+│  name          │          │  description  │       │
+│  birth_date    │◄─────┐   │  category     │       │
+│  age           │      │   │  min_age      │       │
+│  avatar_url    │      │   │  max_age      │       │
+│  notes         │      │   │  price_range  │       │
+└────────┬───────┘      │   │  is_indoor    │       │
+         │              │   │  address      │       │
+         │ 1:N          │   │  latitude     │       │
+         │              │   │  longitude    │       │
+         ▼              │   │  avg_rating   │       │
+┌─────────────────┐    │   │  total_reviews│       │
+│CHILD_PREFERENCES│    │   │  status       │       │
+│ =============== │    │   └───────┬───────┘       │
+│ •preference_id  │    │           │               │
+│  child_id (FK)  │    │           │ 1:N           │
+│  type (ENUM)    │    │           │               │
+│  tag_name       │    │    ┌──────┴──────┐        │
+└─────────────────┘    │    │             │        │
+                       │    ▼             ▼        │
+┌─────────────────┐    │ ┌─────────┐ ┌──────────┐ │
+│KIDSWIPE_HISTORY │────┤ │SPOT_IMG │ │SPOT_TAGS │ │
+│ =============== │    │ │=========│ │==========│ │
+│ •swipe_id (PK)  │    │ │•img_id  │ │•tag_id   │ │
+│  user_id (FK)   │    │ │ spot_id │ │ spot_id  │ │
+│  child_id (FK)  │    │ │ url     │ │ tag_name │ │
+│  spot_id (FK)   │    │ │ is_main │ └──────────┘ │
+│  action (ENUM)  │    │ └─────────┘              │
+└─────────────────┘    │         ▲                │
+                       │         │                │
+┌─────────────────┐    │         │ 1:N            │
+│RECOMMENDATIONS  │────┘    ┌────┴──────┐         │
+│ =============== │         │SPOT_FACIL │         │
+│ •recommend_id   │         │===========│         │
+│  user_id (FK)   │         │•facil_id  │         │
+│  child_id (FK)  │         │ spot_id   │         │
+│  spot_id (FK)   │         │ name      │         │
+│  score          │         │ available │         │
+│  factors (JSON) │         └───────────┘         │
+│  expires_at     │                               │
+└─────────────────┘                               │
+         │                                        │
+         │                                        │
+         │                    ┌───────────────────┘
+         │                    │
+         │                    ▼
+         │           ┌────────────────┐
+         └──────────►│    REVIEWS     │
+                     │ ============== │
+                     │ •review_id (PK)│
+                     │  spot_id (FK)  │
+                     │  user_id (FK)  │
+                     │  rating (1-5)  │
+                     │  comment       │
+                     │  is_hidden     │
+                     └────────┬───────┘
+                              │
+                              │ 1:N
+                       ┌──────┴────────┐
+                       │               │
+                       ▼               ▼
+              ┌──────────────┐ ┌──────────────┐
+              │ REVIEW_IMGS  │ │ REVIEW_FACIL │
+              │ ============ │ │ ============ │
+              │ •img_id      │ │ •facil_id    │
+              │  review_id   │ │  review_id   │
+              │  url         │ │  name        │
+              └──────────────┘ └──────────────┘
 
-    SPOT_TAGS {
-        int tag_id PK
-        int spot_id FK
-        varchar tag_name
-    }
+┌────────────────┐          ┌────────────────┐
+│   FAVORITES    │          │   SCHEDULES    │
+│ ============== │          │ ============== │
+│ •favorite_id   │          │ •schedule_id   │
+│  user_id (FK)  │          │  user_id (FK)  │
+│  spot_id (FK)  │          │  spot_id (FK)  │
+│  collection    │          │  date          │
+│  saved_at      │          │  time_slot     │
+└────────────────┘          │  status (ENUM) │
+                            │  notes         │
+                            └────────────────┘
 
-    REVIEWS {
-        int review_id PK
-        int spot_id FK
-        int user_id FK
-        int rating
-        varchar comment
-        int safety_report_count
-        int helpful_count
-        boolean is_hidden
-        timestamp posted_at
-    }
+┌─────────────────┐         ┌──────────────────┐
+│  KPIs_METRICS   │         │ADMIN_ACTIVITY_LOG│
+│ =============== │         │ ================ │
+│ •metric_id (PK) │         │ •log_id (PK)     │
+│  date           │         │  admin_id (FK)   │
+│  metric_name    │         │  action (ENUM)   │
+│  value          │         │  target_type     │
+│  time_period    │         │  target_id       │
+└─────────────────┘         │  details (JSON)  │
+                            └──────────────────┘
 
-    REVIEW_IMAGES {
-        int review_image_id PK
-        int review_id FK
-        varchar image_url
-        timestamp uploaded_at
-    }
-
-    REVIEW_FACILITIES {
-        int review_facility_id PK
-        int review_id FK
-        varchar facility_name
-        boolean is_checked
-    }
-
-    FAVORITES {
-        int favorite_id PK
-        int user_id FK
-        int spot_id FK
-        varchar collection_tag
-        timestamp saved_at
-    }
-
-    SCHEDULES {
-        int schedule_id PK
-        int user_id FK
-        int spot_id FK
-        date scheduled_date
-        enum time_slot
-        int travel_time
-        boolean reminder_enabled
-        enum status
-        text notes
-        timestamp created_at
-    }
-
-    KIDSWIPE_HISTORY {
-        int swipe_id PK
-        int user_id FK
-        int child_id FK
-        int spot_id FK
-        enum action
-        timestamp timestamp
-    }
-
-    RECOMMENDATIONS {
-        int recommendation_id PK
-        int user_id FK
-        int child_id FK
-        int spot_id FK
-        decimal score
-        json factors
-        timestamp generated_at
-        timestamp expires_at
-    }
-
-    KPIS_METRICS {
-        int metric_id PK
-        date date
-        varchar metric_name
-        decimal value
-        enum time_period
-        timestamp calculated_at
-    }
-
-    ADMIN_ACTIVITY_LOGS {
-        int log_id PK
-        int admin_id FK
-        enum action
-        varchar target_type
-        int target_id
-        json details
-        timestamp timestamp
-    }
-
-    WEATHER_CONDITIONS {
-        int weather_id PK
-        date date
-        varchar location
-        enum condition
-        decimal temperature
-        timestamp fetched_at
-    }
+┌──────────────────┐
+│WEATHER_CONDITIONS│
+│ ================ │
+│ •weather_id (PK) │
+│  date            │
+│  location        │
+│  condition (ENUM)│
+│  temperature     │
+└──────────────────┘
 ```
 
-## 📋 Giải thích các mối quan hệ chính
+---
 
-### 1️⃣ Users (Người dùng)
-- **One-to-Many** với Children: Một user có nhiều hồ sơ trẻ
-- **One-to-Many** với Reviews: Một user viết nhiều đánh giá
-- **One-to-Many** với Favorites: Một user lưu nhiều địa điểm yêu thích
-- **One-to-Many** với Schedules: Một user có nhiều lịch trình
-- **One-to-Many** với KidSwipe_History: Một user có nhiều lượt swipe
+## 🔗 Relationship Summary
 
-### 2️⃣ Spots (Địa điểm)
-- **One-to-Many** với Spot_Images: Một địa điểm có nhiều ảnh
-- **One-to-Many** với Spot_Facilities: Một địa điểm có nhiều tiện nghi
-- **One-to-Many** với Spot_Tags: Một địa điểm có nhiều tag
-- **One-to-Many** với Reviews: Một địa điểm có nhiều đánh giá
+### Core Entities
 
-### 3️⃣ Children (Hồ sơ trẻ)
-- **One-to-Many** với Child_Preferences: Một trẻ có nhiều sở thích/không thích
-- **One-to-Many** với KidSwipe_History: Lịch sử các lần swipe của trẻ
+| Parent | Relationship | Child | Type |
+|--------|--------------|-------|------|
+| **users** | `1:N` | children | Parent-Child |
+| **users** | `1:N` | reviews | User Reviews |
+| **users** | `1:N` | favorites | User Favorites |
+| **users** | `1:N` | schedules | User Plans |
+| **users** | `1:N` | kidswipe_history | Swipe Actions |
+| **users** | `1:N` | recommendations | Personalized |
+| **children** | `1:N` | child_preferences | Likes/Dislikes |
+| **children** | `1:N` | kidswipe_history | Kid's Choice |
+| **spots** | `1:N` | spot_images | Photos |
+| **spots** | `1:N` | spot_facilities | Amenities |
+| **spots** | `1:N` | spot_tags | Tags |
+| **spots** | `1:N` | reviews | User Reviews |
+| **spots** | `1:N` | favorites | Bookmarks |
+| **spots** | `1:N` | schedules | Plans |
+| **reviews** | `1:N` | review_images | Review Photos |
+| **reviews** | `1:N` | review_facilities | Facility Checks |
 
-### 4️⃣ Reviews (Đánh giá)
-- **One-to-Many** với Review_Images: Một review có nhiều ảnh
-- **One-to-Many** với Review_Facilities: Một review đánh giá nhiều tiện nghi
+---
 
-## 🔑 Các Index quan trọng
+## 📚 17 Tables Chi Tiết
 
-### Performance Indexes:
-- `idx_email` - Tìm kiếm user nhanh
-- `idx_location` - Query địa điểm theo tọa độ
-- `idx_rating` - Sắp xếp theo rating
-- `ft_name_description` - Full-text search địa điểm
+### 👤 **1. USERS** - Quản lý người dùng (Cha mẹ)
 
-### Foreign Key Indexes:
-- Tất cả foreign keys đều có index để tối ưu JOIN queries
+**Mục đích:** Lưu thông tin tài khoản, vị trí, phân quyền
 
-## 🔄 Triggers tự động
+**Columns chính:**
+- `user_id` (PK) - ID duy nhất
+- `email` (UNIQUE) - Đăng nhập
+- `password_hash` - Mật khẩu đã mã hóa bcrypt
+- `role` - USER hoặc ADMIN
+- `status` - ACTIVE hoặc BANNED
+- `location_lat/lng` - Vị trí hiện tại (để gợi ý địa điểm gần)
 
-### Automatic Rating Updates:
-- `update_spot_rating_after_insert` - Cập nhật rating khi có review mới
-- `update_spot_rating_after_update` - Cập nhật rating khi chỉnh sửa review
-- `update_spot_rating_after_delete` - Cập nhật rating khi xóa review
+**Use cases:**
+- Đăng ký/đăng nhập
+- Lưu vị trí để recommend địa điểm gần
+- Phân quyền admin/user
 
-## 📊 Views có sẵn
+---
 
-1. **view_top_rated_spots** - Top địa điểm đánh giá cao nhất
-2. **view_popular_spots** - Địa điểm được yêu thích nhiều nhất
+### 👶 **2. CHILDREN** - Hồ sơ trẻ em
 
-## 🎯 Các đặc điểm nổi bật
+**Mục đích:** Mỗi user có thể có nhiều con, lưu thông tin để gợi ý phù hợp
 
-### 1. Computed Column:
-- `age` trong table `children` - Tự động tính tuổi từ birth_date
+**Columns chính:**
+- `child_id` (PK)
+- `user_id` (FK → users)
+- `name`, `birth_date`
+- `age` - Tự động tính từ birth_date
+- `notes` - Ghi chú sức khỏe/đặc biệt
 
-### 2. JSON Fields:
-- `operating_hours` - Giờ mở cửa linh hoạt
-- `factors` - Lý do recommendation
-- `details` - Chi tiết admin logs
+**Use cases:**
+- Gợi ý địa điểm phù hợp với độ tuổi
+- Filter spots theo age range
+- Kids swipe feature
 
-### 3. ENUMs:
-- Đảm bảo data integrity
-- Dễ maintain và query
+---
 
-### 4. Cascading Deletes:
-- Xóa user → tự động xóa children, reviews, favorites, etc.
-- Xóa spot → tự động xóa images, facilities, tags, etc.
+### ❤️ **3. CHILD_PREFERENCES** - Sở thích của trẻ
 
-## 📈 Tổng kết
+**Mục đích:** Lưu những gì trẻ THÍCH và KHÔNG THÍCH
 
-- **Tổng số bảng**: 17 tables
-- **Tổng số views**: 2 views  
-- **Tổng số triggers**: 3 triggers
-- **Tổng số indexes**: 30+ indexes
-- **Support**: Full UTF-8 (emoji, tiếng Nhật, tiếng Việt)
+**Columns chính:**
+- `child_id` (FK → children)
+- `preference_type` - LIKE hoặc DISLIKE
+- `tag_name` - animals, sports, crafts, water...
+
+**Use cases:**
+- Recommendation algorithm
+- Kids swipe (swipe right = LIKE, left = DISLIKE)
+- Filter spots
+
+---
+
+### 📍 **4. SPOTS** - Địa điểm vui chơi
+
+**Mục đích:** Core table - lưu toàn bộ thông tin địa điểm
+
+**Columns chính:**
+- `spot_id` (PK)
+- `name`, `description`
+- `category` - MUSEUM, PARK, ZOO, AQUARIUM, INDOOR_PLAY...
+- `min_age`, `max_age` - Phù hợp với độ tuổi
+- `price_range` - FREE, UNDER_1000, 1000_3000...
+- `is_indoor` - Trong nhà/ngoài trời
+- `latitude`, `longitude` - Vị trí GPS
+- `weather_suitable` - Phù hợp thời tiết nào
+- `average_rating`, `total_reviews` - Tự động update từ reviews
+- `operating_hours` (JSON) - Giờ mở cửa từng ngày
+
+**Use cases:**
+- List/detail địa điểm
+- Search, filter (age, price, indoor, weather)
+- Calculate distance
+- Recommendation
+
+---
+
+### 🖼️ **5. SPOT_IMAGES** - Ảnh địa điểm
+
+**Mục đích:** Mỗi spot có nhiều ảnh
+
+**Columns:**
+- `spot_id` (FK)
+- `image_url`
+- `is_main` - Ảnh đại diện
+- `display_order` - Thứ tự hiển thị
+
+---
+
+### 🏢 **6. SPOT_FACILITIES** - Tiện nghi
+
+**Mục đích:** Liệt kê tiện nghi có tại địa điểm
+
+**Examples:** PARKING, NURSING_ROOM, STROLLER_ACCESSIBLE, RESTROOM, CAFE...
+
+**Quan trọng cho:** Cha mẹ có em bé
+
+---
+
+### 🏷️ **7. SPOT_TAGS** - Tags phân loại
+
+**Mục đích:** Tags để filter và match với preferences
+
+**Examples:** 雨の日OK, 無料, 室内, 駅近, 動物, 工作...
+
+---
+
+### ⭐ **8. REVIEWS** - Đánh giá của user
+
+**Mục đích:** User đánh giá sau khi đi
+
+**Columns chính:**
+- `spot_id`, `user_id` (FK)
+- `rating` - 1-5 sao
+- `comment` - Max 140 ký tự (giống Twitter)
+- `is_hidden` - Admin có thể ẩn review vi phạm
+
+**Triggers:**
+- Auto update `spots.average_rating` khi thêm/sửa/xóa review
+
+---
+
+### 📸 **9-10. REVIEW_IMAGES & REVIEW_FACILITIES**
+
+- Review có thể kèm ảnh
+- Review có thể check các facilities đã dùng (CLEAN, SAFE, KID_FRIENDLY...)
+
+---
+
+### ❤️ **11. FAVORITES** - Yêu thích
+
+**Mục đích:** User save địa điểm để xem lại
+
+**Features:**
+- `collection_tag` - Phân loại (Indoor, Free, Near...)
+- Unique (user_id, spot_id) - Không duplicate
+
+---
+
+### 📅 **12. SCHEDULES** - Lịch trình
+
+**Mục đích:** User lên kế hoạch đi chơi
+
+**Columns chính:**
+- `scheduled_date` - Ngày dự kiến
+- `time_slot` - AM, PM, FULL_DAY
+- `status` - PLANNED, COMPLETED, CANCELLED
+- `reminder_enabled` - Nhắc nhở
+
+**Use cases:**
+- Calendar view
+- Track đã đi chưa
+- Notifications
+
+---
+
+### 👶💚 **13. KIDSWIPE_HISTORY** - Lịch sử Kids Swipe
+
+**Mục đích:** Tính năng cho trẻ swipe chọn địa điểm (như Tinder)
+
+**Columns:**
+- `child_id`, `spot_id`
+- `action` - LIKE hoặc SKIP
+
+**Use cases:**
+- Học sở thích của trẻ
+- Improve recommendations
+- Analytics
+
+---
+
+### 🎯 **14. RECOMMENDATIONS** - Cache gợi ý
+
+**Mục đích:** Cache kết quả recommendation (optimize performance)
+
+**Columns:**
+- `score` - Điểm phù hợp (0-100)
+- `factors` (JSON) - Lý do: {"distance": "5km", "age_match": true, "weather": "good"}
+- `expires_at` - TTL để refresh
+
+**Recommendation Algorithm xét:**
+1. **Distance** - Gần nhà
+2. **Age match** - Phù hợp độ tuổi
+3. **Weather** - Thời tiết hôm nay
+4. **Preferences** - Sở thích trẻ
+5. **Rating** - Đánh giá cao
+6. **Price** - Miễn phí/giá rẻ ưu tiên
+
+---
+
+### 📊 **15. KPIs_METRICS** - Tracking metrics
+
+**Mục đích:** Analytics, dashboard admin
+
+**Metrics examples:**
+- Average Decision Time
+- Route Activation Rate
+- Monthly Repeat Rate
+- User Retention
+
+---
+
+### 🔒 **16. ADMIN_ACTIVITY_LOGS** - Admin audit trail
+
+**Mục đích:** Theo dõi hành động admin
+
+**Actions:** CREATE_SPOT, EDIT_SPOT, DELETE_SPOT, HIDE_REVIEW, BAN_USER...
+
+---
+
+### 🌦️ **17. WEATHER_CONDITIONS** - Weather cache
+
+**Mục đích:** Cache weather từ API, tránh gọi nhiều lần
+
+**Use cases:**
+- Filter spots phù hợp thời tiết
+- Recommendations
+- Reduce API costs
+
+---
+
+## 🔄 Database Features
+
+### 🔥 Triggers (3 triggers)
+
+1. **update_spot_rating_after_insert** - Auto calculate rating khi có review mới
+2. **update_spot_rating_after_update** - Re-calculate khi review bị sửa
+3. **update_spot_rating_after_delete** - Re-calculate khi xóa review
+
+### 👁️ Views (2 views)
+
+1. **view_top_rated_spots** - Top spots có rating cao
+2. **view_popular_spots** - Spots được save nhiều nhất
+
+---
+
+## ⚡ Performance Optimization
+
+### Indexes quan trọng:
+
+1. **users.idx_email** - Login nhanh
+2. **spots.idx_location** - Tìm địa điểm gần (latitude, longitude)
+3. **spots.FULLTEXT(name, description)** - Search text
+4. **spots.idx_category** - Filter category
+5. **reviews.idx_spot_id** - List reviews
+6. **schedules.idx_user_date** - Calendar view
+
+---
+
+## 🎯 Business Logic Examples
+
+### Tìm địa điểm phù hợp cho trẻ:
+
+```sql
+SELECT s.*,
+  -- Tính khoảng cách
+  (6371 * acos(cos(radians(user_lat)) * cos(radians(s.latitude)) 
+    * cos(radians(s.longitude) - radians(user_lng)) 
+    + sin(radians(user_lat)) * sin(radians(s.latitude)))) AS distance,
+  -- Điểm phù hợp tuổi
+  CASE WHEN child_age BETWEEN s.min_age AND s.max_age THEN 20 ELSE 0 END AS age_score,
+  -- Điểm rating
+  s.average_rating * 4 AS rating_score
+FROM spots s
+WHERE s.status = 'PUBLIC'
+  AND s.is_indoor = (CASE WHEN weather='RAINY' THEN TRUE ELSE s.is_indoor END)
+ORDER BY (age_score + rating_score - distance) DESC
+LIMIT 20;
+```
+
+### Spots phổ biến tuần này:
+
+```sql
+SELECT s.name, COUNT(sch.schedule_id) as scheduled_count
+FROM spots s
+INNER JOIN schedules sch ON s.spot_id = sch.spot_id
+WHERE sch.scheduled_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 7 DAY)
+GROUP BY s.spot_id
+ORDER BY scheduled_count DESC;
+```
+
+---
+
+## 🚀 Roadmap
+
+### Phase 2:
+- [ ] Soft delete cho critical tables
+- [ ] Read replicas cho scalability
+- [ ] Partitioning cho large tables
+
+### Phase 3:
+- [ ] ElasticSearch cho advanced search
+- [ ] Redis cache layer
+- [ ] Real-time notifications
+
+---
+
+## 📖 Giải thích các khái niệm
+
+| Term | Giải thích |
+|------|------------|
+| **Spot** | Địa điểm vui chơi (zoo, museum, park, aquarium...) |
+| **KidSwipe** | Tính năng cho trẻ swipe left/right chọn địa điểm (như Tinder) |
+| **Recommendation** | Gợi ý địa điểm phù hợp dựa trên AI/algorithm |
+| **Schedule** | Lịch trình đã lên kế hoạch |
+| **Favorite** | Địa điểm yêu thích (bookmark) |
+| **Review** | Đánh giá sau khi đã đi |
+| **Facilities** | Tiện nghi (parking, restroom, nursing room...) |
+
+---
+
+**Version:** 2.0  
+**Last Updated:** November 11, 2025  
+**Author:** ITSS1 Team

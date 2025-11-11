@@ -26,20 +26,24 @@ app.get('/health', (req, res) => {
   });
 });
 
-// API routes will be added here
+// Import routes
+const authRoutes = require('./routes/authRoutes');
+
+// API routes
+app.use('/api/auth', authRoutes);
+
 app.get('/api', (req, res) => {
   res.json({
     message: 'Kodomo Weekend Navi API',
     version: '1.0.0',
     endpoints: {
-      health: '/health',
-      api: '/api',
-      users: '/api/users',
-      spots: '/api/spots',
-      reviews: '/api/reviews',
-      favorites: '/api/favorites',
-      schedules: '/api/schedules',
-      children: '/api/children'
+      health: 'GET /health',
+      auth: {
+        register: 'POST /api/auth/register',
+        login: 'POST /api/auth/login',
+        logout: 'POST /api/auth/logout',
+        profile: 'GET /api/auth/profile'
+      }
     }
   });
 });
