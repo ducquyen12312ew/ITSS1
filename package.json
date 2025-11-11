@@ -2,13 +2,13 @@
   "name": "kodomo-weekend-navi",
   "version": "1.0.0",
   "description": "Backend API cho ứng dụng Cẩm nang đi chơi cuối tuần cùng con",
-  "main": "src/server.js",
+  "main": "backend/src/server.js",
   "scripts": {
-    "start": "node src/server.js",
-    "dev": "nodemon src/server.js",
-    "migrate": "node src/database/migrate.js",
-    "seed": "node src/database/seed.js",
-    "db:reset": "node src/database/reset.js"
+    "start": "node backend/src/server.js",
+    "dev": "nodemon backend/src/server.js",
+    "migrate": "node backend/src/database/migrate.js",
+    "seed": "node backend/src/database/seed.js",
+    "db:reset": "node backend/src/database/reset.js"
   },
   "keywords": [
     "kodomo",
