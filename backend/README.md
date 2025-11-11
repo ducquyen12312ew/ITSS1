@@ -134,98 +134,101 @@ curl http://localhost:3000/api
 | GET    | `/health`  | Health check     |
 | GET    | `/api`     | API information  |
 
-#### 👤 Users (Người dùng)
+#### � Authentication (Đã hoàn thành ✅)
 
 | Method | Endpoint                  | Mô tả                 | Auth |
 |--------|---------------------------|-----------------------|------|
-| POST   | `/api/users/register`     | Đăng ký tài khoản     | ❌   |
-| POST   | `/api/users/login`        | Đăng nhập             | ❌   |
-| GET    | `/api/users/profile`      | Xem profile           | ✅   |
-| PUT    | `/api/users/profile`      | Cập nhật profile      | ✅   |
+| POST   | `/api/auth/register`      | Đăng ký tài khoản     | ❌   |
+| POST   | `/api/auth/login`         | Đăng nhập             | ❌   |
+| POST   | `/api/auth/logout`        | Đăng xuất             | ✅   |
+| GET    | `/api/auth/profile`       | Xem profile           | ✅   |
 
-#### 📍 Spots (Địa điểm)
+#### 📍 Spots (Địa điểm) - TODO
 
-| Method | Endpoint                  | Mô tả                 | Auth |
-|--------|---------------------------|-----------------------|------|
-| GET    | `/api/spots`              | Lấy danh sách địa điểm | ❌   |
-| GET    | `/api/spots/:id`          | Chi tiết địa điểm     | ❌   |
-| POST   | `/api/spots`              | Tạo địa điểm mới      | 🔐 Admin |
-| PUT    | `/api/spots/:id`          | Cập nhật địa điểm     | 🔐 Admin |
-| DELETE | `/api/spots/:id`          | Xóa địa điểm          | 🔐 Admin |
+| Method | Endpoint                  | Mô tả                 | Auth | Status |
+|--------|---------------------------|-----------------------|------|--------|
+| GET    | `/api/spots`              | Lấy danh sách địa điểm | ❌   | ⏳ TODO |
+| GET    | `/api/spots/:id`          | Chi tiết địa điểm     | ❌   | ⏳ TODO |
+| POST   | `/api/spots`              | Tạo địa điểm mới      | 🔐 Admin | ⏳ TODO |
+| PUT    | `/api/spots/:id`          | Cập nhật địa điểm     | 🔐 Admin | ⏳ TODO |
+| DELETE | `/api/spots/:id`          | Xóa địa điểm          | 🔐 Admin | ⏳ TODO |
 
-#### ⭐ Reviews (Đánh giá)
+#### 👶 Kids Swipe Feature - TODO
 
-| Method | Endpoint                  | Mô tả                 | Auth |
-|--------|---------------------------|-----------------------|------|
-| GET    | `/api/reviews`            | Danh sách đánh giá    | ❌   |
-| POST   | `/api/reviews`            | Tạo đánh giá          | ✅   |
-| PUT    | `/api/reviews/:id`        | Cập nhật đánh giá     | ✅   |
-| DELETE | `/api/reviews/:id`        | Xóa đánh giá          | ✅   |
+| Method | Endpoint                     | Mô tả                    | Auth | Status |
+|--------|------------------------------|--------------------------|------|--------|
+| POST   | `/api/kids/:childId/swipe`   | Swipe tag (LIKE/SKIP)    | ✅   | ⏳ TODO |
+| GET    | `/api/kids/:childId/preferences` | Lấy sở thích         | ✅   | ⏳ TODO |
+| GET    | `/api/kids/:childId/recommendations` | Gợi ý spots      | ✅   | ⏳ TODO |
 
-#### ❤️ Favorites (Yêu thích)
+#### ⭐ Reviews (Đánh giá) - TODO
 
-| Method | Endpoint                  | Mô tả                 | Auth |
-|--------|---------------------------|-----------------------|------|
-| GET    | `/api/favorites`          | Danh sách yêu thích   | ✅   |
-| POST   | `/api/favorites`          | Thêm yêu thích        | ✅   |
-| DELETE | `/api/favorites/:id`      | Xóa yêu thích         | ✅   |
+| Method | Endpoint                  | Mô tả                 | Auth | Status |
+|--------|---------------------------|-----------------------|------|--------|
+| GET    | `/api/spots/:id/reviews`  | Danh sách đánh giá    | ❌   | ⏳ TODO |
+| POST   | `/api/reviews`            | Tạo đánh giá          | ✅   | ⏳ TODO |
+| PUT    | `/api/reviews/:id`        | Cập nhật đánh giá     | ✅   | ⏳ TODO |
+| DELETE | `/api/reviews/:id`        | Xóa đánh giá          | ✅   | ⏳ TODO |
 
-#### 📅 Schedules (Lịch trình)
+#### ❤️ Favorites (Yêu thích) - TODO
 
-| Method | Endpoint                  | Mô tả                 | Auth |
-|--------|---------------------------|-----------------------|------|
-| GET    | `/api/schedules`          | Danh sách lịch trình  | ✅   |
-| POST   | `/api/schedules`          | Tạo lịch trình        | ✅   |
-| PUT    | `/api/schedules/:id`      | Cập nhật lịch trình   | ✅   |
-| DELETE | `/api/schedules/:id`      | Xóa lịch trình        | ✅   |
+| Method | Endpoint                  | Mô tả                 | Auth | Status |
+|--------|---------------------------|-----------------------|------|--------|
+| GET    | `/api/favorites`          | Danh sách yêu thích   | ✅   | ⏳ TODO |
+| POST   | `/api/favorites`          | Thêm yêu thích        | ✅   | ⏳ TODO |
+| DELETE | `/api/favorites/:id`      | Xóa yêu thích         | ✅   | ⏳ TODO |
 
-#### 👶 Children (Hồ sơ trẻ em)
+#### 📅 Schedules (Lịch trình) - TODO
 
-| Method | Endpoint                  | Mô tả                 | Auth |
-|--------|---------------------------|-----------------------|------|
-| GET    | `/api/children`           | Danh sách trẻ         | ✅   |
-| POST   | `/api/children`           | Thêm hồ sơ trẻ        | ✅   |
-| PUT    | `/api/children/:id`       | Cập nhật hồ sơ        | ✅   |
-| DELETE | `/api/children/:id`       | Xóa hồ sơ             | ✅   |
+| Method | Endpoint                  | Mô tả                 | Auth | Status |
+|--------|---------------------------|-----------------------|------|--------|
+| GET    | `/api/schedules`          | Danh sách lịch trình  | ✅   | ⏳ TODO |
+| POST   | `/api/schedules`          | Tạo lịch trình        | ✅   | ⏳ TODO |
+| PUT    | `/api/schedules/:id`      | Cập nhật lịch trình   | ✅   | ⏳ TODO |
+| DELETE | `/api/schedules/:id`      | Xóa lịch trình        | ✅   | ⏳ TODO |
 
-#### 🎯 Recommendations (Gợi ý)
+#### 👶 Children (Hồ sơ trẻ em) - TODO
 
-| Method | Endpoint                     | Mô tả                    | Auth |
-|--------|------------------------------|--------------------------|------|
-| GET    | `/api/recommendations`       | Lấy gợi ý phù hợp        | ✅   |
-| POST   | `/api/recommendations/generate` | Tạo gợi ý mới         | ✅   |
+| Method | Endpoint                  | Mô tả                 | Auth | Status |
+|--------|---------------------------|-----------------------|------|--------|
+| GET    | `/api/children`           | Danh sách trẻ         | ✅   | ⏳ TODO |
+| POST   | `/api/children`           | Thêm hồ sơ trẻ        | ✅   | ⏳ TODO |
+| PUT    | `/api/children/:id`       | Cập nhật hồ sơ        | ✅   | ⏳ TODO |
+| DELETE | `/api/children/:id`       | Xóa hồ sơ             | ✅   | ⏳ TODO |
 
-#### 🔐 Admin
+#### 🔐 Admin - TODO
 
-| Method | Endpoint                  | Mô tả                 | Auth |
-|--------|---------------------------|-----------------------|------|
-| GET    | `/api/admin/dashboard`    | Dashboard KPI         | 🔐 Admin |
-| GET    | `/api/admin/users`        | Quản lý users         | 🔐 Admin |
-| GET    | `/api/admin/reviews`      | Quản lý reviews       | 🔐 Admin |
+| Method | Endpoint                  | Mô tả                 | Auth | Status |
+|--------|---------------------------|-----------------------|------|--------|
+| GET    | `/api/admin/dashboard`    | Dashboard KPI         | 🔐 Admin | ⏳ TODO |
+| GET    | `/api/admin/users`        | Quản lý users         | 🔐 Admin | ⏳ TODO |
+| GET    | `/api/admin/spots`        | Quản lý spots         | 🔐 Admin | ⏳ TODO |
 
 ## 🗄️ Cấu trúc Database
 
-Xem chi tiết trong file: [database/ERD.md](database/ERD.md)
+Xem chi tiết trong file: [database/DATABASE_SCHEMA.md](database/DATABASE_SCHEMA.md)
 
-### Các bảng chính:
+### 12 bảng chính (Đơn giản hóa từ 17 bảng):
 
-1. **users** - Người dùng (5 users mẫu)
-2. **children** - Hồ sơ trẻ em (5 children mẫu)
-3. **child_preferences** - Sở thích trẻ
-4. **spots** - Địa điểm (10 spots mẫu tại Tokyo)
+**Authentication & Users:**
+1. **users** - Người dùng (4 users mẫu: 1 admin + 3 parents)
+2. **children** - Hồ sơ trẻ em (4 children mẫu)
+3. **child_preferences** - Sở thích tags của trẻ (từ Kids Swipe)
+
+**Spots & Content:**
+4. **spots** - Địa điểm (10 spots mẫu tại Tokyo, facilities dạng JSON)
 5. **spot_images** - Ảnh địa điểm
-6. **spot_facilities** - Tiện nghi
-7. **spot_tags** - Tags
-8. **reviews** - Đánh giá (13 reviews mẫu)
-9. **review_images** - Ảnh đánh giá
-10. **review_facilities** - Đánh giá tiện nghi
-11. **favorites** - Yêu thích
-12. **schedules** - Lịch trình
-13. **kidswipe_history** - Lịch sử swipe
-14. **recommendations** - Gợi ý
-15. **kpis_metrics** - KPI metrics
-16. **admin_activity_logs** - Admin logs
-17. **weather_conditions** - Thời tiết
+6. **spot_tags** - Tags linh hoạt (animals, crafts, outdoor...)
+
+**User Interactions:**
+7. **reviews** - Đánh giá (10 reviews, 1 ảnh + facilities JSON)
+8. **favorites** - Yêu thích (7 favorites)
+9. **schedules** - Lịch trình (4 schedules)
+
+**Features:**
+10. **kid_swipe** - Lịch sử swipe tags của trẻ (Kids Swipe feature)
+11. **weather_cache** - Cache thời tiết
+12. **admin_logs** - Audit trail + metrics
 
 ### Dữ liệu mẫu:
 
@@ -236,22 +239,22 @@ Xem chi tiết trong file: [database/ERD.md](database/ERD.md)
 - Password: `password123`
 - Role: ADMIN
 
-**User:**
-- Email: `tanaka.yuki@example.com`
-- Password: `password123`
-- Role: USER
+**User Accounts:**
+- Email: `tanaka.yuki@example.com` (Password: `password123`)
+- Email: `sato.kenji@example.com` (Password: `password123`)
+- Email: `suzuki.mai@example.com` (Password: `password123`)
 
-**Spots mẫu (Tokyo):**
-- Ueno Zoo (上野動物園)
-- Tokyo Skytree (東京スカイツリー)
-- National Museum of Nature and Science
-- Yoyogi Park (代々木公園)
-- KidZania Tokyo
-- Odaiba Seaside Park
-- Sumida Aquarium
-- Ghibli Museum
-- ASOBono Indoor Playground
-- Showa Kinen Park
+**Spots mẫu (10 địa điểm Tokyo):**
+- Ueno Zoo - Vườn thú nổi tiếng
+- National Museum of Nature and Science - Bảo tàng khoa học
+- Tokyo Skytree - Tháp quan sát 634m
+- Odaiba Seaside Park - Công viên bãi biển
+- KidZania Tokyo - Thành phố nghề nghiệp
+- Kasai Rinkai Aquarium - Thủy cung
+- Yoyogi Park - Công viên miễn phí
+- teamLab Borderless - Bảo tàng digital art
+- Asobono - Khu vui chơi trong nhà
+- Inokashira Park Zoo - Vườn thú nhỏ
 
 ## 📝 Scripts hữu ích
 

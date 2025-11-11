@@ -158,25 +158,20 @@ Kết quả mong đợi:
 +------------------------------+
 | Tables_in_kodomo_weekend_navi|
 +------------------------------+
-| admin_activity_logs          |
+| admin_logs                   |
 | child_preferences            |
 | children                     |
 | favorites                    |
-| kidswipe_history             |
-| kpis_metrics                 |
-| recommendations              |
-| review_facilities            |
-| review_images                |
+| kid_swipe                    |
 | reviews                      |
 | schedules                    |
-| spot_facilities              |
 | spot_images                  |
 | spot_tags                    |
 | spots                        |
 | users                        |
-| weather_conditions           |
+| weather_cache                |
 +------------------------------+
-17 rows in set
+12 rows in set
 ```
 
 ---
@@ -185,13 +180,16 @@ Kết quả mong đợi:
 
 ### 📊 Thống kê dữ liệu mẫu:
 
-- **5 Users** (1 Admin + 4 Users)
-- **5 Children** (Hồ sơ trẻ em)
+- **4 Users** (1 Admin + 3 Parents)
+- **4 Children** (Hồ sơ trẻ em từ 3-7 tuổi)
 - **10 Spots** (Địa điểm tại Tokyo)
-- **13 Reviews** (Đánh giá)
-- **13 Favorites** (Yêu thích)
-- **7 Schedules** (Lịch trình)
-- **50+ Images** (Ảnh địa điểm và review)
+- **10 Reviews** (Đánh giá 4-5 sao)
+- **7 Favorites** (Yêu thích)
+- **4 Schedules** (Lịch trình)
+- **10 Spot Images** (Mỗi spot 1 ảnh chính)
+- **27 Spot Tags** (animals, crafts, outdoor...)
+- **9 Child Preferences** (LIKE/DISLIKE tags)
+- **7 Kid Swipes** (Lịch sử swipe)
 
 ### 🔑 Test Accounts:
 
@@ -207,31 +205,31 @@ Role: ADMIN
 Email: tanaka.yuki@example.com
 Password: password123
 Role: USER
-Children: Haruto (6 tuổi), Himari (4 tuổi)
-
-Email: nguyen.anh@example.com
-Password: password123
-Role: USER
-Children: Minh (7 tuổi)
+Children: Taro (6 tuổi), Hanako (5 tuổi)
 
 Email: sato.kenji@example.com
 Password: password123
 Role: USER
-Children: Ren (5 tuổi), Yui (3 tuổi)
+Children: Kenta (7 tuổi)
+
+Email: suzuki.mai@example.com
+Password: password123
+Role: USER
+Children: Misaki (6 tuổi)
 ```
 
 ### 📍 10 Địa điểm mẫu (Tokyo):
 
-1. **Ueno Zoo** - Vườn thú nổi tiếng với panda
-2. **Tokyo Skytree** - Tháp truyền hình cao nhất
-3. **National Museum of Nature and Science** - Bảo tàng khoa học
-4. **Yoyogi Park** - Công viên miễn phí
-5. **KidZania Tokyo** - Thành phố nghề nghiệp cho trẻ
-6. **Odaiba Seaside Park** - Bãi biển nhân tạo
-7. **Sumida Aquarium** - Thủy cung
-8. **Ghibli Museum** - Bảo tàng Studio Ghibli
-9. **ASOBono** - Khu vui chơi trong nhà
-10. **Showa Kinen Park** - Công viên quốc gia
+1. **Ueno Zoo** - Vườn thú nổi tiếng với panda (ZOO, 1000-3000 JPY)
+2. **National Museum of Nature and Science** - Bảo tàng khoa học (MUSEUM, 1000-3000 JPY)
+3. **Tokyo Skytree** - Tháp quan sát 634m (THEME_PARK, 3000-5000 JPY)
+4. **Odaiba Seaside Park** - Bãi biển công viên (PARK, FREE)
+5. **KidZania Tokyo** - Thành phố nghề nghiệp (INDOOR_PLAY, 3000-5000 JPY)
+6. **Kasai Rinkai Aquarium** - Thủy cung với bể cá ngừ (AQUARIUM, 1000-3000 JPY)
+7. **Yoyogi Park** - Công viên rộng lớn (PARK, FREE)
+8. **teamLab Borderless** - Bảo tàng digital art (MUSEUM, 3000-5000 JPY)
+9. **Asobono** - Khu vui chơi Tokyo Dome City (INDOOR_PLAY, 1000-3000 JPY)
+10. **Inokashira Park Zoo** - Vườn thú nhỏ (ZOO, UNDER_1000 JPY)
 
 ---
 
@@ -358,16 +356,18 @@ SELECT
     (SELECT COUNT(*) FROM spots) as spots,
     (SELECT COUNT(*) FROM reviews) as reviews,
     (SELECT COUNT(*) FROM favorites) as favorites,
-    (SELECT COUNT(*) FROM schedules) as schedules;
+    (SELECT COUNT(*) FROM schedules) as schedules,
+    (SELECT COUNT(*) FROM spot_tags) as tags,
+    (SELECT COUNT(*) FROM kid_swipe) as swipes;
 ```
 
 Kết quả mong đợi:
 ```
-+-------+----------+-------+---------+-----------+-----------+
-| users | children | spots | reviews | favorites | schedules |
-+-------+----------+-------+---------+-----------+-----------+
-|     5 |        5 |    10 |      13 |        13 |         7 |
-+-------+----------+-------+---------+-----------+-----------+
++-------+----------+-------+---------+-----------+-----------+------+--------+
+| users | children | spots | reviews | favorites | schedules | tags | swipes |
++-------+----------+-------+---------+-----------+-----------+------+--------+
+|     4 |        4 |    10 |      10 |         7 |         4 |   27 |      7 |
++-------+----------+-------+---------+-----------+-----------+------+--------+
 ```
 
 ### Test 2: Kiểm tra foreign keys
@@ -380,20 +380,25 @@ JOIN spots s ON r.spot_id = s.spot_id
 LIMIT 5;
 ```
 
-### Test 3: Kiểm tra triggers hoạt động
+### Test 3: Kiểm tra Kids Swipe workflow
 
 ```sql
--- Thêm review mới
-INSERT INTO reviews (spot_id, user_id, rating, comment) 
-VALUES (1, 2, 5, 'Test review');
+-- Xem preferences hiện tại của Taro (child_id = 1)
+SELECT * FROM child_preferences WHERE child_id = 1;
 
--- Kiểm tra average_rating tự động update
-SELECT name, average_rating, total_reviews 
-FROM spots 
-WHERE spot_id = 1;
+-- Xem spots phù hợp với Taro (có tag 'animals')
+SELECT s.name, GROUP_CONCAT(st.tag_name) as tags
+FROM spots s
+JOIN spot_tags st ON s.spot_id = st.spot_id
+WHERE st.tag_name IN ('animals', 'outdoor')
+GROUP BY s.spot_id;
 
--- Xóa review test
-DELETE FROM reviews WHERE comment = 'Test review';
+-- Xem lịch sử swipe
+SELECT c.name, ks.tag_name, ks.action, ks.created_at
+FROM kid_swipe ks
+JOIN children c ON ks.child_id = c.child_id
+ORDER BY ks.created_at DESC
+LIMIT 10;
 ```
 
 ---
@@ -404,8 +409,9 @@ Sau khi setup database thành công:
 
 1. ✅ Chạy server: `npm run dev`
 2. ✅ Test API: `curl http://localhost:3000/health`
-3. ✅ Xem ERD diagram: `backend/database/ERD.md`
-4. ✅ Bắt đầu develop API endpoints
+3. ✅ Xem database schema: `backend/database/DATABASE_SCHEMA.md`
+4. ✅ Test Auth API: POST `/api/auth/login` với account có sẵn
+5. ✅ Bắt đầu develop API endpoints tiếp theo
 
 ---
 
