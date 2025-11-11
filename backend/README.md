@@ -143,13 +143,14 @@ curl http://localhost:3000/api
 | POST   | `/api/auth/logout`        | Đăng xuất             | ✅   |
 | GET    | `/api/auth/profile`       | Xem profile           | ✅   |
 
-#### 📍 Spots (Địa điểm) - TODO
+#### 📍 Spots (Địa điểm) - Đã hoàn thành ✅
 
 | Method | Endpoint                  | Mô tả                 | Auth | Status |
 |--------|---------------------------|-----------------------|------|--------|
-| GET    | `/api/spots`              | Lấy danh sách địa điểm với search & filter | ❌   | ⏳ TODO |
-| GET    | `/api/spots/search`       | Tìm kiếm theo keyword (tên/category) | ❌   | ⏳ TODO |
-| GET    | `/api/spots/:id`          | Chi tiết địa điểm     | ❌   | ⏳ TODO |
+| GET    | `/api/spots/search`       | Tìm kiếm + filter địa điểm với đầy đủ tính năng | ❌   | ✅ Done |
+| GET    | `/api/spots/suggestions`  | Autocomplete khi gõ keyword | ❌   | ✅ Done |
+| GET    | `/api/spots/:id`          | Chi tiết địa điểm (full info + images + tags + review stats) | ❌   | ✅ Done |
+| GET    | `/api/spots/:id/reviews`  | Danh sách reviews đầy đủ với user info + images | ❌   | ✅ Done |
 | POST   | `/api/spots`              | Tạo địa điểm mới      | 🔐 Admin | ⏳ TODO |
 | PUT    | `/api/spots/:id`          | Cập nhật địa điểm     | 🔐 Admin | ⏳ TODO |
 | DELETE | `/api/spots/:id`          | Xóa địa điểm          | 🔐 Admin | ⏳ TODO |
@@ -176,14 +177,19 @@ curl http://localhost:3000/api
 | GET    | `/api/kids/:childId/preferences` | Lấy sở thích         | ✅   | ⏳ TODO |
 | GET    | `/api/kids/:childId/recommendations` | Gợi ý spots      | ✅   | ⏳ TODO |
 
-#### ⭐ Reviews (Đánh giá) - TODO
+#### ⭐ Reviews (Đánh giá)
 
 | Method | Endpoint                  | Mô tả                 | Auth | Status |
 |--------|---------------------------|-----------------------|------|--------|
-| GET    | `/api/spots/:id/reviews`  | Danh sách đánh giá    | ❌   | ⏳ TODO |
-| POST   | `/api/reviews`            | Tạo đánh giá          | ✅   | ⏳ TODO |
+| GET    | `/api/spots/:id/reviews`  | Danh sách đánh giá đầy đủ (user, comment, images) | ❌   | ✅ Done |
+| POST   | `/api/reviews`            | Tạo đánh giá mới      | ✅   | ⏳ TODO |
 | PUT    | `/api/reviews/:id`        | Cập nhật đánh giá     | ✅   | ⏳ TODO |
 | DELETE | `/api/reviews/:id`        | Xóa đánh giá          | ✅   | ⏳ TODO |
+
+**Query Parameters cho GET `/api/spots/:id/reviews`:**
+- `limit` - Số lượng reviews mỗi trang (default: 10)
+- `offset` - Vị trí bắt đầu (default: 0)
+- `sort` - Sắp xếp: `newest`, `oldest`, `highest_rating`, `lowest_rating`, `most_helpful` (default: newest)
 
 #### ❤️ Favorites (Yêu thích) - TODO
 

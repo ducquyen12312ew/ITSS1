@@ -289,6 +289,95 @@ const getSpotById = async (req, res) => {
 };
 
 /**
+ * GET /api/spots/:id/reviews
+ * Lấy danh sách reviews chi tiết cho một spot
+ * Bao gồm: user info, rating, comment, images, helpful_count
+ * Hỗ trợ sorting và pagination
+ */
+const getSpotReviews = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { limit = 10, offset = 0, sort = 'newest' } = req.query;
+
+    // Validate sort parameter
+    const validSorts = {
+      newest: 'r.created_at DESC',
+      oldest: 'r.created_at ASC',
+      highest_rating: 'r.rating DESC, r.created_at DESC',
+      lowest_rating: 'r.rating ASC, r.created_at DESC',
+      most_helpful: 'r.helpful_count DESC, r.created_at DESC'
+    };
+
+    const orderBy = validSorts[sort] || validSorts.newest;
+
+    // Get reviews with user information
+    const reviewsQuery = `
+      SELECT 
+        r.review_id,
+        r.rating,
+        r.comment,
+        r.image_url,
+        r.facilities_check,
+        r.created_at,
+        r.updated_at,
+        u.user_id,
+        u.first_name,
+        u.last_name,
+        u.email
+      FROM reviews r
+      JOIN users u ON r.user_id = u.user_id
+      WHERE r.spot_id = ? AND r.is_hidden = FALSE
+      ORDER BY ${orderBy}
+      LIMIT ? OFFSET ?
+    `;
+
+    const reviews = await db.query(reviewsQuery, [
+      id,
+      parseInt(limit),
+      parseInt(offset)
+    ]);
+
+    // Get total count
+    const countQuery = `
+      SELECT COUNT(*) as total 
+      FROM reviews 
+      WHERE spot_id = ? AND is_hidden = FALSE
+    `;
+    const countResult = await db.query(countQuery, [id]);
+    const total = countResult[0].total;
+
+    // Format reviews with parsed JSON fields
+    const formattedReviews = reviews.map(review => ({
+      ...review,
+      facilities_check: review.facilities_check 
+        ? JSON.parse(review.facilities_check) 
+        : null
+    }));
+
+    res.json({
+      success: true,
+      data: {
+        reviews: formattedReviews,
+        pagination: {
+          total: total,
+          limit: parseInt(limit),
+          offset: parseInt(offset),
+          has_more: (parseInt(offset) + reviews.length) < total
+        },
+        sort_by: sort
+      }
+    });
+
+  } catch (error) {
+    console.error('Error fetching spot reviews:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Lỗi khi lấy danh sách đánh giá'
+    });
+  }
+};
+
+/**
  * GET /api/spots/suggestions
  * Gợi ý autocomplete khi user gõ keyword
  * Trả về danh sách ngắn gọn để hiển thị dropdown
@@ -342,5 +431,6 @@ const getSearchSuggestions = async (req, res) => {
 module.exports = {
   searchSpots,
   getSpotById,
+  getSpotReviews,
   getSearchSuggestions
 };

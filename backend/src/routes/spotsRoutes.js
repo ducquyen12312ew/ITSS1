@@ -26,6 +26,14 @@ router.get('/search', spotsController.searchSpots);
 router.get('/suggestions', spotsController.getSearchSuggestions);
 
 /**
+ * GET /api/spots/:id/reviews
+ * Lấy danh sách reviews của địa điểm
+ * Query params: limit, offset, sort (newest|oldest|highest_rating|lowest_rating|most_helpful)
+ * ⚠️ PHẢI ĐẶT TRƯỚC /:id ĐỂ TRÁNH CONFLICT
+ */
+router.get('/:id/reviews', spotsController.getSpotReviews);
+
+/**
  * GET /api/spots/:id
  * Lấy chi tiết 1 địa điểm
  */
