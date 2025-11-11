@@ -4,8 +4,8 @@ const path = require('path');
 const session = require('express-session');
 const config = require('./config/config');
 const db = require('./database/db');
-const childrenByUser = {};
 
+const childrenByUser = {};
 const app = express();
 
 app.use(cors(config.cors));
@@ -50,8 +50,18 @@ const reviews = {
   sp2: [], sp3: [], sp4: []
 };
 
-const favoritesByUser = {}; // { email: Set(ids) }
-const schedulesByUser = {}; // { email: [{id, date, time, note}] }
+// ==== Demo catalog (sp1..sp4) ====
+const CATALOG = {
+  sp1: { id:'sp1', title:'キッズパーク ひまわり', img:'https://ik.imagekit.io/lginc73sk/Kid/pic11.png?updatedAt=1762859324941', distanceKm:3.2, rating:4.4, reviews:128, age:'3〜8歳', type:'室内', price:'¥500〜¥1,200', tags:['室内遊び','有料','ボールプール'], rainOk:true, openToday:true },
+  sp2: { id:'sp2', title:'恐竜博物館',           img:'https://ik.imagekit.io/lginc73sk/Kid/pic12.png?updatedAt=1762859324756', distanceKm:4.6, rating:4.6, reviews:243, age:'5〜12歳', type:'学習', price:'¥900〜¥1,500', tags:['恐竜','展示','学習'],        rainOk:true, openToday:false },
+  sp3: { id:'sp3', title:'わんぱく公園',         img:'https://ik.imagekit.io/lginc73sk/Kid/pic13.png?updatedAt=1762859324793', distanceKm:2.1, rating:4.2, reviews:209, age:'2〜10歳', type:'外遊び', price:'無料',       tags:['芝生','アスレチック','無料'],     rainOk:false, openToday:true },
+  sp4: { id:'sp4', title:'水族館マリンワールド', img:'https://ik.imagekit.io/lginc73sk/Kid/pic14.png?updatedAt=1762859324792', distanceKm:7.5, rating:4.7, reviews:425, age:'3〜12歳', type:'室内', price:'¥1,100〜¥2,400', tags:['水族館','イルカ','屋内'],        rainOk:true, openToday:true },
+};
+const getSpot = id => CATALOG[id];
+
+// ==== FIX: dùng Map thay cho Object ====
+const favoritesByUser = new Map(); // email => Set(spotIds)
+const schedulesByUser = {};        // giữ nguyên Object cho demo
 
 function includes(t,q){return t.toLowerCase().includes((q||'').toLowerCase())}
 function findSpot(id){return spots.find(s=>s.id===id)}
@@ -90,28 +100,24 @@ app.post('/api/spots/:id/reviews', requireLogin, (req, res) => {
 
 app.post('/api/spots/:id/favorite', requireLogin, (req, res) => {
   const email = req.session.user.email;
-  favoritesByUser[email] = favoritesByUser[email] || new Set();
-  const set = favoritesByUser[email];
-  if (set.has(req.params.id)) set.delete(req.params.id); else set.add(req.params.id);
-  res.json({ success:true, favorite: set.has(req.params.id) });
+  const id = req.params.id;
+  if (!getSpot(id)) return res.status(404).json({ success:false, message:'Spot not found' });
+  let set = favoritesByUser.get(email);
+  if (!set) { set = new Set(); favoritesByUser.set(email, set); }
+  if (set.has(id)) { set.delete(id); return res.json({ success:true, favorite:false }); }
+  set.add(id);
+  res.json({ success:true, favorite:true });
 });
 
-app.post('/api/spots/:id/schedule', requireLogin, (req, res) => {
-  const email = req.session.user.email;
-  schedulesByUser[email] = schedulesByUser[email] || [];
-  const item = { id:req.params.id, date:req.body.date, time:req.body.time, note:req.body.note||'' };
-  schedulesByUser[email].push(item);
-  res.json({ success:true, scheduled:item });
-});
-
+// ==== Pages (đặt TRƯỚC 404 handler) ====
 app.get('/', requireLogin, (_req, res) => res.sendFile(path.join(__dirname, '../public/home.html')));
 app.get('/login', (_req, res) => res.sendFile(path.join(__dirname, '../public/login.html')));
 app.get('/search', requireLogin, (_req, res) => res.sendFile(path.join(__dirname, '../public/search.html')));
 app.get('/spot/:id', requireLogin, (req, res) => res.sendFile(path.join(__dirname, '../public/spot.html')));
-app.get('/kids', requireLogin, (_req, res) => {
-  res.sendFile(path.join(__dirname, '../public/kids.html'));
-});
+app.get('/kids', requireLogin, (_req, res) => res.sendFile(path.join(__dirname, '../public/kids.html')));
+app.get('/favorites', requireLogin, (_req, res) => res.sendFile(path.join(__dirname, '../public/favorites.html')));
 
+// ==== Children profile ====
 app.get('/api/children', requireLogin, (req, res) => {
   const email = req.session.user.email;
   res.json({ success:true, profile: childrenByUser[email] || null });
@@ -124,9 +130,37 @@ app.post('/api/children', requireLogin, (req, res) => {
   res.json({ success:true, profile: childrenByUser[email] });
 });
 
+// ==== Favorites API (dùng Map đồng bộ) ====
+app.get('/api/favorites', requireLogin, (req, res) => {
+  const email = req.session.user.email;
+  const set = favoritesByUser.get(email) || new Set();
+  const items = [...set].map(id => getSpot(id)).filter(Boolean);
+  res.json({ success:true, total: items.length, items });
+});
+
+app.post('/api/favorites/:id', requireLogin, (req, res) => {
+  const email = req.session.user.email;
+  const id = req.params.id;
+  if (!getSpot(id)) return res.status(404).json({ success:false, message:'Spot not found' });
+  let set = favoritesByUser.get(email);
+  if (!set) { set = new Set(); favoritesByUser.set(email, set); }
+  set.add(id);
+  res.json({ success:true });
+});
+
+app.delete('/api/favorites/:id', requireLogin, (req, res) => {
+  const email = req.session.user.email;
+  const id = req.params.id;
+  const set = favoritesByUser.get(email);
+  if (set) set.delete(id);
+  res.json({ success:true });
+});
+
+// ==== Health & API info ====
 app.get('/health', (_req, res) => res.json({ status:'OK', timestamp:new Date().toISOString(), uptime:process.uptime(), environment:config.env }));
 app.get('/api', (_req, res) => res.json({ message:'Kodomo Weekend Navi API', version:'1.0.0' }));
 
+// ==== 404 & Error handlers (ĐỂ CUỐI CÙNG) ====
 app.use((req, res) => res.status(404).json({ error:'Not Found', message:`Cannot ${req.method} ${req.path}` }));
 app.use((err, _req, res, _next) => { console.error('Error:', err); res.status(err.status||500).json({ error:err.message||'Internal Server Error', ...(config.env==='development'&&{stack:err.stack}) }); });
 

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>お気に入り | コドモ週末ナビ</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+  <link rel="stylesheet" href="/css/home.css">
+  <style>
+    .wrap{max-width:1100px;margin:18px auto 90px;padding:0 16px}
+    .page-title{font-weight:800;font-size:18px;margin:8px 2px 12px}
+    .card{cursor:pointer}
+    .card .remove{position:absolute;top:10px;right:10px;background:#fff;border:1px solid #e5e7eb;border-radius:999px;padding:6px 9px;font-size:12px}
+    .empty{padding:36px;color:#64748b}
+  </style>
+</head>
+<body>
+<header class="hero">
+  <div class="hero-inner">
+    <div class="hero-top">
+      <div class="brand">コドモ週末ナビ<span class="sub">お気に入り</span></div>
+      <a class="profile-btn" href="/profile">プロフィール</a>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="page-title">お気に入り</div>
+  <div id="count" class="muted"></div>
+  <div id="grid" class="card-grid"></div>
+  <div id="empty" class="empty" style="display:none">まだお気に入りがありません。</div>
+</main>
+
+<nav class="tabbar">
+  <a class="tab" href="/"><i class="fa-solid fa-house"></i><span>ホーム</span></a>
+  <a class="tab" href="/search"><i class="fa-solid fa-magnifying-glass"></i><span>検索</span></a>
+  <a class="tab" href="/favorites"><i class="fa-regular fa-heart"></i><span>お気に入り</span></a>
+  <a class="tab" href="/schedule"><i class="fa-regular fa-calendar"></i><span>スケジュール</span></a>
+  <a class="tab" href="/kids"><i class="fa-regular fa-user"></i><span>設定</span></a>
+  <a class="tab" href="/profile"><i class="fa-solid fa-robot"></i><span>キッド</span></a>
+  <a class="tab logout-btn"><i class="fa-solid fa-right-from-bracket"></i><span>ログアウト</span></a>
+</nav>
+
+<script src="/js/favorites.js"></script>
+</body>
+</html>

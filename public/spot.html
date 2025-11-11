@@ -16,7 +16,7 @@
     .hero-img img{width:100%;height:100%;object-fit:cover;display:block}
     .title-row{display:flex;align-items:center;gap:10px;margin-top:14px}
     .op-row{display:flex;gap:10px;margin:14px 0}
-    .btn{border-radius:12px;padding:10px 14px;font-weight:700;border:1px solid #e5e7eb;background:#fff}
+    .btn{border-radius:12px;padding:10px 14px;font-weight:700;border:1px solid #e5e7eb;background:#fff;cursor:pointer}
     .btn.primary{background:#2563eb;color:#fff;border-color:#2563eb}
     .pilltab{display:flex;gap:10px;margin:6px 0 12px}
     .pilltab .tabb{padding:8px 12px;border:1px solid #e5e7eb;border-radius:999px;background:#fff;font-weight:700}
@@ -24,13 +24,14 @@
     .row{display:flex;gap:12px;color:#64748b;font-size:13px}
     .row .m i{margin-right:6px}
     .hr{height:1px;background:#e5e7eb;margin:10px 0}
-    .sched{border:1px solid #e5e7eb;border-radius:12px;padding:10px}
     .sched-head{display:flex;justify-content:space-between;align-items:center}
     .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
     .field{width:100%;padding:10px 12px;border:1px solid #e5e7eb;border-radius:12px;font-size:14px;background:#fff}
     .reviews .item{border-top:1px solid #e5e7eb;padding:10px 0}
     .muted{color:#64748b}
     .taglist{display:flex;gap:8px;flex-wrap:wrap}
+    .ghost{background:#fff;border:1px solid #e5e7eb;color:#333}
+    .ghost:hover{background:#f1f5f9}
   </style>
 </head>
 <body>
@@ -44,28 +45,40 @@
 </header>
 
 <div class="wrap">
-  <div class="crumb"><a href="javascript:history.back()"><i class="fa-solid fa-angle-left"></i> 戻る</a><span id="crumbName" class="muted"></span></div>
+  <!-- breadcrumb & title -->
+  <div class="crumb">
+    <a href="javascript:history.back()"><i class="fa-solid fa-angle-left"></i> 戻る</a>
+    <span id="crumbName" class="muted"></span>
+  </div>
 
+  <!-- hero -->
   <div class="hero-img"><img id="heroImg" src="" alt=""></div>
 
+  <!-- title -->
   <div class="title-row">
     <h2 id="spotName" class="title" style="font-size:20px;margin:0"></h2>
     <div id="badgeStack" class="badge-stack" style="position:static"></div>
   </div>
 
+  <!-- meta & pill -->
   <div class="row" id="metaRow" style="margin-top:6px"></div>
   <div class="pilltab">
     <span class="tabb" id="ageTypePrice"></span>
   </div>
 
+  <!-- actions -->
   <div class="op-row">
     <button id="btnRoute" class="btn"><i class="fa-solid fa-location-arrow"></i> 経路</button>
-    <button id="btnFav" class="btn"><i class="fa-regular fa-heart"></i> 保存</button>
+    <button id="btnFav" class="btn ghost"><i class="fa-regular fa-heart"></i> 保存</button>
     <button id="btnOpenSched" class="btn"><i class="fa-regular fa-calendar"></i> 追加</button>
   </div>
 
-  <div class="sect">
-    <div class="sched-head"><strong>スケジュールに追加</strong><button id="btnCloseSched" class="btn">閉じる</button></div>
+  <!-- schedule panel -->
+  <div id="schedPanel" class="sect" style="display:none">
+    <div class="sched-head">
+      <strong>スケジュールに追加</strong>
+      <button id="btnCloseSched" class="btn">閉じる</button>
+    </div>
     <div class="hr"></div>
     <div class="grid2">
       <input id="date" type="date" class="field">
@@ -78,6 +91,7 @@
     </div>
   </div>
 
+  <!-- details -->
   <div class="sect">
     <strong>施設について</strong>
     <div id="desc" style="margin-top:8px"></div>
@@ -103,6 +117,7 @@
     <div id="tags" class="taglist" style="margin-top:8px"></div>
   </div>
 
+  <!-- reviews -->
   <div class="sect reviews">
     <div style="display:flex;justify-content:space-between;align-items:center">
       <strong>レビュー</strong>
@@ -112,6 +127,7 @@
   </div>
 </div>
 
+<!-- tabbar -->
 <nav class="tabbar">
   <a class="tab" href="/"><i class="fa-solid fa-house"></i><span>ホーム</span></a>
   <a class="tab" href="/search"><i class="fa-solid fa-magnifying-glass"></i><span>検索</span></a>
