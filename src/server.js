@@ -4,6 +4,7 @@ const path = require('path');
 const session = require('express-session');
 const config = require('./config/config');
 const db = require('./database/db');
+const childrenByUser = {};
 
 const app = express();
 
@@ -111,6 +112,17 @@ app.get('/kids', requireLogin, (_req, res) => {
   res.sendFile(path.join(__dirname, '../public/kids.html'));
 });
 
+app.get('/api/children', requireLogin, (req, res) => {
+  const email = req.session.user.email;
+  res.json({ success:true, profile: childrenByUser[email] || null });
+});
+
+app.post('/api/children', requireLogin, (req, res) => {
+  const email = req.session.user.email;
+  const { name="", age="", likes=[], dislikes=[] } = req.body || {};
+  childrenByUser[email] = { name, age, likes: Array.isArray(likes)?likes:[], dislikes: Array.isArray(dislikes)?dislikes:[] };
+  res.json({ success:true, profile: childrenByUser[email] });
+});
 
 app.get('/health', (_req, res) => res.json({ status:'OK', timestamp:new Date().toISOString(), uptime:process.uptime(), environment:config.env }));
 app.get('/api', (_req, res) => res.json({ message:'Kodomo Weekend Navi API', version:'1.0.0' }));

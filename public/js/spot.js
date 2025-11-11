@@ -73,3 +73,27 @@ function wireActions(s){
 }
 
 document.addEventListener('DOMContentLoaded',load);
+document.addEventListener('DOMContentLoaded', () => {
+  const path = window.location.pathname;
+
+  document.querySelectorAll('.tabbar .tab').forEach(tab => {
+    const href = tab.getAttribute('href');
+    if (!href) return;
+    // Nếu URL khớp đầu đường dẫn thì active
+    if (path === href || (path.startsWith(href) && href !== '/')) {
+      tab.classList.add('active');
+    }
+  });
+
+  // Xử lý logout
+  const logoutBtn = document.querySelector('.logout-btn');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', async () => {
+      if (confirm('ログアウトしますか？')) {
+        const res = await fetch('/api/auth/logout', { method: 'POST' });
+        const data = await res.json();
+        if (data.success) window.location.href = '/login';
+      }
+    });
+  }
+});
