@@ -215,14 +215,47 @@ curl http://localhost:3000/api
 | GET    | `/api/kids-swipe/:childId/recommendations` | Gợi ý spots dựa trên preferences | ✅   | ✅ Done |
 
 
-#### �📅 Schedules (Lịch trình) - TODO
+####  Schedules (Lịch trình cuối tuần) - Đã hoàn thành ✅
 
-| Method | Endpoint                  | Mô tả                 | Auth | Status |
-|--------|---------------------------|-----------------------|------|--------|
-| GET    | `/api/schedules`          | Danh sách lịch trình  | ✅   | ⏳ TODO |
-| POST   | `/api/schedules`          | Tạo lịch trình        | ✅   | ⏳ TODO |
-| PUT    | `/api/schedules/:id`      | Cập nhật lịch trình   | ✅   | ⏳ TODO |
-| DELETE | `/api/schedules/:id`      | Xóa lịch trình        | ✅   | ⏳ TODO |
+**Mô tả:** Quản lý lịch trình đi chơi cuối tuần - Thêm spots vào calendar, xem danh sách, cập nhật, hủy/xóa
+
+| Method | Endpoint                                 | Mô tả                           | Auth | Status |
+|--------|------------------------------------------|---------------------------------|------|--------|
+| GET    | `/api/schedules`                         | Danh sách lịch trình + filters  | ✅   | ✅ Done |
+| GET    | `/api/schedules/calendar/:year/:month`   | Lịch trình theo tháng (calendar view) | ✅   | ✅ Done |
+| GET    | `/api/schedules/:scheduleId`             | Chi tiết lịch trình + spot info | ✅   | ✅ Done |
+| POST   | `/api/schedules`                         | Thêm lịch trình (từ spot detail) | ✅   | ✅ Done |
+| PUT    | `/api/schedules/:scheduleId`             | Cập nhật ngày/giờ/ghi chú       | ✅   | ✅ Done |
+| DELETE | `/api/schedules/:scheduleId`             | Xóa hoặc hủy lịch trình         | ✅   | ✅ Done |
+
+**Query Parameters cho GET `/api/schedules`:**
+- `status` - Filter theo trạng thái: `PLANNED`, `COMPLETED`, `CANCELLED`
+- `from_date` - Từ ngày (YYYY-MM-DD)
+- `to_date` - Đến ngày (YYYY-MM-DD)
+- `limit`, `offset` - Phân trang (default: 50, 0)
+
+**Body cho POST `/api/schedules`:**
+```json
+{
+  "spot_id": 1,
+  "scheduled_date": "2025-11-20",
+  "time_slot": "AM",          // AM, PM, FULL_DAY
+  "notes": "Bring camera"
+}
+```
+
+**Body cho PUT `/api/schedules/:scheduleId`:**
+```json
+{
+  "scheduled_date": "2025-11-21",
+  "time_slot": "PM",
+  "notes": "Updated notes",
+  "status": "COMPLETED"       // PLANNED, COMPLETED, CANCELLED
+}
+```
+
+**Query Parameters cho DELETE `/api/schedules/:scheduleId`:**
+- `soft_delete=true` - Đánh dấu CANCELLED (giữ lịch sử), không có = xóa hoàn toàn
 
 #### 👶 Children (Hồ sơ trẻ em) - Đã hoàn thành ✅
 

@@ -32,6 +32,7 @@ const spotsRoutes = require('./routes/spotsRoutes');
 const childrenRoutes = require('./routes/childrenRoutes');
 const favoritesRoutes = require('./routes/favoritesRoutes');
 const kidsSwipeRoutes = require('./routes/kidsSwipeRoutes');
+const schedulesRoutes = require('./routes/schedulesRoutes');
 
 // API routes
 app.use('/api/auth', authRoutes);
@@ -39,6 +40,7 @@ app.use('/api/spots', spotsRoutes);
 app.use('/api/children', childrenRoutes);
 app.use('/api/favorites', favoritesRoutes);
 app.use('/api/kids-swipe', kidsSwipeRoutes);
+app.use('/api/schedules', schedulesRoutes);
 
 app.get('/api', (req, res) => {
   res.json({
@@ -76,8 +78,17 @@ app.get('/api', (req, res) => {
       },
       kidsSwipe: {
         swipe: 'POST /api/kids-swipe/:childId/swipe',
+        spots: 'GET /api/kids-swipe/:childId/spots',
         preferences: 'GET /api/kids-swipe/:childId/preferences',
         recommendations: 'GET /api/kids-swipe/:childId/recommendations'
+      },
+      schedules: {
+        list: 'GET /api/schedules',
+        calendar: 'GET /api/schedules/calendar/:year/:month',
+        detail: 'GET /api/schedules/:id',
+        add: 'POST /api/schedules',
+        update: 'PUT /api/schedules/:id',
+        delete: 'DELETE /api/schedules/:id?soft_delete=true'
       }
     }
   });
