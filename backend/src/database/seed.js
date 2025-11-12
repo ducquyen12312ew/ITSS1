@@ -53,7 +53,7 @@ async function seed() {
     console.log('   🔑 Password: password123');
     console.log('   👤 Role: ADMIN');
     console.log('\n   📧 Email: buibaomoyu@gmail.com');
-    console.log('   🔑 Password: B@o140804');
+    console.log('   🔑 Password: (Bao_password)');
     console.log('   👤 Role: USER');
     console.log('   👶 Children: Minh (5y), An (3y)');
     

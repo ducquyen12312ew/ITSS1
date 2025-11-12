@@ -2,7 +2,7 @@ USE kodomo_weekend_navi;
 
 -- Users 
 -- password for test accounts: password123
--- password for buibaomoyu@gmail.com: B@o140804
+-- password for buibaomoyu@gmail.com: (Bao_password)
 INSERT INTO users (email, password_hash, first_name, last_name, role, status, agreement, location_lat, location_lng, location_name) VALUES
 ('admin@kodomo.com', '$2b$10$rT8YhS8qN3x5L1mZ9yJZWe7K3vN9xL2mZ8yJZWe7K3vN9xL2mZ8yJ', 'Admin', 'System', 'ADMIN', 'ACTIVE', TRUE, 35.6762, 139.6503, 'Tokyo'),
 ('buibaomoyu@gmail.com', '$2b$10$leYXirPOMnfEN.fLYUPpXehbBMbeVEtc87xwf9Ag39hPw.DrXM/vO', 'Bao', 'Bui', 'USER', 'ACTIVE', TRUE, 35.6812, 139.7671, 'Tokyo'),

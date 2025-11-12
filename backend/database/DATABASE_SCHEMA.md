@@ -152,7 +152,7 @@ role: ADMIN
 
 -- Users
 email: buibaomoyu@gmail.com
-password: B@o140804
+password: (Bao_password)
 role: USER
 
 email: tanaka.yuki@example.com

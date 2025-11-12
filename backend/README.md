@@ -279,7 +279,7 @@ Xem chi tiết trong file: [database/DATABASE_SCHEMA.md](database/DATABASE_SCHEM
 - Role: ADMIN
 
 **User Accounts:**
-- Email: `buibaomoyu@gmail.com` (Password: `B@o140804`) - Has 2 children: Minh, An
+- Email: `buibaomoyu@gmail.com` (Password: `(Bao_password)`) - Has 2 children: Minh, An
 - Email: `tanaka.yuki@example.com` (Password: `password123`) - Has 2 children: Taro, Hanako
 - Email: `sato.kenji@example.com` (Password: `password123`) - Has 1 child: Kenta
 - Email: `suzuki.mai@example.com` (Password: `password123`) - Has 1 child: Misaki

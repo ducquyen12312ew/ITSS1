@@ -203,7 +203,7 @@ Role: ADMIN
 #### User Accounts:
 ```
 Email: buibaomoyu@gmail.com
-Password: B@o140804
+Password: (Bao_password)
 Role: USER
 Children: Minh (5 tuổi), An (3 tuổi)
 
