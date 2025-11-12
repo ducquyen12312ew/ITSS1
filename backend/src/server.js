@@ -30,11 +30,15 @@ app.get('/health', (req, res) => {
 const authRoutes = require('./routes/authRoutes');
 const spotsRoutes = require('./routes/spotsRoutes');
 const childrenRoutes = require('./routes/childrenRoutes');
+const favoritesRoutes = require('./routes/favoritesRoutes');
+const kidsSwipeRoutes = require('./routes/kidsSwipeRoutes');
 
 // API routes
 app.use('/api/auth', authRoutes);
 app.use('/api/spots', spotsRoutes);
 app.use('/api/children', childrenRoutes);
+app.use('/api/favorites', favoritesRoutes);
+app.use('/api/kids-swipe', kidsSwipeRoutes);
 
 app.get('/api', (req, res) => {
   res.json({
@@ -60,6 +64,20 @@ app.get('/api', (req, res) => {
         create: 'POST /api/children',
         update: 'PUT /api/children/:id',
         delete: 'DELETE /api/children/:id'
+      },
+      favorites: {
+        list: 'GET /api/favorites',
+        check: 'GET /api/favorites/check/:spotId',
+        collections: 'GET /api/favorites/collections',
+        add: 'POST /api/favorites',
+        update: 'PUT /api/favorites/:id',
+        deleteById: 'DELETE /api/favorites/:id',
+        deleteBySpot: 'DELETE /api/favorites/spot/:spotId'
+      },
+      kidsSwipe: {
+        swipe: 'POST /api/kids-swipe/:childId/swipe',
+        preferences: 'GET /api/kids-swipe/:childId/preferences',
+        recommendations: 'GET /api/kids-swipe/:childId/recommendations'
       }
     }
   });

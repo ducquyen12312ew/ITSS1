@@ -191,15 +191,31 @@ curl http://localhost:3000/api
 - `offset` - Vị trí bắt đầu (default: 0)
 - `sort` - Sắp xếp: `newest`, `oldest`, `highest_rating`, `lowest_rating`, `most_helpful` (default: newest)
 
-#### ❤️ Favorites (Yêu thích) - TODO
+#### ❤️ Favorites (Yêu thích) - Đã hoàn thành ✅
 
 | Method | Endpoint                  | Mô tả                 | Auth | Status |
 |--------|---------------------------|-----------------------|------|--------|
-| GET    | `/api/favorites`          | Danh sách yêu thích   | ✅   | ⏳ TODO |
-| POST   | `/api/favorites`          | Thêm yêu thích        | ✅   | ⏳ TODO |
-| DELETE | `/api/favorites/:id`      | Xóa yêu thích         | ✅   | ⏳ TODO |
+| GET    | `/api/favorites`          | Danh sách yêu thích + spot info | ✅   | ✅ Done |
+| GET    | `/api/favorites/check/:spotId` | Kiểm tra spot có được yêu thích chưa | ✅   | ✅ Done |
+| GET    | `/api/favorites/collections` | Lấy danh sách collection tags | ✅   | ✅ Done |
+| POST   | `/api/favorites`          | Thêm spot vào yêu thích | ✅   | ✅ Done |
+| PUT    | `/api/favorites/:id`      | Cập nhật collection_tag | ✅   | ✅ Done |
+| DELETE | `/api/favorites/:id`      | Xóa yêu thích (by favorite_id) | ✅   | ✅ Done |
+| DELETE | `/api/favorites/spot/:spotId` | Xóa yêu thích (by spot_id) | ✅   | ✅ Done |
 
-#### 📅 Schedules (Lịch trình) - TODO
+
+#### � Kids Swipe (Tính năng swipe cho trẻ) - Đã hoàn thành ✅
+
+**Mô tả:** Trẻ swipe các spots → Hệ thống học tags → Gợi ý spots phù hợp
+
+| Method | Endpoint                                 | Mô tả                           | Auth | Status |
+|--------|------------------------------------------|---------------------------------|------|--------|
+| POST   | `/api/kids-swipe/:childId/swipe`         | Child swipe spot (LIKE/SKIP)    | ✅   | ✅ Done |
+| GET    | `/api/kids-swipe/:childId/preferences`   | Xem tags mà child thích         | ✅   | ✅ Done |
+| GET    | `/api/kids-swipe/:childId/recommendations` | Gợi ý spots dựa trên preferences | ✅   | ✅ Done |
+
+
+#### �📅 Schedules (Lịch trình) - TODO
 
 | Method | Endpoint                  | Mô tả                 | Auth | Status |
 |--------|---------------------------|-----------------------|------|--------|
@@ -263,9 +279,10 @@ Xem chi tiết trong file: [database/DATABASE_SCHEMA.md](database/DATABASE_SCHEM
 - Role: ADMIN
 
 **User Accounts:**
-- Email: `tanaka.yuki@example.com` (Password: `password123`)
-- Email: `sato.kenji@example.com` (Password: `password123`)
-- Email: `suzuki.mai@example.com` (Password: `password123`)
+- Email: `buibaomoyu@gmail.com` (Password: `B@o140804`) - Has 2 children: Minh, An
+- Email: `tanaka.yuki@example.com` (Password: `password123`) - Has 2 children: Taro, Hanako
+- Email: `sato.kenji@example.com` (Password: `password123`) - Has 1 child: Kenta
+- Email: `suzuki.mai@example.com` (Password: `password123`) - Has 1 child: Misaki
 
 **Spots mẫu (10 địa điểm Tokyo):**
 - Ueno Zoo - Vườn thú nổi tiếng

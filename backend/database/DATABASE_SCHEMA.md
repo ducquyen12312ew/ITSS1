@@ -151,6 +151,10 @@ password: password123
 role: ADMIN
 
 -- Users
+email: buibaomoyu@gmail.com
+password: B@o140804
+role: USER
+
 email: tanaka.yuki@example.com
 password: password123
 role: USER

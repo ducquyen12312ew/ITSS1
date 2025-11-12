@@ -147,11 +147,14 @@ CREATE TABLE schedules (
 CREATE TABLE kid_swipe (
     swipe_id INT PRIMARY KEY AUTO_INCREMENT,
     child_id INT NOT NULL,
-    tag_name VARCHAR(50) NOT NULL,
+    spot_id INT NOT NULL,
     action ENUM('LIKE', 'SKIP') NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (child_id) REFERENCES children(child_id) ON DELETE CASCADE,
-    INDEX idx_child_id (child_id)
+    FOREIGN KEY (spot_id) REFERENCES spots(spot_id) ON DELETE CASCADE,
+    UNIQUE KEY unique_child_spot (child_id, spot_id),
+    INDEX idx_child_id (child_id),
+    INDEX idx_spot_id (spot_id)
 );
 
 CREATE TABLE weather_cache (

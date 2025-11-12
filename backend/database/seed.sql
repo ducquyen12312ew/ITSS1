@@ -1,18 +1,23 @@
 USE kodomo_weekend_navi;
 
--- Users (password: password123)
+-- Users 
+-- password for test accounts: password123
+-- password for buibaomoyu@gmail.com: B@o140804
 INSERT INTO users (email, password_hash, first_name, last_name, role, status, agreement, location_lat, location_lng, location_name) VALUES
 ('admin@kodomo.com', '$2b$10$rT8YhS8qN3x5L1mZ9yJZWe7K3vN9xL2mZ8yJZWe7K3vN9xL2mZ8yJ', 'Admin', 'System', 'ADMIN', 'ACTIVE', TRUE, 35.6762, 139.6503, 'Tokyo'),
+('buibaomoyu@gmail.com', '$2b$10$leYXirPOMnfEN.fLYUPpXehbBMbeVEtc87xwf9Ag39hPw.DrXM/vO', 'Bao', 'Bui', 'USER', 'ACTIVE', TRUE, 35.6812, 139.7671, 'Tokyo'),
 ('tanaka.yuki@example.com', '$2b$10$rT8YhS8qN3x5L1mZ9yJZWe7K3vN9xL2mZ8yJZWe7K3vN9xL2mZ8yJ', 'Yuki', 'Tanaka', 'USER', 'ACTIVE', TRUE, 35.6812, 139.7671, 'Ueno'),
 ('sato.kenji@example.com', '$2b$10$rT8YhS8qN3x5L1mZ9yJZWe7K3vN9xL2mZ8yJZWe7K3vN9xL2mZ8yJ', 'Kenji', 'Sato', 'USER', 'ACTIVE', TRUE, 35.6586, 139.7454, 'Asakusa'),
 ('suzuki.mai@example.com', '$2b$10$rT8YhS8qN3x5L1mZ9yJZWe7K3vN9xL2mZ8yJZWe7K3vN9xL2mZ8yJ', 'Mai', 'Suzuki', 'USER', 'ACTIVE', TRUE, 35.6284, 139.7366, 'Shinagawa');
 
 -- Children
 INSERT INTO children (user_id, name, birth_date, avatar_url, notes) VALUES
-(2, 'Taro', '2018-04-15', 'https://i.pravatar.cc/150?img=1', 'Loves animals'),
-(2, 'Hanako', '2020-08-22', 'https://i.pravatar.cc/150?img=2', 'Likes crafts'),
-(3, 'Kenta', '2017-12-10', 'https://i.pravatar.cc/150?img=3', 'Enjoys outdoor'),
-(4, 'Misaki', '2019-06-05', 'https://i.pravatar.cc/150?img=4', 'Allergic to peanuts');
+(2, 'Minh', '2020-03-15', 'https://i.pravatar.cc/150?img=1', 'Loves exploring'),
+(2, 'An', '2022-08-22', 'https://i.pravatar.cc/150?img=2', 'Curious toddler'),
+(3, 'Taro', '2018-04-15', 'https://i.pravatar.cc/150?img=3', 'Loves animals'),
+(3, 'Hanako', '2020-08-22', 'https://i.pravatar.cc/150?img=4', 'Likes crafts'),
+(4, 'Kenta', '2017-12-10', 'https://i.pravatar.cc/150?img=5', 'Enjoys outdoor'),
+(5, 'Misaki', '2019-06-05', 'https://i.pravatar.cc/150?img=6', 'Allergic to peanuts');
 
 -- Child preferences
 INSERT INTO child_preferences (child_id, preference_type, tag_name) VALUES
@@ -52,18 +57,28 @@ INSERT INTO spot_images (spot_id, image_url, is_main, display_order) VALUES
 (9, 'https://images.unsplash.com/photo-1587832187482-08b97139a5f6', TRUE, 1),
 (10, 'https://images.unsplash.com/photo-1516641051054-9df6a1aad654', TRUE, 1);
 
--- Spot tags
+-- Spot tags (including common tags: age ranges, indoor/outdoor for all spots)
 INSERT INTO spot_tags (spot_id, tag_name) VALUES
-(1, 'animals'),(1, 'outdoor'),(1, 'rain_ok'),
-(2, 'indoor'),(2, 'educational'),(2, 'crafts'),
-(3, 'indoor'),(3, 'sightseeing'),
-(4, 'outdoor'),(4, 'water'),(4, 'free'),
-(5, 'indoor'),(5, 'roleplay'),(5, 'educational'),
-(6, 'animals'),(6, 'indoor'),(6, 'water'),
-(7, 'outdoor'),(7, 'free'),(7, 'picnic'),
-(8, 'indoor'),(8, 'art'),(8, 'digital'),
-(9, 'indoor'),(9, 'play'),(9, 'kids_only'),
-(10, 'animals'),(10, 'outdoor'),(10, 'cheap');
+-- Ueno Zoo
+(1, 'outdoor'),(1, 'animals'),(1, 'rain_ok'),(1, 'age_2-5'),(1, 'age_6-12'),(1, 'educational'),(1, 'nature'),
+-- National Museum
+(2, 'indoor'),(2, 'educational'),(2, 'crafts'),(2, 'age_4-8'),(2, 'age_9-15'),(2, 'science'),(2, 'museum'),
+-- Tokyo Skytree
+(3, 'indoor'),(3, 'sightseeing'),(3, 'age_0-3'),(3, 'age_4-8'),(3, 'age_9-15'),(3, 'age_16-18'),(3, 'family'),
+-- Odaiba Seaside Park
+(4, 'outdoor'),(4, 'water'),(4, 'free'),(4, 'age_0-3'),(4, 'age_4-8'),(4, 'age_9-15'),(4, 'beach'),(4, 'picnic'),
+-- KidZania Tokyo
+(5, 'indoor'),(5, 'roleplay'),(5, 'educational'),(5, 'age_4-8'),(5, 'age_9-12'),(5, 'interactive'),(5, 'career'),
+-- Kasai Rinkai Aquarium
+(6, 'indoor'),(6, 'animals'),(6, 'water'),(6, 'age_0-3'),(6, 'age_4-8'),(6, 'age_9-15'),(6, 'age_16-18'),(6, 'marine_life'),
+-- Yoyogi Park
+(7, 'outdoor'),(7, 'free'),(7, 'picnic'),(7, 'age_0-3'),(7, 'age_4-8'),(7, 'age_9-15'),(7, 'nature'),(7, 'sports'),
+-- teamLab Borderless
+(8, 'indoor'),(8, 'art'),(8, 'digital'),(8, 'age_0-3'),(8, 'age_4-8'),(8, 'age_9-15'),(8, 'age_16-18'),(8, 'interactive'),
+-- Asobono
+(9, 'indoor'),(9, 'play'),(9, 'kids_only'),(9, 'age_0-3'),(9, 'age_4-8'),(9, 'safe'),(9, 'toddler'),
+-- Inokashira Park Zoo
+(10, 'outdoor'),(10, 'animals'),(10, 'cheap'),(10, 'age_2-5'),(10, 'age_6-12'),(10, 'nature'),(10, 'small_zoo');
 
 -- Reviews
 INSERT INTO reviews (spot_id, user_id, rating, comment, image_url, facilities_check, report_count, is_hidden) VALUES
@@ -81,21 +96,41 @@ INSERT INTO reviews (spot_id, user_id, rating, comment, image_url, facilities_ch
 -- Favorites
 INSERT INTO favorites (user_id, spot_id, collection_tag) VALUES
 (2, 1, 'Animals'),(2, 6, 'Animals'),(2, 2, 'Indoor'),
-(3, 7, 'Free'),(3, 4, 'Outdoor'),
-(4, 5, 'Educational'),(4, 9, 'Indoor');
+(3, 7, 'Free'),(3, 4, 'Outdoor'),(3, 1, 'Weekend Plans'),
+(4, 5, 'Educational'),(4, 9, 'Indoor'),
+(5, 8, 'Art & Culture'),(5, 3, 'Sightseeing');
 
 -- Schedules
 INSERT INTO schedules (user_id, spot_id, scheduled_date, time_slot, status, notes) VALUES
-(2, 1, '2025-11-16', 'AM', 'PLANNED', 'Visit pandas'),
+(2, 1, '2025-11-16', 'AM', 'PLANNED', 'Visit pandas with Minh'),
 (2, 6, '2025-11-17', 'PM', 'PLANNED', 'Aquarium date'),
-(3, 7, '2025-11-16', 'FULL_DAY', 'PLANNED', 'Picnic'),
-(4, 5, '2025-11-23', 'AM', 'PLANNED', 'Reserved');
+(3, 7, '2025-11-16', 'FULL_DAY', 'PLANNED', 'Picnic with Taro and Hanako'),
+(4, 5, '2025-11-23', 'AM', 'PLANNED', 'Reserved for Kenta'),
+(5, 8, '2025-11-24', 'PM', 'PLANNED', 'teamLab with Misaki');
 
--- Kid swipe history
-INSERT INTO kid_swipe (child_id, tag_name, action) VALUES
-(1, 'animals', 'LIKE'),(1, 'outdoor', 'LIKE'),(1, 'sports', 'SKIP'),
-(2, 'crafts', 'LIKE'),(2, 'indoor', 'LIKE'),
-(3, 'outdoor', 'LIKE'),(3, 'water', 'LIKE');
+-- Kid swipe history (updated with spot_id instead of tag_name)
+INSERT INTO kid_swipe (child_id, spot_id, action) VALUES
+-- Minh (child_id=1) liked zoo and aquarium, skipped museum
+(1, 1, 'LIKE'),  -- Ueno Zoo
+(1, 6, 'LIKE'),  -- Kasai Rinkai Aquarium
+(1, 2, 'SKIP'),  -- National Museum
+-- An (child_id=2) liked indoor play, skipped outdoor park
+(2, 9, 'LIKE'),  -- Asobono
+(2, 5, 'LIKE'),  -- KidZania
+(2, 7, 'SKIP'),  -- Yoyogi Park
+-- Taro (child_id=3) liked outdoor activities
+(3, 1, 'LIKE'),  -- Ueno Zoo
+(3, 4, 'LIKE'),  -- Odaiba Seaside Park
+(3, 7, 'LIKE'),  -- Yoyogi Park
+-- Hanako (child_id=4) liked art and indoor
+(4, 8, 'LIKE'),  -- teamLab
+(4, 2, 'LIKE'),  -- National Museum
+(4, 4, 'SKIP'),  -- Odaiba (outdoor)
+-- Kenta (child_id=5) adventurous, likes variety
+(5, 1, 'LIKE'),  -- Ueno Zoo
+(5, 5, 'LIKE'),  -- KidZania
+(5, 8, 'LIKE'),  -- teamLab
+(5, 10, 'SKIP'); -- Inokashira Park Zoo
 
 -- Weather cache
 INSERT INTO weather_cache (date, location, weather_condition, temperature) VALUES

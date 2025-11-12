@@ -202,15 +202,20 @@ Role: ADMIN
 
 #### User Accounts:
 ```
+Email: buibaomoyu@gmail.com
+Password: B@o140804
+Role: USER
+Children: Minh (5 tuổi), An (3 tuổi)
+
 Email: tanaka.yuki@example.com
 Password: password123
 Role: USER
-Children: Taro (6 tuổi), Hanako (5 tuổi)
+Children: Taro (7 tuổi), Hanako (5 tuổi)
 
 Email: sato.kenji@example.com
 Password: password123
 Role: USER
-Children: Kenta (7 tuổi)
+Children: Kenta (8 tuổi)
 
 Email: suzuki.mai@example.com
 Password: password123

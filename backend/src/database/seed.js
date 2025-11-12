@@ -48,13 +48,14 @@ async function seed() {
     console.log('   ❤️  Favorites:', favorites[0].count);
     console.log('   📅 Schedules:', schedules[0].count);
     
-    console.log('\n🔑 Test Account:');
-    console.log('   Email: admin@kodomo.com');
-    console.log('   Password: password123');
-    console.log('   Role: ADMIN');
-    console.log('\n   Email: tanaka.yuki@example.com');
-    console.log('   Password: password123');
-    console.log('   Role: USER');
+    console.log('\n🔑 Test Accounts:');
+    console.log('   📧 Email: admin@kodomo.com');
+    console.log('   🔑 Password: password123');
+    console.log('   👤 Role: ADMIN');
+    console.log('\n   📧 Email: buibaomoyu@gmail.com');
+    console.log('   🔑 Password: B@o140804');
+    console.log('   👤 Role: USER');
+    console.log('   👶 Children: Minh (5y), An (3y)');
     
   } catch (error) {
     console.error('\n❌ Seed failed:', error.message);
