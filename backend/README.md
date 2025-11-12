@@ -208,14 +208,16 @@ curl http://localhost:3000/api
 | PUT    | `/api/schedules/:id`      | Cập nhật lịch trình   | ✅   | ⏳ TODO |
 | DELETE | `/api/schedules/:id`      | Xóa lịch trình        | ✅   | ⏳ TODO |
 
-#### 👶 Children (Hồ sơ trẻ em) - TODO
+#### 👶 Children (Hồ sơ trẻ em) - Đã hoàn thành ✅
 
 | Method | Endpoint                  | Mô tả                 | Auth | Status |
 |--------|---------------------------|-----------------------|------|--------|
-| GET    | `/api/children`           | Danh sách trẻ         | ✅   | ⏳ TODO |
-| POST   | `/api/children`           | Thêm hồ sơ trẻ        | ✅   | ⏳ TODO |
-| PUT    | `/api/children/:id`       | Cập nhật hồ sơ        | ✅   | ⏳ TODO |
-| DELETE | `/api/children/:id`       | Xóa hồ sơ             | ✅   | ⏳ TODO |
+| GET    | `/api/children`           | Danh sách trẻ của user| ✅   | ✅ Done |
+| GET    | `/api/children/:id`       | Chi tiết 1 trẻ        | ✅   | ✅ Done |
+| POST   | `/api/children`           | Thêm hồ sơ trẻ mới    | ✅   | ✅ Done |
+| PUT    | `/api/children/:id`       | Cập nhật hồ sơ        | ✅   | ✅ Done |
+| DELETE | `/api/children/:id`       | Xóa hồ sơ             | ✅   | ✅ Done |
+
 
 #### 🔐 Admin - TODO
 

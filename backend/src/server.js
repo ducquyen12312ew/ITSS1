@@ -29,10 +29,12 @@ app.get('/health', (req, res) => {
 // Import routes
 const authRoutes = require('./routes/authRoutes');
 const spotsRoutes = require('./routes/spotsRoutes');
+const childrenRoutes = require('./routes/childrenRoutes');
 
 // API routes
 app.use('/api/auth', authRoutes);
 app.use('/api/spots', spotsRoutes);
+app.use('/api/children', childrenRoutes);
 
 app.get('/api', (req, res) => {
   res.json({
@@ -49,7 +51,15 @@ app.get('/api', (req, res) => {
       spots: {
         search: 'GET /api/spots/search?keyword=&category=&sort=',
         suggestions: 'GET /api/spots/suggestions?keyword=',
-        detail: 'GET /api/spots/:id'
+        detail: 'GET /api/spots/:id',
+        reviews: 'GET /api/spots/:id/reviews'
+      },
+      children: {
+        list: 'GET /api/children',
+        detail: 'GET /api/children/:id',
+        create: 'POST /api/children',
+        update: 'PUT /api/children/:id',
+        delete: 'DELETE /api/children/:id'
       }
     }
   });
