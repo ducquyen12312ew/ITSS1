@@ -34,6 +34,7 @@ const favoritesRoutes = require('./routes/favoritesRoutes');
 const kidsSwipeRoutes = require('./routes/kidsSwipeRoutes');
 const schedulesRoutes = require('./routes/schedulesRoutes');
 const reviewsRoutes = require('./routes/reviewsRoutes');
+const recommendationsRoutes = require('./routes/recommendationsRoutes');
 
 // API routes
 app.use('/api/auth', authRoutes);
@@ -43,6 +44,7 @@ app.use('/api/favorites', favoritesRoutes);
 app.use('/api/kids-swipe', kidsSwipeRoutes);
 app.use('/api/schedules', schedulesRoutes);
 app.use('/api/reviews', reviewsRoutes);
+app.use('/api/recommendations', recommendationsRoutes);
 
 app.get('/api', (req, res) => {
   res.json({
@@ -100,6 +102,10 @@ app.get('/api', (req, res) => {
         delete: 'DELETE /api/reviews/:reviewId?soft_delete=true',
         report: 'POST /api/reviews/:reviewId/report',
         spotReviews: 'GET /api/spots/:id/reviews'
+      },
+      recommendations: {
+        smart: 'GET /api/recommendations?child_id=&lat=&lng=&weather=&rain_ok=&open_now=',
+        weatherAlternatives: 'GET /api/recommendations/weather-alternatives?lat=&lng='
       }
     }
   });

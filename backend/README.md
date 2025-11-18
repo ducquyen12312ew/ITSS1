@@ -205,6 +205,31 @@ curl http://localhost:3000/api
 | GET    | `/api/kids-swipe/:childId/recommendations`| Gợi ý spots dựa trên preferences         | ✅   |
 | GET    | `/api/kids-swipe/:childId/spots`          | Danh sách spots chưa swipe               | ✅   |
 
+### 🎯 Smart Recommendations (Gợi ý thông minh)
+
+**Tự động gợi ý spots tối ưu dựa trên: khoảng cách, thời tiết, hồ sơ trẻ, lịch sử favorites**
+
+| Method | Endpoint                                | Description                                   | Auth       |
+|--------|-----------------------------------------|-----------------------------------------------|------------|
+| GET    | `/api/recommendations`                  | Gợi ý thông minh (distance + weather + child profile + favorites) | ✅ Optional |
+| GET    | `/api/recommendations/weather-alternatives` | Gợi ý thay thế khi thời tiết xấu (indoor/rain-friendly) | ✅ Optional |
+
+**Query Parameters cho `/api/recommendations`:**
+- `child_id` - Lọc theo child (age + preferences)
+- `lat`, `lng` - Vị trí hiện tại (required)
+- `distance` - Khoảng cách tối đa (km, default: 20)
+- `weather` - RAIN, SUNNY, HOT (ưu tiên indoor/outdoor)
+- `rain_ok` - true/false (chỉ indoor/rain-friendly)
+- `open_now` - true/false (đang mở cửa)
+- `limit`, `offset` - Pagination
+
+**Scoring Algorithm:**
+- Distance score (30 pts): Càng gần càng cao điểm
+- Rating score (25 pts): Đánh giá cao = điểm cao
+- Popularity (15 pts): Nhiều reviews = điểm cao
+- Preference match (20 pts): Tags trùng với sở thích child
+- Favorite bonus (10 pts): Đã yêu thích trước đó
+
 ---
 
 � **Chi tiết đầy đủ:** Xem file [`API_ENDPOINTS.md`](API_ENDPOINTS.md) để biết request/response examples, query parameters, và validation rules.
