@@ -36,6 +36,7 @@ const schedulesRoutes = require('./routes/schedulesRoutes');
 const reviewsRoutes = require('./routes/reviewsRoutes');
 const recommendationsRoutes = require('./routes/recommendationsRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const spotManagementRoutes = require('./routes/spotManagementRoutes');
 
 // API routes
 app.use('/api/auth', authRoutes);
@@ -47,6 +48,7 @@ app.use('/api/schedules', schedulesRoutes);
 app.use('/api/reviews', reviewsRoutes);
 app.use('/api/recommendations', recommendationsRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/admin/spot-management', spotManagementRoutes);
 
 app.get('/api', (req, res) => {
   res.json({
@@ -113,6 +115,13 @@ app.get('/api', (req, res) => {
         dashboard: 'GET /api/admin/dashboard?period=30',
         users: 'GET /api/admin/users',
         spots: 'GET /api/admin/spots'
+      },
+      spotManagement: {
+        create: 'POST /api/admin/spot-management',
+        update: 'PUT /api/admin/spot-management/:spotId',
+        preview: 'GET /api/admin/spot-management/:spotId/preview',
+        publish: 'POST /api/admin/spot-management/:spotId/publish',
+        deleteImage: 'DELETE /api/admin/spot-management/:spotId/images/:imageId'
       }
     }
   });

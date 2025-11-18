@@ -252,6 +252,30 @@ curl http://localhost:3000/api
 - **Categories**: Distribution theo category
 - **Daily Trend**: Activity 7 ngày gần nhất
 
+### 📝 Spot Management (Quản lý địa điểm)
+
+**Thêm/chỉnh sửa địa điểm đơn giản - Admin Only**
+
+| Method | Endpoint                                        | Description                           | Auth     |
+|--------|-------------------------------------------------|---------------------------------------|----------|
+| POST   | `/api/admin/spot-management`                    | Tạo spot mới (DRAFT/PUBLIC)           | 🔐 Admin |
+| PUT    | `/api/admin/spot-management/:spotId`            | Chỉnh sửa spot                        | 🔐 Admin |
+| GET    | `/api/admin/spot-management/:spotId/preview`    | Xem trước trước khi publish           | 🔐 Admin |
+| POST   | `/api/admin/spot-management/:spotId/publish`    | Publish spot (DRAFT → PUBLIC)         | 🔐 Admin |
+| DELETE | `/api/admin/spot-management/:spotId/images/:imageId` | Xóa hình ảnh của spot            | 🔐 Admin |
+
+**Validation Rules:**
+- ✅ `name`: Required, không chứa ký tự đặc biệt (!@#$%^&*+=[]{};\':"|,.<>/?~`)
+- ✅ `standards_checked`: Must be `true` (checkbox "đã kiểm tra tiêu chuẩn đăng bài")
+- ✅ `status`: 'DRAFT' hoặc 'PUBLIC'
+- ✅ `google_maps_url`: Optional
+- ✅ `image_url`: Optional (upload)
+
+**Workflow:**
+1. Admin tạo DRAFT spot với tên + Google Maps URL + ảnh
+2. Preview để xem trước
+3. Publish để chuyển PUBLIC hoặc tiếp tục chỉnh sửa
+
 ---
 
 � **Chi tiết đầy đủ:** Xem file [`API_ENDPOINTS.md`](API_ENDPOINTS.md) để biết request/response examples, query parameters, và validation rules.

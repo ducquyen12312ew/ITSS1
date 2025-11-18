@@ -18,6 +18,7 @@
 8. [Kids Swipe](#8-kids-swipe-tính-năng-swipe)
 9. [Admin](#9-admin-dashboard--management) 🔐
 10. [Smart Recommendations](#10-smart-recommendations-gợi-ý-thông-minh)
+11. [Spot Management](#11-spot-management-quản-lý-địa-điểm) 🔐
 
 ---
 
@@ -1519,9 +1520,193 @@ Nhiều endpoints hỗ trợ soft delete:
 
 ---
 
-**📖 Xem thêm:**
+---
+
+## 11. Spot Management (Quản lý địa điểm)
+
+> **� Admin Only** - Thêm/chỉnh sửa địa điểm đơn giản
+
+### POST `/api/admin/spot-management`
+**Tạo địa điểm mới**
+
+**Headers:**
+```
+Authorization: Bearer <admin_token>
+Content-Type: application/json
+```
+
+**Request Body:**
+```json
+{
+  "name": "TeamLab Planets Tokyo",
+  "google_maps_url": "https://maps.app.goo.gl/abc123",
+  "image_url": "https://example.com/teamlab.jpg",
+  "standards_checked": true,
+  "status": "DRAFT"
+}
+```
+
+**Validation:**
+- `name`: Required, không chứa ký tự đặc biệt (!@#$%^&*+=[]{};\':"|,.<>/?~`)
+- `standards_checked`: Required, phải là `true`
+- `status`: 'DRAFT' hoặc 'PUBLIC' (default: DRAFT)
+- `google_maps_url`: Optional
+- `image_url`: Optional
+
+**Response (201):**
+```json
+{
+  "success": true,
+  "message": "Đã lưu nháp thành công",
+  "data": {
+    "spot": {
+      "spot_id": 11,
+      "name": "TeamLab Planets Tokyo",
+      "google_maps_url": "https://maps.app.goo.gl/abc123",
+      "status": "DRAFT",
+      "images": ["https://example.com/teamlab.jpg"],
+      "created_by_admin_id": 1,
+      "created_at": "2025-11-18T02:30:00.000Z"
+    }
+  }
+}
+```
+
+**Errors:**
+- `400` - Tên thiếu hoặc chứa ký tự đặc biệt
+- `400` - Chưa check "tiêu chuẩn đăng bài"
+- `401` - Không có token
+- `403` - Không phải admin
+
+---
+
+### PUT `/api/admin/spot-management/:spotId`
+**Chỉnh sửa địa điểm**
+
+**Headers:**
+```
+Authorization: Bearer <admin_token>
+Content-Type: application/json
+```
+
+**Request Body:** Same as POST
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Đã cập nhật địa điểm thành công",
+  "data": {
+    "spot": {
+      "spot_id": 11,
+      "name": "TeamLab Planets Tokyo Updated",
+      "images": [
+        "https://example.com/teamlab.jpg",
+        "https://example.com/teamlab-new.jpg"
+      ]
+    }
+  }
+}
+```
+
+**Errors:**
+- `404` - Không tìm thấy spot
+- Còn lại giống POST
+
+---
+
+### GET `/api/admin/spot-management/:spotId/preview`
+**Xem trước địa điểm**
+
+**Headers:**
+```
+Authorization: Bearer <admin_token>
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "spot": {
+      "spot_id": 11,
+      "name": "TeamLab Planets Tokyo",
+      "status": "DRAFT",
+      "google_maps_url": "https://maps.app.goo.gl/abc123",
+      "images": [
+        {
+          "image_url": "https://example.com/teamlab.jpg",
+          "display_order": 1
+        }
+      ],
+      "tags": [],
+      "facilities": {},
+      "operating_hours": {}
+    },
+    "preview_mode": true,
+    "can_publish": true
+  }
+}
+```
+
+**Errors:**
+- `404` - Không tìm thấy spot
+
+---
+
+### POST `/api/admin/spot-management/:spotId/publish`
+**Publish spot (DRAFT → PUBLIC)**
+
+**Headers:**
+```
+Authorization: Bearer <admin_token>
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Đã publish địa điểm \"TeamLab Planets Tokyo\" thành công",
+  "data": {
+    "spot_id": 11,
+    "status": "PUBLIC"
+  }
+}
+```
+
+**Errors:**
+- `404` - Không tìm thấy spot
+- `400` - Spot không ở trạng thái DRAFT
+
+---
+
+### DELETE `/api/admin/spot-management/:spotId/images/:imageId`
+**Xóa hình ảnh của spot**
+
+**Headers:**
+```
+Authorization: Bearer <admin_token>
+```
+
+**Note:** `imageId` là `image_id` từ table `spot_images`
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Đã xóa hình ảnh thành công"
+}
+```
+
+**Errors:**
+- `404` - Không tìm thấy hình ảnh
+
+---
+
+**�📖 Xem thêm:**
 - [README.md](README.md) - Overview & setup
 - [DATABASE_SCHEMA.md](database/DATABASE_SCHEMA.md) - Database structure
+- [SPOT_MANAGEMENT_API_TESTING.md](SPOT_MANAGEMENT_API_TESTING.md) - Testing guide
 - [SCHEDULES_API_TESTING.md](SCHEDULES_API_TESTING.md) - Testing guide
 
 ---
