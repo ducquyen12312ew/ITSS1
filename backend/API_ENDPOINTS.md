@@ -16,6 +16,8 @@
 6. [Schedules](#6-schedules-lịch-trình)
 7. [Children](#7-children-hồ-sơ-trẻ-em)
 8. [Kids Swipe](#8-kids-swipe-tính-năng-swipe)
+9. [Admin](#9-admin-dashboard--management) 🔐
+10. [Smart Recommendations](#10-smart-recommendations-gợi-ý-thông-minh)
 
 ---
 
@@ -1236,10 +1238,253 @@ GET /api/kids-swipe/1/spots?limit=20&category=ZOO
 
 ---
 
-## 📝 Notes
+## 9. Admin (Dashboard & Management)
+
+### GET `/api/admin/dashboard`
+**Dashboard KPIs theo thời gian thực** 🔐 Admin Only
+
+**Query Parameters:**
+- `period` - 7, 30, 90 (days) - Default: 30
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "period": {
+      "days": 30,
+      "start_date": "2025-10-19",
+      "end_date": "2025-11-18"
+    },
+    "totals": {
+      "users": 4,
+      "spots": 10,
+      "reviews": 10,
+      "favorites": 7,
+      "schedules": 4,
+      "children": 6
+    },
+    "ratings": {
+      "average": 4.5,
+      "total_reviews": 10,
+      "distribution": [
+        {"rating": 5, "count": 6, "percentage": 60.0},
+        {"rating": 4, "count": 3, "percentage": 30.0}
+      ]
+    },
+    "growth": {
+      "new_users": 2,
+      "new_reviews": 5,
+      "new_favorites": 4,
+      "new_schedules": 3
+    },
+    "activity": {
+      "active_users": 3,
+      "activity_rate": 75.0,
+      "avg_favorites_per_user": 1.75,
+      "avg_schedules_per_user": 1.0,
+      "avg_reviews_per_user": 2.5
+    },
+    "popular_spots": [
+      {
+        "spot_id": 1,
+        "name": "Ueno Zoo",
+        "category": "ZOO",
+        "average_rating": 4.5,
+        "review_count": 2,
+        "favorite_count": 3,
+        "new_favorites": 2,
+        "new_reviews": 1,
+        "popularity_score": 4
+      }
+    ],
+    "categories": [
+      {"category": "ZOO", "count": 2},
+      {"category": "PARK", "count": 3}
+    ],
+    "daily_trend": [
+      {"date": "2025-11-12", "activities": 5},
+      {"date": "2025-11-13", "activities": 8}
+    ]
+  }
+}
+```
+
+---
+
+### GET `/api/admin/users`
+**Danh sách tất cả users với stats** 🔐 Admin Only
+
+**Query Parameters:**
+- `limit` - Default: 50
+- `offset` - Default: 0
+- `sort` - created_at, favorites, reviews (Default: created_at)
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "users": [
+      {
+        "user_id": 2,
+        "email": "buibaomoyu@gmail.com",
+        "first_name": "Nguyễn",
+        "last_name": "Bảo Minh",
+        "role": "USER",
+        "created_at": "2025-01-15T10:00:00.000Z",
+        "last_login": "2025-11-18T08:30:00.000Z",
+        "children_count": 2,
+        "favorites_count": 3,
+        "schedules_count": 2,
+        "reviews_count": 5
+      }
+    ],
+    "pagination": {
+      "total": 4,
+      "limit": 50,
+      "offset": 0,
+      "has_more": false
+    }
+  }
+}
+```
+
+---
+
+### GET `/api/admin/spots`
+**Danh sách tất cả spots (PUBLIC/DRAFT/ARCHIVED)** 🔐 Admin Only
+
+**Query Parameters:**
+- `limit` - Default: 50
+- `offset` - Default: 0
+- `status` - PUBLIC, DRAFT, ARCHIVED (optional filter)
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "spots": [
+      {
+        "spot_id": 1,
+        "name": "Ueno Zoo",
+        "category": "ZOO",
+        "status": "PUBLIC",
+        "address": "Taito-ku, Tokyo",
+        "average_rating": 4.5,
+        "created_at": "2025-01-01T00:00:00.000Z",
+        "main_image": "https://...",
+        "review_count": 2,
+        "favorite_count": 3,
+        "schedule_count": 2,
+        "facilities": {},
+        "operating_hours": {}
+      }
+    ],
+    "pagination": {
+      "total": 10,
+      "limit": 50,
+      "offset": 0,
+      "has_more": false
+    }
+  }
+}
+```
+
+---
+
+## 10. Smart Recommendations (Gợi ý thông minh)
+
+### GET `/api/recommendations`
+**Gợi ý thông minh dựa trên location, weather, child profile, favorites** � Optional Auth
+
+**Query Parameters:**
+- `lat`, `lng` - **Required** - Vị trí hiện tại
+- `child_id` - Optional - Filter theo child (age + preferences)
+- `distance` - Default: 20 (km)
+- `weather` - RAIN, SUNNY, HOT
+- `rain_ok` - true/false (chỉ indoor/rain-friendly)
+- `open_now` - true/false (đang mở cửa)
+- `limit`, `offset` - Pagination
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "recommendations": [
+      {
+        "spot_id": 1,
+        "name": "Ueno Zoo",
+        "distance": 3.2,
+        "recommendation_score": 87.5,
+        "preference_match_score": 3,
+        "is_favorite": true,
+        "average_rating": 4.5,
+        "tags": ["outdoor", "animals"]
+      }
+    ],
+    "metadata": {
+      "location": {"lat": 35.6812, "lng": 139.7671},
+      "filters_applied": ["distance <= 20km", "age: 5"]
+    },
+    "pagination": {
+      "total": 8,
+      "limit": 20,
+      "offset": 0,
+      "has_more": false
+    }
+  }
+}
+```
+
+**Scoring Algorithm:**
+- Distance (30 pts) - Càng gần càng cao
+- Rating (25 pts) - Đánh giá cao
+- Popularity (15 pts) - Nhiều reviews
+- Preference match (20 pts) - Tags trùng sở thích
+- Favorite bonus (10 pts) - Đã yêu thích
+
+---
+
+### GET `/api/recommendations/weather-alternatives`
+**Gợi ý thay thế khi thời tiết xấu (indoor/rain-friendly)** 🔓 Optional Auth
+
+**Query Parameters:**
+- `lat`, `lng` - **Required**
+- `distance` - Default: 30 (km)
+- `limit` - Default: 10
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Gợi ý thay thế cho thời tiết xấu (indoor/rain-friendly)",
+  "data": {
+    "alternatives": [
+      {
+        "spot_id": 5,
+        "name": "KidZania Tokyo",
+        "is_indoor": true,
+        "weather_suitable": "ALL_WEATHER",
+        "distance": 8.5,
+        "average_rating": 4.8
+      }
+    ],
+    "total": 4
+  }
+}
+```
+
+---
+
+## �📝 Notes
 
 ### Authentication
 - Tất cả endpoints có 🔐 yêu cầu JWT token trong header
+- 🔐 Admin Only: Chỉ user có role = 'ADMIN'
+- 🔓 Optional Auth: Không bắt buộc token, nhưng có token sẽ tốt hơn
 - Token có thời hạn 7 ngày (xem config)
 - Token format: `Authorization: Bearer <token>`
 

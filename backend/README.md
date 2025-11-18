@@ -230,6 +230,28 @@ curl http://localhost:3000/api
 - Preference match (20 pts): Tags trùng với sở thích child
 - Favorite bonus (10 pts): Đã yêu thích trước đó
 
+### 🔐 Admin (Dashboard & Management)
+
+**Dashboard KPIs theo thời gian thực - Chỉ dành cho Admin**
+
+| Method | Endpoint              | Description                                      | Auth       |
+|--------|-----------------------|--------------------------------------------------|------------|
+| GET    | `/api/admin/dashboard`| Dashboard KPIs (totals, ratings, growth, trends) | 🔐 Admin   |
+| GET    | `/api/admin/users`    | Danh sách users với stats                        | 🔐 Admin   |
+| GET    | `/api/admin/spots`    | Danh sách spots (PUBLIC/DRAFT/ARCHIVED)          | 🔐 Admin   |
+
+**Query Parameters cho `/api/admin/dashboard`:**
+- `period` - 7, 30, 90 (days) - default: 30
+
+**Dashboard KPIs bao gồm:**
+- **Totals**: Users, Spots, Reviews, Favorites, Schedules, Children
+- **Ratings**: Average rating, distribution (1-5 stars)
+- **Growth**: New users, reviews, favorites, schedules trong period
+- **Activity**: Active users, activity rate, avg engagement per user
+- **Popular Spots**: Top 10 spots theo favorites + reviews
+- **Categories**: Distribution theo category
+- **Daily Trend**: Activity 7 ngày gần nhất
+
 ---
 
 � **Chi tiết đầy đủ:** Xem file [`API_ENDPOINTS.md`](API_ENDPOINTS.md) để biết request/response examples, query parameters, và validation rules.
