@@ -19,6 +19,7 @@
 9. [Admin](#9-admin-dashboard--management) 🔐
 10. [Smart Recommendations](#10-smart-recommendations-gợi-ý-thông-minh)
 11. [Spot Management](#11-spot-management-quản-lý-địa-điểm) 🔐
+12. [Review Management](#12-review-management-quản-lý-đánh-giá) 🔐
 
 ---
 
@@ -1703,11 +1704,252 @@ Authorization: Bearer <admin_token>
 
 ---
 
+## 12. Review Management (Quản lý đánh giá)
+
+> **🔐 Admin Only** - Quản lý tập trung tất cả reviews, phát hiện nội dung không phù hợp
+
+### GET `/api/admin/review-management`
+**Danh sách tất cả reviews với filtering**
+
+**Headers:**
+```
+Authorization: Bearer <admin_token>
+```
+
+**Query Parameters:**
+- `rating`: 1-5 (filter by rating)
+- `status`: 'public' | 'hidden' | 'all' (default: all)
+- `spot_id`: Filter by spot
+- `user_id`: Filter by user
+- `has_image`: true/false (có ảnh đính kèm)
+- `date_from`, `date_to`: Date range (YYYY-MM-DD)
+- `sort`: 'latest' | 'oldest' | 'rating_high' | 'rating_low' (default: latest)
+- `limit`, `offset`: Pagination
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "reviews": [
+      {
+        "review_id": 1,
+        "spot_id": 1,
+        "spot_name": "Ueno Zoo",
+        "spot_category": "ZOO",
+        "user_id": 2,
+        "user_name": "Bùi Bảo Mơ",
+        "user_email": "buibaomoyu@gmail.com",
+        "rating": 5,
+        "comment": "Amazing experience!",
+        "image_url": "https://example.com/review.jpg",
+        "is_hidden": false,
+        "report_count": 0,
+        "created_at": "2025-11-12T08:24:43.000Z"
+      }
+    ],
+    "statistics": {
+      "total_reviews": 12,
+      "public_reviews": 10,
+      "hidden_reviews": 2,
+      "reviews_with_image": 5,
+      "reported_reviews": 1,
+      "average_rating": 4.5,
+      "rating_distribution": {
+        "5": 6,
+        "4": 3,
+        "3": 2,
+        "2": 1,
+        "1": 0
+      }
+    },
+    "pagination": {
+      "total": 12,
+      "limit": 20,
+      "offset": 0,
+      "has_more": false
+    }
+  }
+}
+```
+
+**Errors:**
+- `401` - Unauthorized (token không hợp lệ)
+- `403` - Forbidden (không phải admin)
+- `500` - Server error
+
+---
+
+### GET `/api/admin/review-management/:reviewId`
+**Chi tiết review với full info**
+
+**Headers:**
+```
+Authorization: Bearer <admin_token>
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "review": {
+      "review_id": 1,
+      "spot_id": 1,
+      "spot_name": "Ueno Zoo",
+      "spot_category": "ZOO",
+      "spot_address": "Tokyo, Ueno",
+      "user_id": 2,
+      "user_name": "Bùi Bảo Mơ",
+      "user_email": "buibaomoyu@gmail.com",
+      "user_total_reviews": 5,
+      "rating": 5,
+      "comment": "Amazing experience!",
+      "image_url": "https://example.com/review.jpg",
+      "is_hidden": false,
+      "report_count": 0,
+      "created_at": "2025-11-12T08:24:43.000Z",
+      "updated_at": "2025-11-12T08:24:43.000Z"
+    },
+    "user_other_reviews": [
+      {
+        "review_id": 2,
+        "spot_name": "Tokyo Tower",
+        "rating": 4,
+        "created_at": "2025-10-01T10:00:00.000Z"
+      }
+    ],
+    "report_history": null
+  }
+}
+```
+
+**Errors:**
+- `404` - Không tìm thấy review
+- `401` - Unauthorized
+- `403` - Forbidden
+
+---
+
+### PATCH `/api/admin/review-management/:reviewId/toggle-status`
+**Toggle public/hidden status**
+
+**Headers:**
+```
+Authorization: Bearer <admin_token>
+Content-Type: application/json
+```
+
+**Body:**
+```json
+{
+  "is_hidden": true
+}
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Đã ẩn review",
+  "data": {
+    "review_id": 1,
+    "is_hidden": true,
+    "status": "hidden"
+  }
+}
+```
+
+**Example: Unhide review**
+```json
+{
+  "is_hidden": false
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Đã hiện review",
+  "data": {
+    "review_id": 1,
+    "is_hidden": false,
+    "status": "public"
+  }
+}
+```
+
+**Errors:**
+- `404` - Không tìm thấy review
+- `400` - is_hidden phải là boolean
+
+---
+
+### POST `/api/admin/review-management/:reviewId/reset-reports`
+**Reset report count**
+
+**Headers:**
+```
+Authorization: Bearer <admin_token>
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Đã reset report count",
+  "data": {
+    "review_id": 1,
+    "report_count": 0
+  }
+}
+```
+
+**Use Case:** Admin đã kiểm tra review bị report và xác nhận nội dung hợp lệ
+
+**Errors:**
+- `404` - Không tìm thấy review
+
+---
+
+### DELETE `/api/admin/review-management/:reviewId`
+**Xóa review (hard delete)**
+
+**Headers:**
+```
+Authorization: Bearer <admin_token>
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Đã xóa review thành công",
+  "data": {
+    "review_id": 1,
+    "spot_id": 1
+  }
+}
+```
+
+**Side Effects:**
+- ⚠️ Hard delete (không thể undo)
+- ✅ Tự động update spot statistics (review_count, average_rating)
+
+**Use Case:** Xóa review vi phạm nghiêm trọng (spam, hate speech, inappropriate content)
+
+**Errors:**
+- `404` - Không tìm thấy review
+
+---
+
 **�📖 Xem thêm:**
 - [README.md](README.md) - Overview & setup
 - [DATABASE_SCHEMA.md](database/DATABASE_SCHEMA.md) - Database structure
-- [SPOT_MANAGEMENT_API_TESTING.md](SPOT_MANAGEMENT_API_TESTING.md) - Testing guide
-- [SCHEDULES_API_TESTING.md](SCHEDULES_API_TESTING.md) - Testing guide
+- [REVIEW_MANAGEMENT_API_TESTING.md](REVIEW_MANAGEMENT_API_TESTING.md) - Review management testing guide
+- [SPOT_MANAGEMENT_API_TESTING.md](SPOT_MANAGEMENT_API_TESTING.md) - Spot management testing guide
+- [SCHEDULES_API_TESTING.md](SCHEDULES_API_TESTING.md) - Schedules testing guide
 
 ---
 

@@ -276,9 +276,42 @@ curl http://localhost:3000/api
 2. Preview để xem trước
 3. Publish để chuyển PUBLIC hoặc tiếp tục chỉnh sửa
 
+### 💬 Review Management (Quản lý đánh giá)
+
+**Quản lý tập trung tất cả reviews - Admin Only**
+
+| Method | Endpoint                                               | Description                          | Auth     |
+|--------|--------------------------------------------------------|--------------------------------------|----------|
+| GET    | `/api/admin/review-management`                         | Danh sách reviews (filter + stats)   | 🔐 Admin |
+| GET    | `/api/admin/review-management/:reviewId`               | Chi tiết review + user history       | 🔐 Admin |
+| PATCH  | `/api/admin/review-management/:reviewId/toggle-status` | Toggle public/hidden                 | 🔐 Admin |
+| POST   | `/api/admin/review-management/:reviewId/reset-reports` | Reset report count                   | 🔐 Admin |
+| DELETE | `/api/admin/review-management/:reviewId`               | Xóa review (hard delete)             | 🔐 Admin |
+
+**Filter Options (GET list):**
+- `rating`: 1-5 (filter by rating)
+- `status`: 'public' | 'hidden' | 'all' (default: all)
+- `spot_id`: Filter by spot
+- `user_id`: Filter by user
+- `has_image`: true/false (có ảnh đính kèm)
+- `date_from`, `date_to`: Date range (YYYY-MM-DD)
+- `sort`: 'latest' | 'oldest' | 'rating_high' | 'rating_low'
+- `limit`, `offset`: Pagination
+
+**Statistics (Included in list response):**
+- Total reviews, public/hidden count
+- Reviews with image, reported reviews
+- Average rating, rating distribution (1-5)
+
+**Use Cases:**
+- Tìm reviews có rating thấp để kiểm tra chất lượng
+- Lọc reviews bị report để xử lý
+- Ẩn/hiện reviews không phù hợp
+- Xóa nội dung vi phạm chính sách
+
 ---
 
-� **Chi tiết đầy đủ:** Xem file [`API_ENDPOINTS.md`](API_ENDPOINTS.md) để biết request/response examples, query parameters, và validation rules.
+📚 **Chi tiết đầy đủ:** Xem file [`API_ENDPOINTS.md`](API_ENDPOINTS.md) để biết request/response examples, query parameters, và validation rules.
 
 ## 🗄️ Cấu trúc Database
 

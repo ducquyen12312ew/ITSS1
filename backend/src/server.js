@@ -37,6 +37,7 @@ const reviewsRoutes = require('./routes/reviewsRoutes');
 const recommendationsRoutes = require('./routes/recommendationsRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const spotManagementRoutes = require('./routes/spotManagementRoutes');
+const reviewManagementRoutes = require('./routes/reviewManagementRoutes');
 
 // API routes
 app.use('/api/auth', authRoutes);
@@ -49,6 +50,7 @@ app.use('/api/reviews', reviewsRoutes);
 app.use('/api/recommendations', recommendationsRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/admin/spot-management', spotManagementRoutes);
+app.use('/api/admin/review-management', reviewManagementRoutes);
 
 app.get('/api', (req, res) => {
   res.json({
@@ -122,6 +124,13 @@ app.get('/api', (req, res) => {
         preview: 'GET /api/admin/spot-management/:spotId/preview',
         publish: 'POST /api/admin/spot-management/:spotId/publish',
         deleteImage: 'DELETE /api/admin/spot-management/:spotId/images/:imageId'
+      },
+      reviewManagement: {
+        list: 'GET /api/admin/review-management?rating=&status=&sort=',
+        detail: 'GET /api/admin/review-management/:reviewId',
+        toggleStatus: 'PATCH /api/admin/review-management/:reviewId/toggle-status',
+        resetReports: 'POST /api/admin/review-management/:reviewId/reset-reports',
+        delete: 'DELETE /api/admin/review-management/:reviewId'
       }
     }
   });
