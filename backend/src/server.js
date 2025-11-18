@@ -33,6 +33,7 @@ const childrenRoutes = require('./routes/childrenRoutes');
 const favoritesRoutes = require('./routes/favoritesRoutes');
 const kidsSwipeRoutes = require('./routes/kidsSwipeRoutes');
 const schedulesRoutes = require('./routes/schedulesRoutes');
+const reviewsRoutes = require('./routes/reviewsRoutes');
 
 // API routes
 app.use('/api/auth', authRoutes);
@@ -41,6 +42,7 @@ app.use('/api/children', childrenRoutes);
 app.use('/api/favorites', favoritesRoutes);
 app.use('/api/kids-swipe', kidsSwipeRoutes);
 app.use('/api/schedules', schedulesRoutes);
+app.use('/api/reviews', reviewsRoutes);
 
 app.get('/api', (req, res) => {
   res.json({
@@ -89,6 +91,15 @@ app.get('/api', (req, res) => {
         add: 'POST /api/schedules',
         update: 'PUT /api/schedules/:id',
         delete: 'DELETE /api/schedules/:id?soft_delete=true'
+      },
+      reviews: {
+        create: 'POST /api/reviews',
+        userReviews: 'GET /api/reviews/user/:userId',
+        detail: 'GET /api/reviews/:reviewId',
+        update: 'PUT /api/reviews/:reviewId',
+        delete: 'DELETE /api/reviews/:reviewId?soft_delete=true',
+        report: 'POST /api/reviews/:reviewId/report',
+        spotReviews: 'GET /api/spots/:id/reviews'
       }
     }
   });

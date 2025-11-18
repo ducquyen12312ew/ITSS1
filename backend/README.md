@@ -125,156 +125,89 @@ curl http://localhost:3000/api
 
 ## 📚 API Endpoints
 
-### Base URL: `http://localhost:3000/api`
+> **Base URL:** `http://localhost:3000`
 
-#### 🏥 Health & Info
+### 🏥 System Health
 
-| Method | Endpoint   | Mô tả            |
-|--------|------------|------------------|
-| GET    | `/health`  | Health check     |
-| GET    | `/api`     | API information  |
+| Method | Endpoint   | Description      | Auth |
+|--------|------------|------------------|------|
+| GET    | `/health`  | Health check     | ❌   |
+| GET    | `/api`     | API information  | ❌   |
 
-#### � Authentication (Đã hoàn thành ✅)
+### 🔐 Authentication
 
-| Method | Endpoint                  | Mô tả                 | Auth |
-|--------|---------------------------|-----------------------|------|
-| POST   | `/api/auth/register`      | Đăng ký tài khoản     | ❌   |
-| POST   | `/api/auth/login`         | Đăng nhập             | ❌   |
-| POST   | `/api/auth/logout`        | Đăng xuất             | ✅   |
-| GET    | `/api/auth/profile`       | Xem profile           | ✅   |
+| Method | Endpoint               | Description       | Auth |
+|--------|------------------------|-------------------|------|
+| POST   | `/api/auth/register`   | Đăng ký tài khoản | ❌   |
+| POST   | `/api/auth/login`      | Đăng nhập         | ❌   |
+| POST   | `/api/auth/logout`     | Đăng xuất         | ✅   |
+| GET    | `/api/auth/profile`    | Xem profile       | ✅   |
 
-#### 📍 Spots (Địa điểm) - Đã hoàn thành ✅
+### 📍 Spots (Địa điểm)
 
-| Method | Endpoint                  | Mô tả                 | Auth | Status |
-|--------|---------------------------|-----------------------|------|--------|
-| GET    | `/api/spots/search`       | Tìm kiếm + filter địa điểm với đầy đủ tính năng | ❌   | ✅ Done |
-| GET    | `/api/spots/suggestions`  | Autocomplete khi gõ keyword | ❌   | ✅ Done |
-| GET    | `/api/spots/:id`          | Chi tiết địa điểm (full info + images + tags + review stats) | ❌   | ✅ Done |
-| GET    | `/api/spots/:id/reviews`  | Danh sách reviews đầy đủ với user info + images | ❌   | ✅ Done |
-| POST   | `/api/spots`              | Tạo địa điểm mới      | 🔐 Admin | ⏳ TODO |
-| PUT    | `/api/spots/:id`          | Cập nhật địa điểm     | 🔐 Admin | ⏳ TODO |
-| DELETE | `/api/spots/:id`          | Xóa địa điểm          | 🔐 Admin | ⏳ TODO |
+| Method | Endpoint                  | Description                                    | Auth |
+|--------|---------------------------|------------------------------------------------|------|
+| GET    | `/api/spots/search`       | Tìm kiếm + filter địa điểm (keyword, category, age, price, facilities) | ❌   |
+| GET    | `/api/spots/suggestions`  | Autocomplete suggestions                       | ❌   |
+| GET    | `/api/spots/:id`          | Chi tiết địa điểm (info, images, tags, reviews) | ❌   |
+| GET    | `/api/spots/:id/reviews`  | Danh sách reviews của spot                     | ❌   |
 
-**Query Parameters cho GET `/api/spots`:**
-- `keyword` - Tìm kiếm theo tên hoặc mô tả
-- `category` - Lọc theo loại (PARK, MUSEUM, ZOO, AQUARIUM, THEME_PARK, INDOOR_PLAY)
-- `min_age`, `max_age` - Lọc theo độ tuổi
-- `price_range` - Lọc theo giá (FREE, UNDER_1000, 1000_3000, 3000_5000, OVER_5000)
-- `is_indoor` - Lọc trong nhà/ngoài trời (true/false)
-- `weather` - Lọc theo thời tiết (ALL_WEATHER, SUNNY_ONLY, RAIN_OK)
-- `facilities` - Lọc theo tiện nghi (parking, nursing_room, stroller, cafe)
-- `min_rating` - Lọc theo đánh giá tối thiểu
-- `lat`, `lng`, `distance` - Lọc theo khoảng cách (km)
-- `sort` - Sắp xếp: `recommended` (default), `distance`, `rating`, `age_match`
-- `child_id` - Dùng cho age_match sorting
-- `limit`, `offset` - Phân trang
+### ⭐ Reviews (Đánh giá)
 
-#### 👶 Kids Swipe Feature - TODO
+| Method | Endpoint                       | Description                           | Auth |
+|--------|--------------------------------|---------------------------------------|------|
+| POST   | `/api/reviews`                 | Tạo review (rating 1-5, comment max 140 chars) | ✅   |
+| GET    | `/api/reviews/user/:userId`    | Tất cả reviews của user               | ✅   |
+| GET    | `/api/reviews/:reviewId`       | Chi tiết review                       | ❌   |
+| PUT    | `/api/reviews/:reviewId`       | Cập nhật review                       | ✅   |
+| DELETE | `/api/reviews/:reviewId`       | Xóa review (support soft delete)      | ✅   |
+| POST   | `/api/reviews/:reviewId/report`| Báo cáo review (spam/inappropriate)   | ✅   |
 
-| Method | Endpoint                     | Mô tả                    | Auth | Status |
-|--------|------------------------------|--------------------------|------|--------|
-| POST   | `/api/kids/:childId/swipe`   | Swipe tag (LIKE/SKIP)    | ✅   | ⏳ TODO |
-| GET    | `/api/kids/:childId/preferences` | Lấy sở thích         | ✅   | ⏳ TODO |
-| GET    | `/api/kids/:childId/recommendations` | Gợi ý spots      | ✅   | ⏳ TODO |
+### ❤️ Favorites (Yêu thích)
 
-#### ⭐ Reviews (Đánh giá)
+| Method | Endpoint                       | Description                           | Auth |
+|--------|--------------------------------|---------------------------------------|------|
+| GET    | `/api/favorites`               | Danh sách favorites + spot info       | ✅   |
+| GET    | `/api/favorites/collections`   | Danh sách collection tags             | ✅   |
+| GET    | `/api/favorites/check/:spotId` | Kiểm tra spot có được yêu thích chưa  | ✅   |
+| POST   | `/api/favorites`               | Thêm spot vào favorites               | ✅   |
+| PUT    | `/api/favorites/:id`           | Cập nhật collection_tag               | ✅   |
+| DELETE | `/api/favorites/:id`           | Xóa favorite by favorite_id           | ✅   |
+| DELETE | `/api/favorites/spot/:spotId`  | Xóa favorite by spot_id (toggle)      | ✅   |
 
-| Method | Endpoint                  | Mô tả                 | Auth | Status |
-|--------|---------------------------|-----------------------|------|--------|
-| GET    | `/api/spots/:id/reviews`  | Danh sách đánh giá đầy đủ (user, comment, images) | ❌   | ✅ Done |
-| POST   | `/api/reviews`            | Tạo đánh giá mới      | ✅   | ⏳ TODO |
-| PUT    | `/api/reviews/:id`        | Cập nhật đánh giá     | ✅   | ⏳ TODO |
-| DELETE | `/api/reviews/:id`        | Xóa đánh giá          | ✅   | ⏳ TODO |
+### 📅 Schedules (Lịch trình cuối tuần)
 
-**Query Parameters cho GET `/api/spots/:id/reviews`:**
-- `limit` - Số lượng reviews mỗi trang (default: 10)
-- `offset` - Vị trí bắt đầu (default: 0)
-- `sort` - Sắp xếp: `newest`, `oldest`, `highest_rating`, `lowest_rating`, `most_helpful` (default: newest)
+| Method | Endpoint                              | Description                                | Auth |
+|--------|---------------------------------------|--------------------------------------------|------|
+| GET    | `/api/schedules`                      | Danh sách lịch trình (filter: status, date) | ✅   |
+| GET    | `/api/schedules/calendar/:year/:month`| Lịch theo tháng (calendar view)           | ✅   |
+| GET    | `/api/schedules/:scheduleId`          | Chi tiết lịch trình + spot info            | ✅   |
+| POST   | `/api/schedules`                      | Thêm lịch trình (spot, date, time_slot)   | ✅   |
+| PUT    | `/api/schedules/:scheduleId`          | Cập nhật lịch trình                        | ✅   |
+| DELETE | `/api/schedules/:scheduleId`          | Xóa/hủy lịch trình (support soft delete)  | ✅   |
 
-#### ❤️ Favorites (Yêu thích) - Đã hoàn thành ✅
+### 👶 Children (Hồ sơ trẻ em)
 
-| Method | Endpoint                  | Mô tả                 | Auth | Status |
-|--------|---------------------------|-----------------------|------|--------|
-| GET    | `/api/favorites`          | Danh sách yêu thích + spot info | ✅   | ✅ Done |
-| GET    | `/api/favorites/check/:spotId` | Kiểm tra spot có được yêu thích chưa | ✅   | ✅ Done |
-| GET    | `/api/favorites/collections` | Lấy danh sách collection tags | ✅   | ✅ Done |
-| POST   | `/api/favorites`          | Thêm spot vào yêu thích | ✅   | ✅ Done |
-| PUT    | `/api/favorites/:id`      | Cập nhật collection_tag | ✅   | ✅ Done |
-| DELETE | `/api/favorites/:id`      | Xóa yêu thích (by favorite_id) | ✅   | ✅ Done |
-| DELETE | `/api/favorites/spot/:spotId` | Xóa yêu thích (by spot_id) | ✅   | ✅ Done |
+| Method | Endpoint              | Description              | Auth |
+|--------|-----------------------|--------------------------|------|
+| GET    | `/api/children`       | Danh sách trẻ của user   | ✅   |
+| GET    | `/api/children/:id`   | Chi tiết trẻ             | ✅   |
+| POST   | `/api/children`       | Thêm hồ sơ trẻ mới       | ✅   |
+| PUT    | `/api/children/:id`   | Cập nhật hồ sơ           | ✅   |
+| DELETE | `/api/children/:id`   | Xóa hồ sơ                | ✅   |
 
+### 🎮 Kids Swipe (Tính năng swipe cho trẻ)
 
-#### � Kids Swipe (Tính năng swipe cho trẻ) - Đã hoàn thành ✅
+| Method | Endpoint                                  | Description                              | Auth |
+|--------|-------------------------------------------|------------------------------------------|------|
+| POST   | `/api/kids-swipe/:childId/swipe`          | Child swipe spot (LIKE/SKIP)             | ✅   |
+| GET    | `/api/kids-swipe/:childId/preferences`    | Tags mà child thích (learned preferences)| ✅   |
+| GET    | `/api/kids-swipe/:childId/recommendations`| Gợi ý spots dựa trên preferences         | ✅   |
+| GET    | `/api/kids-swipe/:childId/spots`          | Danh sách spots chưa swipe               | ✅   |
 
-**Mô tả:** Trẻ swipe các spots → Hệ thống học tags → Gợi ý spots phù hợp
+---
 
-| Method | Endpoint                                 | Mô tả                           | Auth | Status |
-|--------|------------------------------------------|---------------------------------|------|--------|
-| POST   | `/api/kids-swipe/:childId/swipe`         | Child swipe spot (LIKE/SKIP)    | ✅   | ✅ Done |
-| GET    | `/api/kids-swipe/:childId/preferences`   | Xem tags mà child thích         | ✅   | ✅ Done |
-| GET    | `/api/kids-swipe/:childId/recommendations` | Gợi ý spots dựa trên preferences | ✅   | ✅ Done |
-
-
-####  Schedules (Lịch trình cuối tuần) - Đã hoàn thành ✅
-
-**Mô tả:** Quản lý lịch trình đi chơi cuối tuần - Thêm spots vào calendar, xem danh sách, cập nhật, hủy/xóa
-
-| Method | Endpoint                                 | Mô tả                           | Auth | Status |
-|--------|------------------------------------------|---------------------------------|------|--------|
-| GET    | `/api/schedules`                         | Danh sách lịch trình + filters  | ✅   | ✅ Done |
-| GET    | `/api/schedules/calendar/:year/:month`   | Lịch trình theo tháng (calendar view) | ✅   | ✅ Done |
-| GET    | `/api/schedules/:scheduleId`             | Chi tiết lịch trình + spot info | ✅   | ✅ Done |
-| POST   | `/api/schedules`                         | Thêm lịch trình (từ spot detail) | ✅   | ✅ Done |
-| PUT    | `/api/schedules/:scheduleId`             | Cập nhật ngày/giờ/ghi chú       | ✅   | ✅ Done |
-| DELETE | `/api/schedules/:scheduleId`             | Xóa hoặc hủy lịch trình         | ✅   | ✅ Done |
-
-**Query Parameters cho GET `/api/schedules`:**
-- `status` - Filter theo trạng thái: `PLANNED`, `COMPLETED`, `CANCELLED`
-- `from_date` - Từ ngày (YYYY-MM-DD)
-- `to_date` - Đến ngày (YYYY-MM-DD)
-- `limit`, `offset` - Phân trang (default: 50, 0)
-
-**Body cho POST `/api/schedules`:**
-```json
-{
-  "spot_id": 1,
-  "scheduled_date": "2025-11-20",
-  "time_slot": "AM",          // AM, PM, FULL_DAY
-  "notes": "Bring camera"
-}
-```
-
-**Body cho PUT `/api/schedules/:scheduleId`:**
-```json
-{
-  "scheduled_date": "2025-11-21",
-  "time_slot": "PM",
-  "notes": "Updated notes",
-  "status": "COMPLETED"       // PLANNED, COMPLETED, CANCELLED
-}
-```
-
-**Query Parameters cho DELETE `/api/schedules/:scheduleId`:**
-- `soft_delete=true` - Đánh dấu CANCELLED (giữ lịch sử), không có = xóa hoàn toàn
-
-#### 👶 Children (Hồ sơ trẻ em) - Đã hoàn thành ✅
-
-| Method | Endpoint                  | Mô tả                 | Auth | Status |
-|--------|---------------------------|-----------------------|------|--------|
-| GET    | `/api/children`           | Danh sách trẻ của user| ✅   | ✅ Done |
-| GET    | `/api/children/:id`       | Chi tiết 1 trẻ        | ✅   | ✅ Done |
-| POST   | `/api/children`           | Thêm hồ sơ trẻ mới    | ✅   | ✅ Done |
-| PUT    | `/api/children/:id`       | Cập nhật hồ sơ        | ✅   | ✅ Done |
-| DELETE | `/api/children/:id`       | Xóa hồ sơ             | ✅   | ✅ Done |
-
-
-#### 🔐 Admin - TODO
-
-| Method | Endpoint                  | Mô tả                 | Auth | Status |
-|--------|---------------------------|-----------------------|------|--------|
-| GET    | `/api/admin/dashboard`    | Dashboard KPI         | 🔐 Admin | ⏳ TODO |
-| GET    | `/api/admin/users`        | Quản lý users         | 🔐 Admin | ⏳ TODO |
-| GET    | `/api/admin/spots`        | Quản lý spots         | 🔐 Admin | ⏳ TODO |
+� **Chi tiết đầy đủ:** Xem file [`API_ENDPOINTS.md`](API_ENDPOINTS.md) để biết request/response examples, query parameters, và validation rules.
 
 ## 🗄️ Cấu trúc Database
 
