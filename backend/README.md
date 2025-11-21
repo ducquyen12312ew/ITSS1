@@ -309,6 +309,46 @@ curl http://localhost:3000/api
 - Ẩn/hiện reviews không phù hợp
 - Xóa nội dung vi phạm chính sách
 
+### 👥 User Management (Quản lý người dùng)
+
+**Quản lý tập trung toàn bộ người dùng - Admin Only**
+
+| Method | Endpoint                                               | Description                          | Auth     |
+|--------|--------------------------------------------------------|--------------------------------------|----------|
+| GET    | `/api/admin/user-management`                           | Danh sách users (search + filter)    | 🔐 Admin |
+| GET    | `/api/admin/user-management/:userId`                   | Chi tiết user + activity             | 🔐 Admin |
+| PATCH  | `/api/admin/user-management/:userId/toggle-ban`        | BAN/UNBAN tài khoản                  | 🔐 Admin |
+| PATCH  | `/api/admin/user-management/:userId/change-role`       | Thay đổi USER ↔ ADMIN                | 🔐 Admin |
+| DELETE | `/api/admin/user-management/:userId`                   | Xóa user (hard delete)               | 🔐 Admin |
+
+**Filter Options (GET list):**
+- `search`: Tìm theo name hoặc email
+- `role`: 'USER' | 'ADMIN' | 'all' (default: all)
+- `status`: 'ACTIVE' | 'BANNED' | 'all' (default: all)
+- `email_domain`: Filter theo domain (gmail.com, yahoo.com)
+- `date_from`, `date_to`: Date range đăng ký
+- `sort`: 'latest' | 'oldest' | 'name' | 'last_login'
+- `limit`, `offset`: Pagination
+
+**Statistics (Included in list response):**
+- Total users, admin/user count, banned/active count
+- New users (7 days, 30 days)
+
+**User Detail Includes:**
+- Basic info: name, email, role, status, dates
+- Children list (name, age, gender)
+- Recent reviews (10 latest)
+- Recent favorites (10 latest)
+- Recent schedules (10 latest)
+- Activity statistics (totals + average rating)
+
+**Use Cases:**
+- Tìm user theo email/domain để kiểm tra spam
+- BAN user vi phạm chính sách
+- Nâng quyền USER → ADMIN
+- Xem lịch sử hoạt động của user
+- Xóa tài khoản spam/không hoạt động
+
 ---
 
 📚 **Chi tiết đầy đủ:** Xem file [`API_ENDPOINTS.md`](API_ENDPOINTS.md) để biết request/response examples, query parameters, và validation rules.

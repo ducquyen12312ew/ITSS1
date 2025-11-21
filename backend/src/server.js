@@ -38,6 +38,7 @@ const recommendationsRoutes = require('./routes/recommendationsRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const spotManagementRoutes = require('./routes/spotManagementRoutes');
 const reviewManagementRoutes = require('./routes/reviewManagementRoutes');
+const userManagementRoutes = require('./routes/userManagementRoutes');
 
 // API routes
 app.use('/api/auth', authRoutes);
@@ -51,6 +52,7 @@ app.use('/api/recommendations', recommendationsRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/admin/spot-management', spotManagementRoutes);
 app.use('/api/admin/review-management', reviewManagementRoutes);
+app.use('/api/admin/user-management', userManagementRoutes);
 
 app.get('/api', (req, res) => {
   res.json({
@@ -131,6 +133,13 @@ app.get('/api', (req, res) => {
         toggleStatus: 'PATCH /api/admin/review-management/:reviewId/toggle-status',
         resetReports: 'POST /api/admin/review-management/:reviewId/reset-reports',
         delete: 'DELETE /api/admin/review-management/:reviewId'
+      },
+      userManagement: {
+        list: 'GET /api/admin/user-management?search=&role=&status=&sort=',
+        detail: 'GET /api/admin/user-management/:userId',
+        toggleBan: 'PATCH /api/admin/user-management/:userId/toggle-ban',
+        changeRole: 'PATCH /api/admin/user-management/:userId/change-role',
+        delete: 'DELETE /api/admin/user-management/:userId'
       }
     }
   });

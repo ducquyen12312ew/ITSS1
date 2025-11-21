@@ -23,7 +23,9 @@
 | Smart Recommendations | 2 | 🔓 Optional | ✅ Complete |
 | Admin Dashboard | 3 | 🔐 Admin | ✅ Complete |
 | Spot Management | 5 | 🔐 Admin | ✅ Complete |
-| **TOTAL** | **49** | - | **100%** |
+| Review Management | 5 | 🔐 Admin | ✅ Complete |
+| User Management | 5 | 🔐 Admin | ✅ Complete |
+| **TOTAL** | **59** | - | **100%** |
 
 ---
 
@@ -226,6 +228,44 @@ DELETE /api/admin/spot-management/:spotId/images/:imageId  🔐 Admin Only (Dele
 
 ---
 
+### 1️⃣2️⃣ Review Management (5 endpoints)
+```
+GET    /api/admin/review-management                           🔐 Admin Only (List reviews)
+GET    /api/admin/review-management/:reviewId                 🔐 Admin Only (Detail)
+PATCH  /api/admin/review-management/:reviewId/toggle-status  🔐 Admin Only (Hide/Unhide)
+POST   /api/admin/review-management/:reviewId/reset-reports  🔐 Admin Only (Reset reports)
+DELETE /api/admin/review-management/:reviewId                🔐 Admin Only (Delete review)
+```
+
+**Features:**
+- **Advanced filtering:** rating, status, spot_id, user_id, has_image, date range
+- **Statistics:** total, public/hidden, with_image, reported, rating distribution
+- **Toggle status:** Public ↔ Hidden
+- **Reset reports:** Clear report_count after verification
+- **Hard delete:** Remove inappropriate reviews permanently
+
+---
+
+### 1️⃣3️⃣ User Management (5 endpoints)
+```
+GET    /api/admin/user-management                      🔐 Admin Only (List users)
+GET    /api/admin/user-management/:userId              🔐 Admin Only (Detail)
+PATCH  /api/admin/user-management/:userId/toggle-ban   🔐 Admin Only (BAN/UNBAN)
+PATCH  /api/admin/user-management/:userId/change-role  🔐 Admin Only (Change role)
+DELETE /api/admin/user-management/:userId              🔐 Admin Only (Delete user)
+```
+
+**Features:**
+- **Search & filter:** name, email, role, status, email_domain, date range
+- **Statistics:** total, admin/user count, banned/active, new users (7d, 30d)
+- **User detail:** Basic info + children + recent activity (reviews, favorites, schedules)
+- **BAN/UNBAN:** Toggle account status (prevents login)
+- **Change role:** USER ↔ ADMIN
+- **Hard delete:** Remove spam accounts (cannot delete admin)
+- **Protection:** Cannot ban or delete admin accounts
+
+---
+
 ## 🔐 Authentication & Authorization
 
 ### Auth Levels:
@@ -325,6 +365,8 @@ curl "http://localhost:3000/api/admin/dashboard?period=30" \
 | Smart Recommendations | 2 | ✅ Complete |
 | Admin Dashboard | 3 | ✅ Complete |
 | Spot Management (Admin) | 5 | ✅ Complete |
+| Review Management (Admin) | 5 | ✅ Complete |
+| User Management (Admin) | 5 | ✅ Complete |
 | Weather Integration | 1 | ✅ Complete |
 
 **Total Coverage: 100%** 🎉

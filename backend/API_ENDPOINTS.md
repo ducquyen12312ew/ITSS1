@@ -20,6 +20,7 @@
 10. [Smart Recommendations](#10-smart-recommendations-gợi-ý-thông-minh)
 11. [Spot Management](#11-spot-management-quản-lý-địa-điểm) 🔐
 12. [Review Management](#12-review-management-quản-lý-đánh-giá) 🔐
+13. [User Management](#13-user-management-quản-lý-người-dùng) 🔐
 
 ---
 
@@ -1947,10 +1948,235 @@ Authorization: Bearer <admin_token>
 **�📖 Xem thêm:**
 - [README.md](README.md) - Overview & setup
 - [DATABASE_SCHEMA.md](database/DATABASE_SCHEMA.md) - Database structure
-- [REVIEW_MANAGEMENT_API_TESTING.md](REVIEW_MANAGEMENT_API_TESTING.md) - Review management testing guide
+
+## 13. User Management (Quản lý người dùng)
+
+> **��� Admin Only** - Quản lý tập trung toàn bộ người dùng trong hệ thống
+
+### GET `/api/admin/user-management`
+**Danh sách người dùng với filtering**
+
+**Headers:**
+```
+Authorization: Bearer <admin_token>
+```
+
+**Query Parameters:**
+- `search`: Tìm kiếm theo name hoặc email
+- `role`: 'USER' | 'ADMIN' | 'all' (default: all)
+- `status`: 'ACTIVE' | 'BANNED' | 'all' (default: all)
+- `email_domain`: Filter theo email domain (gmail.com, yahoo.com)
+- `date_from`, `date_to`: Date range đăng ký (YYYY-MM-DD)
+- `sort`: 'latest' | 'oldest' | 'name' | 'last_login' (default: latest)
+- `limit`, `offset`: Pagination
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "users": [
+      {
+        "user_id": 2,
+        "name": "Bùi Bảo Mơ",
+        "email": "buibaomoyu@gmail.com",
+        "role": "USER",
+        "status": "ACTIVE",
+        "is_banned": false,
+        "created_at": "2024-10-01T09:00:00.000Z",
+        "last_login_at": "2025-01-15T08:30:00.000Z",
+        "activity": {
+          "total_reviews": 5,
+          "total_favorites": 12,
+          "total_schedules": 8,
+          "total_children": 2
+        }
+      }
+    ],
+    "statistics": {
+      "total_users": 50,
+      "admin_count": 2,
+      "user_count": 48,
+      "banned_count": 3,
+      "active_count": 47,
+      "new_users_7days": 5,
+      "new_users_30days": 15
+    },
+    "pagination": {
+      "total": 50,
+      "limit": 20,
+      "offset": 0,
+      "has_more": true
+    }
+  }
+}
+```
+
+---
+
+### GET `/api/admin/user-management/:userId`
+**Chi tiết user với full activity**
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "user": {
+      "user_id": 2,
+      "name": "Bùi Bảo Mơ",
+      "email": "buibaomoyu@gmail.com",
+      "role": "USER",
+      "status": "ACTIVE",
+      "is_banned": false,
+      "created_at": "2024-10-01T09:00:00.000Z",
+      "last_login_at": "2025-01-15T08:30:00.000Z",
+      "updated_at": "2025-01-15T08:30:00.000Z"
+    },
+    "children": [
+      {
+        "child_id": 1,
+        "name": "Minh",
+        "date_of_birth": "2018-05-15",
+        "gender": "MALE"
+      }
+    ],
+    "recent_reviews": [
+      {
+        "review_id": 1,
+        "spot_id": 1,
+        "spot_name": "Ueno Zoo",
+        "rating": 5,
+        "comment": "Great place!",
+        "is_hidden": false,
+        "report_count": 0,
+        "created_at": "2025-01-10T10:00:00.000Z"
+      }
+    ],
+    "recent_favorites": [],
+    "recent_schedules": [],
+    "statistics": {
+      "total_reviews": 5,
+      "total_favorites": 12,
+      "total_schedules": 8,
+      "total_children": 2,
+      "average_rating": "4.6"
+    }
+  }
+}
+```
+
+---
+
+### PATCH `/api/admin/user-management/:userId/toggle-ban`
+**Cấm hoặc kích hoạt lại tài khoản**
+
+**Body:**
+```json
+{
+  "is_banned": true
+}
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Đã cấm tài khoản (BAN)",
+  "data": {
+    "user_id": 2,
+    "is_banned": true,
+    "status": "BANNED"
+  }
+}
+```
+
+**Example: UNBAN**
+```json
+{
+  "is_banned": false
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Đã kích hoạt lại tài khoản (UNBAN)",
+  "data": {
+    "user_id": 2,
+    "is_banned": false,
+    "status": "ACTIVE"
+  }
+}
+```
+
+**Errors:**
+- `400` - is_banned phải là boolean
+- `403` - Không thể ban tài khoản Admin
+- `404` - Không tìm thấy user
+
+---
+
+### PATCH `/api/admin/user-management/:userId/change-role`
+**Thay đổi quyền USER ↔ ADMIN**
+
+**Body:**
+```json
+{
+  "role": "ADMIN"
+}
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Đã thay đổi role thành ADMIN",
+  "data": {
+    "user_id": 2,
+    "role": "ADMIN"
+  }
+}
+```
+
+**Errors:**
+- `400` - Role phải là USER hoặc ADMIN
+- `404` - Không tìm thấy user
+
+---
+
+### DELETE `/api/admin/user-management/:userId`
+**Xóa user (hard delete)**
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Đã xóa user thành công",
+  "data": {
+    "user_id": 2
+  }
+}
+```
+
+**Side Effects:**
+- ⚠️ Hard delete (không thể undo)
+- ✅ CASCADE delete: children, reviews, favorites, schedules
+
+**Errors:**
+- `403` - Không thể xóa tài khoản Admin
+- `404` - Không tìm thấy user
+
+---
+
+**��� Xem thêm:**
+- [README.md](README.md) - Overview & setup
+- [DATABASE_SCHEMA.md](database/DATABASE_SCHEMA.md) - Database structure
+- [REVIEW_MANAGEMENT_API_TESTING.md](REVIEW_MANAGEMENT_API_TESTING.md) - Review management testing guide       
 - [SPOT_MANAGEMENT_API_TESTING.md](SPOT_MANAGEMENT_API_TESTING.md) - Spot management testing guide
 - [SCHEDULES_API_TESTING.md](SCHEDULES_API_TESTING.md) - Schedules testing guide
 
 ---
 
-**🎉 Happy Coding!**
+**��� Happy Coding!**
