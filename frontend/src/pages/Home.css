@@ -1,0 +1,274 @@
+/* Root styling */
+:root {
+  --bg: #f7f8fb;
+  --card: #fff;
+  --text: #222;
+  --muted: #6b7280;
+  --brand1: #3ba1df;
+  --brand2: #27c1a5;
+  --line: #e5e7eb;
+  --chip: #f0f3f8;
+}
+
+.home-page {
+  min-height: 100vh;
+  background: var(--bg);
+  padding-bottom: 80px;
+}
+
+/* Hero section */
+.hero {
+  background: linear-gradient(90deg, #1DA1F2 0%, #03e78c 100%);
+  color: #fff;
+}
+
+.hero-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 22px 16px 18px;
+}
+
+.hero-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.brand {
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.brand .sub {
+  display: block;
+  font-size: 12px;
+  opacity: 0.85;
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+.profile-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 10px;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.profile-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Search box */
+.search-row {
+  margin-top: 14px;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 999px;
+  padding: 10px 14px;
+}
+
+.search-box i {
+  color: var(--muted);
+  font-size: 16px;
+}
+
+.search-box input {
+  border: 0;
+  outline: 0;
+  width: 100%;
+  font-size: 14px;
+  background: transparent;
+}
+
+.search-box input::placeholder {
+  color: #999;
+}
+
+/* Chips */
+.chip-row {
+  margin-top: 12px;
+}
+
+.chip-group {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.chip {
+  background: #fff;
+  border: 1px solid #e5eef7;
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: #0f172a;
+}
+
+.chip:hover {
+  border-color: #7cc3ff;
+}
+
+.chip.active {
+  border-color: #7cc3ff;
+  background: #eaf5ff;
+  color: #2563eb;
+}
+
+/* Action buttons */
+.action-row {
+  display: flex;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.primary {
+  background: #fff;
+  color: #0f172a;
+  border: 0;
+  padding: 11px 18px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.primary:hover {
+  transform: translateY(-1px);
+}
+
+.ghost {
+  background: transparent;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  padding: 11px 18px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.2s;
+}
+
+.ghost:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.ghost i {
+  font-size: 14px;
+}
+
+/* Main container */
+.container {
+  max-width: 1100px;
+  margin: 18px auto 0;
+  padding: 0 16px;
+}
+
+.loading {
+  text-align: center;
+  padding: 40px;
+  color: var(--muted);
+}
+
+/* Sections */
+.section {
+  margin-bottom: 32px;
+}
+
+.section-title {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin: 6px 2px 14px;
+  font-weight: 800;
+  font-size: 16px;
+}
+
+.section-title .dot {
+  width: 8px;
+  height: 8px;
+  background: #2563eb;
+  border-radius: 999px;
+  display: inline-block;
+}
+
+.section-title .trend {
+  width: 8px;
+  height: 8px;
+  background: #16a34a;
+  border-radius: 2px;
+  display: inline-block;
+}
+
+.section-title .rain {
+  width: 8px;
+  height: 8px;
+  background: #06b6d4;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+/* Card grid */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+/* Responsive */
+@media (max-width: 1020px) {
+  .card-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 680px) {
+  .card-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-inner {
+    padding: 18px 14px 16px;
+  }
+
+  .brand {
+    font-size: 18px;
+  }
+
+  .chip-group {
+    gap: 6px;
+  }
+
+  .chip {
+    padding: 7px 12px;
+    font-size: 11px;
+  }
+
+  .action-row {
+    flex-direction: column;
+  }
+
+  .primary,
+  .ghost {
+    width: 100%;
+    justify-content: center;
+  }
+}

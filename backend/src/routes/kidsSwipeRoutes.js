@@ -37,4 +37,16 @@ router.get('/:childId/recommendations', kidsSwipeController.getRecommendations);
  */
 router.get('/:childId/spots', kidsSwipeController.getSpotsForSwipe);
 
+/**
+ * GET /api/kids-swipe/:childId/favorites
+ * Lấy danh sách spots mà child đã LIKE
+ */
+router.get('/:childId/favorites', kidsSwipeController.getKidFavorites);
+
+/**
+ * DELETE /api/kids-swipe/:childId/swipe/:spotId
+ * Xóa swipe của trẻ
+ */
+router.delete('/:childId/swipe/:spotId', kidsSwipeController.deleteKidSwipe);
+
 module.exports = router;

@@ -1,144 +1,376 @@
+-- Kodomo Weekend Navi - Seed Data (Hanoi Locations)
+-- Complete database seed with realistic Hanoi spots
+
 USE kodomo_weekend_navi;
 
--- Users 
--- password for test accounts: password123
--- password for buibaomoyu@gmail.com: (Bao_password)
-INSERT INTO users (email, password_hash, first_name, last_name, role, status, agreement, location_lat, location_lng, location_name) VALUES
-('admin@kodomo.com', '$2b$10$rT8YhS8qN3x5L1mZ9yJZWe7K3vN9xL2mZ8yJZWe7K3vN9xL2mZ8yJ', 'Admin', 'System', 'ADMIN', 'ACTIVE', TRUE, 35.6762, 139.6503, 'Tokyo'),
-('buibaomoyu@gmail.com', '$2b$10$leYXirPOMnfEN.fLYUPpXehbBMbeVEtc87xwf9Ag39hPw.DrXM/vO', 'Bao', 'Bui', 'USER', 'ACTIVE', TRUE, 35.6812, 139.7671, 'Tokyo'),
-('tanaka.yuki@example.com', '$2b$10$rT8YhS8qN3x5L1mZ9yJZWe7K3vN9xL2mZ8yJZWe7K3vN9xL2mZ8yJ', 'Yuki', 'Tanaka', 'USER', 'ACTIVE', TRUE, 35.6812, 139.7671, 'Ueno'),
-('sato.kenji@example.com', '$2b$10$rT8YhS8qN3x5L1mZ9yJZWe7K3vN9xL2mZ8yJZWe7K3vN9xL2mZ8yJ', 'Kenji', 'Sato', 'USER', 'ACTIVE', TRUE, 35.6586, 139.7454, 'Asakusa'),
-('suzuki.mai@example.com', '$2b$10$rT8YhS8qN3x5L1mZ9yJZWe7K3vN9xL2mZ8yJZWe7K3vN9xL2mZ8yJ', 'Mai', 'Suzuki', 'USER', 'ACTIVE', TRUE, 35.6284, 139.7366, 'Shinagawa');
+-- Clear existing data
+SET FOREIGN_KEY_CHECKS = 0;
+TRUNCATE TABLE admin_logs;
+TRUNCATE TABLE weather_cache;
+TRUNCATE TABLE kid_swipe;
+TRUNCATE TABLE child_preferences;
+TRUNCATE TABLE schedules;
+TRUNCATE TABLE favorites;
+TRUNCATE TABLE reviews;
+TRUNCATE TABLE spot_tags;
+TRUNCATE TABLE spot_images;
+TRUNCATE TABLE spots;
+TRUNCATE TABLE children;
+TRUNCATE TABLE users;
+SET FOREIGN_KEY_CHECKS = 1;
 
--- Children
-INSERT INTO children (user_id, name, birth_date, avatar_url, notes) VALUES
-(2, 'Minh', '2020-03-15', 'https://i.pravatar.cc/150?img=1', 'Loves exploring'),
-(2, 'An', '2022-08-22', 'https://i.pravatar.cc/150?img=2', 'Curious toddler'),
-(3, 'Taro', '2018-04-15', 'https://i.pravatar.cc/150?img=3', 'Loves animals'),
-(3, 'Hanako', '2020-08-22', 'https://i.pravatar.cc/150?img=4', 'Likes crafts'),
-(4, 'Kenta', '2017-12-10', 'https://i.pravatar.cc/150?img=5', 'Enjoys outdoor'),
-(5, 'Misaki', '2019-06-05', 'https://i.pravatar.cc/150?img=6', 'Allergic to peanuts');
+-- =====================================================
+-- USERS
+-- =====================================================
+-- Password for all users: password123 (hashed with bcrypt)
+-- Admin password: B@o140804 (will need to be hashed properly)
 
--- Child preferences
-INSERT INTO child_preferences (child_id, preference_type, tag_name) VALUES
-(1, 'LIKE', 'animals'),
-(1, 'LIKE', 'outdoor'),
-(1, 'DISLIKE', 'indoor'),
-(2, 'LIKE', 'crafts'),
-(2, 'LIKE', 'indoor'),
-(3, 'LIKE', 'outdoor'),
-(3, 'LIKE', 'sports'),
-(4, 'LIKE', 'animals'),
-(4, 'LIKE', 'crafts');
+INSERT INTO users (email, password_hash, first_name, last_name, role, status, agreement) VALUES
+-- Admin user (temporary hash - please update via app registration)
+('buibaomoyu@gmail.com', '$2a$10$rXK5WZxQfJYmeW8X6JZRr.vGQ6P4YH3fN4uMxP7F5vZ3qP9pX7Y8u', 'Bảo', 'Bùi', 'ADMIN', 'ACTIVE', TRUE),
 
--- Spots
-INSERT INTO spots (name, description, category, min_age, max_age, price_range, is_indoor, address, latitude, longitude, google_maps_url, operating_hours, is_open_today, weather_suitable, estimated_visit_duration, facilities, status, created_by_admin_id) VALUES
-('Ueno Zoo', 'Oldest zoo in Japan with pandas and elephants', 'ZOO', 2, 12, '1000_3000', FALSE, 'Taito-ku, Tokyo', 35.7152, 139.7737, 'https://maps.google.com/?q=35.7152,139.7737', '{"monday":"9:30-17:00","tuesday":"9:30-17:00","wednesday":"Closed","thursday":"9:30-17:00","friday":"9:30-17:00","saturday":"9:30-17:00","sunday":"9:30-17:00"}', TRUE, 'RAIN_OK', 180, '{"parking":true,"nursing_room":true,"stroller":true,"restroom":true,"cafe":true}', 'PUBLIC', 1),
-('National Museum of Nature and Science', 'Dinosaur fossils and science experiments', 'MUSEUM', 4, 15, '1000_3000', TRUE, 'Taito-ku, Tokyo', 35.7164, 139.7760, 'https://maps.google.com/?q=35.7164,139.7760', '{"monday":"9:00-17:00","tuesday":"Closed","wednesday":"9:00-17:00","thursday":"9:00-17:00","friday":"9:00-20:00","saturday":"9:00-17:00","sunday":"9:00-17:00"}', TRUE, 'ALL_WEATHER', 150, '{"parking":false,"nursing_room":true,"stroller":true,"restroom":true,"cafe":true}', 'PUBLIC', 1),
-('Tokyo Skytree', '634m tall observation tower', 'THEME_PARK', 0, 18, '3000_5000', TRUE, 'Sumida-ku, Tokyo', 35.7101, 139.8107, 'https://maps.google.com/?q=35.7101,139.8107', '{"monday":"10:00-21:00","tuesday":"10:00-21:00","wednesday":"10:00-21:00","thursday":"10:00-21:00","friday":"10:00-21:00","saturday":"10:00-21:00","sunday":"10:00-21:00"}', TRUE, 'ALL_WEATHER', 120, '{"parking":true,"nursing_room":true,"stroller":true,"restroom":true,"cafe":true}', 'PUBLIC', 1),
-('Odaiba Seaside Park', 'Beach park with sandy area', 'PARK', 0, 18, 'FREE', FALSE, 'Minato-ku, Tokyo', 35.6295, 139.7741, 'https://maps.google.com/?q=35.6295,139.7741', '{"monday":"24h","tuesday":"24h","wednesday":"24h","thursday":"24h","friday":"24h","saturday":"24h","sunday":"24h"}', TRUE, 'SUNNY_ONLY', 180, '{"parking":true,"nursing_room":false,"stroller":true,"restroom":true,"cafe":false}', 'PUBLIC', 1),
-('KidZania Tokyo', 'Occupational experience for kids', 'INDOOR_PLAY', 3, 12, '3000_5000', TRUE, 'Koto-ku, Tokyo', 35.6548, 139.7966, 'https://maps.google.com/?q=35.6548,139.7966', '{"monday":"9:00-15:00","tuesday":"9:00-15:00","wednesday":"9:00-15:00","thursday":"9:00-15:00","friday":"9:00-15:00","saturday":"9:00-15:00","sunday":"9:00-15:00"}', TRUE, 'ALL_WEATHER', 240, '{"parking":true,"nursing_room":true,"stroller":false,"restroom":true,"cafe":true}', 'PUBLIC', 1),
-('Kasai Rinkai Aquarium', 'Famous aquarium with tuna tank', 'AQUARIUM', 0, 18, '1000_3000', TRUE, 'Edogawa-ku, Tokyo', 35.6426, 139.8571, 'https://maps.google.com/?q=35.6426,139.8571', '{"monday":"9:30-17:00","tuesday":"9:30-17:00","wednesday":"Closed","thursday":"9:30-17:00","friday":"9:30-17:00","saturday":"9:30-17:00","sunday":"9:30-17:00"}', TRUE, 'ALL_WEATHER', 150, '{"parking":true,"nursing_room":true,"stroller":true,"restroom":true,"cafe":true}', 'PUBLIC', 1),
-('Yoyogi Park', 'Large park with lawn and forest', 'PARK', 0, 18, 'FREE', FALSE, 'Shibuya-ku, Tokyo', 35.6719, 139.6951, 'https://maps.google.com/?q=35.6719,139.6951', '{"monday":"24h","tuesday":"24h","wednesday":"24h","thursday":"24h","friday":"24h","saturday":"24h","sunday":"24h"}', TRUE, 'SUNNY_ONLY', 120, '{"parking":false,"nursing_room":false,"stroller":true,"restroom":true,"cafe":false}', 'PUBLIC', 1),
-('teamLab Borderless', 'Digital art museum', 'MUSEUM', 0, 18, '3000_5000', TRUE, 'Koto-ku, Tokyo', 35.6253, 139.7755, 'https://maps.google.com/?q=35.6253,139.7755', '{"monday":"10:00-19:00","tuesday":"Closed","wednesday":"10:00-19:00","thursday":"10:00-19:00","friday":"10:00-21:00","saturday":"10:00-21:00","sunday":"10:00-19:00"}', TRUE, 'ALL_WEATHER', 120, '{"parking":true,"nursing_room":true,"stroller":false,"restroom":true,"cafe":true}', 'PUBLIC', 1),
-('Asobono', 'Indoor playground in Tokyo Dome City', 'INDOOR_PLAY', 0, 8, '1000_3000', TRUE, 'Bunkyo-ku, Tokyo', 35.7056, 139.7520, 'https://maps.google.com/?q=35.7056,139.7520', '{"monday":"10:00-18:00","tuesday":"10:00-18:00","wednesday":"10:00-18:00","thursday":"10:00-18:00","friday":"10:00-18:00","saturday":"10:00-19:00","sunday":"10:00-19:00"}', TRUE, 'ALL_WEATHER', 180, '{"parking":true,"nursing_room":true,"stroller":true,"restroom":true,"cafe":true}', 'PUBLIC', 1),
-('Inokashira Park Zoo', 'Small zoo and aquatic life museum', 'ZOO', 2, 12, 'UNDER_1000', FALSE, 'Musashino-shi, Tokyo', 35.7000, 139.5776, 'https://maps.google.com/?q=35.7000,139.5776', '{"monday":"9:30-17:00","tuesday":"9:30-17:00","wednesday":"Closed","thursday":"9:30-17:00","friday":"9:30-17:00","saturday":"9:30-17:00","sunday":"9:30-17:00"}', TRUE, 'RAIN_OK', 120, '{"parking":false,"nursing_room":false,"stroller":true,"restroom":true,"cafe":false}', 'PUBLIC', 1);
+-- Regular users
+('tanaka.yuki@example.com', '$2a$10$rXK5WZxQfJYmeW8X6JZRr.vGQ6P4YH3fN4uMxP7F5vZ3qP9pX7Y8u', '由紀', '田中', 'USER', 'ACTIVE', TRUE),
+('nguyenvan@example.com', '$2a$10$rXK5WZxQfJYmeW8X6JZRr.vGQ6P4YH3fN4uMxP7F5vZ3qP9pX7Y8u', 'Văn', 'Nguyễn', 'USER', 'ACTIVE', TRUE),
+('tranthihue@example.com', '$2a$10$rXK5WZxQfJYmeW8X6JZRr.vGQ6P4YH3fN4uMxP7F5vZ3qP9pX7Y8u', 'Huệ', 'Trần Thị', 'USER', 'ACTIVE', TRUE),
+('satoyuki@example.com', '$2a$10$rXK5WZxQfJYmeW8X6JZRr.vGQ6P4YH3fN4uMxP7F5vZ3qP9pX7Y8u', '由紀', '佐藤', 'USER', 'ACTIVE', TRUE);
 
--- Spot images
+-- =====================================================
+-- CHILDREN
+-- =====================================================
+
+INSERT INTO children (user_id, name, birth_date, notes) VALUES
+-- Admin children
+(1, 'Minh', '2018-05-15', '活発で動物が大好き。公園で遊ぶのが好きです。'),
+(1, 'An', '2020-08-20', 'おとなしくて絵本が好き。図書館が大好きです。'),
+
+-- User 2 children  
+(2, '太郎', '2019-03-10', 'スポーツが好き。アクティブな遊びを求めています。'),
+(2, '花子', '2021-11-05', '音楽が好き。静かな場所を好みます。'),
+
+-- User 3 children
+(3, 'Hương', '2017-12-25', '好奇心旺盛。新しいことを学ぶのが大好き。'),
+
+-- User 4 children
+(4, 'Mai', '2019-09-22', 'アートが好き。創造的な活動を楽しみます。'),
+
+-- User 5 children
+(5, 'Hải', '2016-07-14', 'サイエンスが好き。博物館巡りが趣味。');
+
+-- =====================================================
+-- SPOTS (Hanoi Locations with Real Data)
+-- =====================================================
+
+INSERT INTO spots (name, description, category, min_age, max_age, price_range, is_indoor, address, latitude, longitude, operating_hours, weather_suitable, facilities, status, average_rating, review_count, created_by_admin_id) VALUES
+
+-- 1. Thảo Cầm Viên Hà Nội (Hanoi Zoo)
+('Thảo Cầm Viên Hà Nội', 'ベトナム最古の動物園。1000頭以上、100種類以上の動物がいます。ライオン、ゾウ、キリン、サルなど様々な動物を観察できます。子供向けの遊び場もあり、週末には多くの家族連れで賑わいます。広大な敷地内には緑も多く、ピクニックにも最適です。', 'ZOO', 0, 12, '1000_3000', FALSE, 'Đường Láng, Ngọc Khánh, Ba Đình, Hà Nội', 21.0329, 105.8089, '{"monday": "7:00-17:00", "tuesday": "7:00-17:00", "wednesday": "7:00-17:00", "thursday": "7:00-17:00", "friday": "7:00-17:00", "saturday": "7:00-17:00", "sunday": "7:00-17:00"}', 'SUNNY_ONLY', '{"parking": true, "restroom": true, "vending_machine": true, "restaurant": true, "stroller_accessible": true, "nursing_room": false, "wheelchair_accessible": true}', 'PUBLIC', 4.5, 120, 1),
+
+-- 2. Bảo tàng Dân tộc học Việt Nam
+('ベトナム民族学博物館', '3.27ヘクタールの広大な野外博物館で、ベトナムの54民族の文化を紹介。伝統的な家屋の展示、文化体験プログラム、伝統工芸のワークショップに参加できます。子供たちは実際に民族衣装を着たり、伝統楽器を演奏したりする体験ができます。', 'MUSEUM', 6, 18, '1000_3000', FALSE, 'Đường Nguyễn Văn Huyên, Nghĩa Đô, Cầu Giấy, Hà Nội', 21.0378, 105.7938, '{"monday": "休館", "tuesday": "8:30-17:30", "wednesday": "8:30-17:30", "thursday": "8:30-17:30", "friday": "8:30-17:30", "saturday": "8:30-17:30", "sunday": "8:30-17:30"}', 'RAIN_OK', '{"parking": true, "restroom": true, "wheelchair_accessible": true, "restaurant": false, "gift_shop": true}', 'PUBLIC', 4.2, 85, 1),
+
+-- 3. Công viên Thủ Lệ
+('トゥーレー公園', '大きな湖のある広い公園。ペダルボート遊び、遊歩道、子供の遊び場があります。週末には多くの家族連れが訪れ、ピクニックやスポーツを楽しんでいます。湖の周りを散歩したり、ボートに乗ったり、芝生でのんびり過ごすことができます。入園無料なので気軽に訪れることができます。', 'PARK', 0, 12, 'FREE', FALSE, 'Đường Thụy Khuê, Thuỵ Khuê, Tây Hồ, Hà Nội', 21.0497, 105.8178, '{"monday": "5:00-22:00", "tuesday": "5:00-22:00", "wednesday": "5:00-22:00", "thursday": "5:00-22:00", "friday": "5:00-22:00", "saturday": "5:00-22:00", "sunday": "5:00-22:00"}', 'SUNNY_ONLY', '{"parking": true, "restroom": true, "vending_machine": true, "stroller_accessible": true, "playground": true}', 'PUBLIC', 4.6, 200, 1),
+
+-- 4. KidZone Vincom Center
+('キッズゾーン ビンコムセンター', '最新の屋内遊び場。ボールプール、大型滑り台、トランポリン、創造エリアなど充実の設備。幼児から小学生まで安全に楽しめます。エアコン完備で雨の日でも快適。スタッフが常駐しており、安全管理も徹底されています。', 'INDOOR_PLAY', 1, 8, '3000_5000', TRUE, 'Vincom Center Bà Triệu, 191 Bà Triệu, Hai Bà Trưng, Hà Nội', 21.0144, 105.8459, '{"monday": "10:00-22:00", "tuesday": "10:00-22:00", "wednesday": "10:00-22:00", "thursday": "10:00-22:00", "friday": "10:00-22:00", "saturday": "9:00-22:00", "sunday": "9:00-22:00"}', 'ALL_WEATHER', '{"parking": true, "restroom": true, "nursing_room": true, "diaper_changing": true, "lockers": true, "air_conditioning": true}', 'PUBLIC', 4.7, 150, 1),
+
+-- 5. Hồ Hoàn Kiếm
+('ホアンキエム湖', 'ハノイの中心にある美しい湖。湖の周りを散歩したり、玉山祠を訪れたり、週末の歩行者天国で子供と安全に遊べます。朝は太極拳をする人々、夕方は散歩する家族連れで賑わいます。湖畔にはカフェやアイスクリーム屋さんもあり、休憩にも最適です。', 'PARK', 0, 18, 'FREE', FALSE, 'Hoàn Kiếm, Hà Nội', 21.0285, 105.8542, '{"monday": "24時間", "tuesday": "24時間", "wednesday": "24時間", "thursday": "24時間", "friday": "24時間", "saturday": "24時間", "sunday": "24時間"}', 'ALL_WEATHER', '{"parking": false, "restroom": true, "vending_machine": true, "stroller_accessible": true, "cafes": true}', 'PUBLIC', 4.8, 500, 1),
+
+-- 6. Bảo tàng Hồ Chí Minh
+('ホーチミン博物館', 'ホーチミン主席の生涯と業績を紹介する博物館。ユニークな建築デザイン、広い庭園があります。ベトナムの歴史を学ぶのに最適で、学校の社会科見学でもよく訪れられます。入場無料なのも魅力的です。', 'MUSEUM', 6, 18, 'FREE', TRUE, 'Số 19 Ngọc Hà, Ba Đình, Hà Nội', 21.0368, 105.8346, '{"monday": "休館", "tuesday": "8:00-12:00, 14:00-17:00", "wednesday": "8:00-12:00, 14:00-17:00", "thursday": "8:00-12:00, 14:00-17:00", "friday": "8:00-12:00, 14:00-17:00", "saturday": "8:00-12:00, 14:00-17:00", "sunday": "8:00-12:00, 14:00-17:00"}', 'ALL_WEATHER', '{"parking": true, "restroom": true, "wheelchair_accessible": true, "guided_tours": true}', 'PUBLIC', 4.0, 60, 1),
+
+-- 7. Times City Water Park
+('タイムズシティウォーターパーク', 'ハノイ最大の屋内ウォーターパーク。多数のウォータースライダー、造波プール、子供用浅いプール、流れるプールなど充実の設備。年中楽しめる温水プールで、冬でも快適に遊べます。家族全員で一日中楽しめる人気スポットです。', 'INDOOR_PLAY', 3, 18, 'OVER_5000', TRUE, 'Times City, 458 Minh Khai, Hai Bà Trưng, Hà Nội', 20.9952, 105.8689, '{"monday": "10:00-21:00", "tuesday": "10:00-21:00", "wednesday": "10:00-21:00", "thursday": "10:00-21:00", "friday": "10:00-21:00", "saturday": "9:00-22:00", "sunday": "9:00-22:00"}', 'ALL_WEATHER', '{"parking": true, "restroom": true, "nursing_room": true, "diaper_changing": true, "lockers": true, "restaurant": true, "life_guards": true}', 'PUBLIC', 4.6, 180, 1),
+
+-- 8. Công viên Nghĩa Đô
+('ギアドー公園', '滑り台、ブランコ、シーソーなどの遊具がある現代的なコミュニティパーク。スポーツコート、ランニングトラック、フィットネス器具も完備。住宅地にあるため、地元の子供たちで賑わっています。無料で利用できる公園です。', 'PARK', 1, 12, 'FREE', FALSE, 'Hoàng Quốc Việt, Nghĩa Đô, Cầu Giấy, Hà Nội', 21.0334, 105.7952, '{"monday": "5:00-22:00", "tuesday": "5:00-22:00", "wednesday": "5:00-22:00", "thursday": "5:00-22:00", "friday": "5:00-22:00", "saturday": "5:00-22:00", "sunday": "5:00-22:00"}', 'SUNNY_ONLY', '{"parking": true, "restroom": true, "stroller_accessible": true, "playground": true, "sports_court": true}', 'PUBLIC', 4.4, 95, 1),
+
+-- 9. Thư viện Khoa học Tổng hợp
+('ハノイ総合科学図書館', '子供向けエリアがある公共図書館。絵本、児童書、学習スペースがあります。定期的な読み聞かせ会やワークショップも開催。静かで落ち着いた環境で、読書好きな子供に最適です。無料で利用できます。', 'OTHER', 3, 15, 'FREE', TRUE, '31 Tràng Thi, Hoàn Kiếm, Hà Nội', 21.0242, 105.8523, '{"monday": "8:00-21:00", "tuesday": "8:00-21:00", "wednesday": "8:00-21:00", "thursday": "8:00-21:00", "friday": "8:00-21:00", "saturday": "8:00-17:00", "sunday": "8:00-17:00"}', 'ALL_WEATHER', '{"parking": false, "restroom": true, "wheelchair_accessible": true, "elevator": true, "wifi": true}', 'PUBLIC', 4.3, 70, 1),
+
+-- 10. Ecopark Adventure Park
+('エコパークアドベンチャーパーク', 'アウトドアアドベンチャーパーク。クライミング、吊り橋、ジップライン、ロープコースなど。子供向けから大人向けまで様々なレベルのコースがあります。安全装備完備で、インストラクターが指導します。自然の中で冒険を楽しめます。', 'THEME_PARK', 5, 18, '1000_3000', FALSE, 'Khu đô thị Ecopark, Văn Giang, Hưng Yên', 20.9461, 105.9458, '{"monday": "8:00-18:00", "tuesday": "8:00-18:00", "wednesday": "8:00-18:00", "thursday": "8:00-18:00", "friday": "8:00-18:00", "saturday": "8:00-19:00", "sunday": "8:00-19:00"}', 'SUNNY_ONLY', '{"parking": true, "restroom": true, "restaurant": true, "lockers": true, "safety_equipment": true}', 'PUBLIC', 4.5, 110, 1),
+
+-- 11. Bảo tàng Lịch sử Quốc gia
+('国立歴史博物館', 'ベトナムの先史時代から現代までの歴史を展示。貴重な遺物や歴史的文書を見ることができます。学生向けの教育プログラムも充実。歴史好きな子供や、社会科の勉強に最適です。', 'MUSEUM', 8, 18, '1000_3000', TRUE, '1 Tràng Tiền, Hoàn Kiếm, Hà Nội', 21.0237, 105.8580, '{"monday": "8:00-12:00, 13:30-17:00", "tuesday": "8:00-12:00, 13:30-17:00", "wednesday": "8:00-12:00, 13:30-17:00", "thursday": "8:00-12:00, 13:30-17:00", "friday": "8:00-12:00, 13:30-17:00", "saturday": "8:00-12:00, 13:30-17:00", "sunday": "8:00-12:00, 13:30-17:00"}', 'ALL_WEATHER', '{"parking": false, "restroom": true, "wheelchair_accessible": true, "guided_tours": true}', 'PUBLIC', 4.1, 55, 1),
+
+-- 12. Lotte Mart Kids Playground
+('ロッテマートキッズプレイグラウンド', 'ロッテマート内の無料遊び場。幼児に安全な遊具、ソフトプレイエリア。保護者が買い物中に子供が遊べる便利なスポット。清潔で安全管理もしっかりしています。', 'INDOOR_PLAY', 2, 8, 'FREE', TRUE, 'Lotte Mart, 54 Liễu Giai, Ba Đình, Hà Nội', 21.0314, 105.8138, '{"monday": "9:00-22:00", "tuesday": "9:00-22:00", "wednesday": "9:00-22:00", "thursday": "9:00-22:00", "friday": "9:00-22:00", "saturday": "9:00-22:00", "sunday": "9:00-22:00"}', 'ALL_WEATHER', '{"parking": true, "restroom": true, "nursing_room": true, "diaper_changing": true, "elevator": true, "restaurant": true}', 'PUBLIC', 4.4, 130, 1),
+
+-- 13. Công viên Thiên văn học
+('ハノイ天文公園', '宇宙と天文学をテーマにした教育的な公園。惑星のモデル、望遠鏡、天文学の展示があります。夜間には星空観察イベントも開催。科学好きな子供に人気のスポットです。', 'OTHER', 6, 18, 'UNDER_1000', FALSE, 'Hoàng Quốc Việt, Nghĩa Tân, Cầu Giấy, Hà Nội', 21.0342, 105.7888, '{"monday": "8:00-17:00", "tuesday": "8:00-17:00", "wednesday": "8:00-17:00", "thursday": "8:00-17:00", "friday": "8:00-17:00", "saturday": "8:00-20:00", "sunday": "8:00-20:00"}', 'SUNNY_ONLY', '{"parking": true, "restroom": true, "stroller_accessible": true, "telescopes": true}', 'PUBLIC', 4.2, 45, 1),
+
+-- 14. VinKE Royal City
+('ビンケ ロイヤルシティ', '50以上のゲーム機、ソフトプレイエリア、バンパーカー、エア遊具がある大型屋内エンターテイメント施設。終日チケットで遊び放題。雨の日や暑い日に最適な屋内施設です。', 'INDOOR_PLAY', 2, 15, '3000_5000', TRUE, 'Vincom Mega Mall Royal City, 72A Nguyễn Trãi, Thanh Xuân, Hà Nội', 21.0007, 105.8081, '{"monday": "9:30-22:00", "tuesday": "9:30-22:00", "wednesday": "9:30-22:00", "thursday": "9:30-22:00", "friday": "9:30-22:00", "saturday": "9:00-22:30", "sunday": "9:00-22:30"}', 'ALL_WEATHER', '{"parking": true, "restroom": true, "nursing_room": true, "diaper_changing": true, "lockers": true, "restaurant": true, "air_conditioning": true}', 'PUBLIC', 4.8, 220, 1),
+
+-- 15. Công viên Indira Gandhi
+('インディラガンディー公園', '多くの緑、鯉の池、子供の遊び場がある静かな公園。家族でのピクニック、散歩、軽い運動に最適。都会の喧騒から離れてリラックスできる癒しのスポットです。', 'PARK', 0, 12, 'FREE', FALSE, 'Láng Hạ, Đống Đa, Hà Nội', 21.0194, 105.8124, '{"monday": "5:00-22:00", "tuesday": "5:00-22:00", "wednesday": "5:00-22:00", "thursday": "5:00-22:00", "friday": "5:00-22:00", "saturday": "5:00-22:00", "sunday": "5:00-22:00"}', 'ALL_WEATHER', '{"parking": true, "restroom": true, "stroller_accessible": true, "vending_machine": true, "pond": true}', 'PUBLIC', 4.5, 88, 1);
+
+-- =====================================================
+-- SPOT IMAGES
+-- =====================================================
+
 INSERT INTO spot_images (spot_id, image_url, is_main, display_order) VALUES
-(1, 'https://images.unsplash.com/photo-1564349683136-77e08dba1ef7', TRUE, 1),
-(2, 'https://images.unsplash.com/photo-1581181530057-8a33e3c94a54', TRUE, 1),
-(3, 'https://images.unsplash.com/photo-1569137139943-ce8bc12c4b5c', TRUE, 1),
-(4, 'https://images.unsplash.com/photo-1559827260-dc66d52bef19', TRUE, 1),
-(5, 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b', TRUE, 1),
-(6, 'https://images.unsplash.com/photo-1535591273668-578e31182c4f', TRUE, 1),
-(7, 'https://images.unsplash.com/photo-1591604466107-ec97de577aff', TRUE, 1),
-(8, 'https://images.unsplash.com/photo-1518640467707-6811f4a6ab73', TRUE, 1),
-(9, 'https://images.unsplash.com/photo-1587832187482-08b97139a5f6', TRUE, 1),
-(10, 'https://images.unsplash.com/photo-1516641051054-9df6a1aad654', TRUE, 1);
+-- Zoo images
+(1, 'https://images.unsplash.com/photo-1564349683136-77e08dba1ef7?w=800', TRUE, 1),
+(1, 'https://images.unsplash.com/photo-1581888227599-779811939961?w=800', FALSE, 2),
 
--- Spot tags (including common tags: age ranges, indoor/outdoor for all spots)
+-- Museum Ethnology
+(2, 'https://images.unsplash.com/photo-1569704449284-135a0c0e0d8f?w=800', TRUE, 1),
+(2, 'https://images.unsplash.com/photo-1608452964553-9b4d97b2752f?w=800', FALSE, 2),
+
+-- Thu Le Park
+(3, 'https://images.unsplash.com/photo-1516302752625-fcc3c50ae61f?w=800', TRUE, 1),
+(3, 'https://images.unsplash.com/photo-1519832979-6fa011b87667?w=800', FALSE, 2),
+
+-- KidZone
+(4, 'https://images.unsplash.com/photo-1587654780291-39c9404d746b?w=800', TRUE, 1),
+(4, 'https://images.unsplash.com/photo-1612198188060-c7c2a3b66eae?w=800', FALSE, 2),
+
+-- Hoan Kiem Lake
+(5, 'https://images.unsplash.com/photo-1555881788-a4e75baa1205?w=800', TRUE, 1),
+(5, 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800', FALSE, 2),
+
+-- Ho Chi Minh Museum
+(6, 'https://images.unsplash.com/photo-1566127444977-eb86e0a1318f?w=800', TRUE, 1),
+
+-- Water Park
+(7, 'https://images.unsplash.com/photo-1587139223877-04cb899fa3e8?w=800', TRUE, 1),
+(7, 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800', FALSE, 2),
+
+-- Nghia Do Park
+(8, 'https://images.unsplash.com/photo-1560421683-6856ea585c78?w=800', TRUE, 1),
+
+-- Library
+(9, 'https://images.unsplash.com/photo-1521587760476-6c12a4b040da?w=800', TRUE, 1),
+
+-- Adventure Park
+(10, 'https://images.unsplash.com/photo-1535923163756-a31799c41fd9?w=800', TRUE, 1),
+
+-- History Museum
+(11, 'https://images.unsplash.com/photo-1566127444977-eb86e0a1318f?w=800', TRUE, 1),
+
+-- Lotte Mart
+(12, 'https://images.unsplash.com/photo-1587654780291-39c9404d746b?w=800', TRUE, 1),
+
+-- Astronomy Park
+(13, 'https://images.unsplash.com/photo-1614732414444-096e5f1122d5?w=800', TRUE, 1),
+
+-- VinKE
+(14, 'https://images.unsplash.com/photo-1597524936625-72cd840bc8f4?w=800', TRUE, 1),
+
+-- Indira Gandhi Park
+(15, 'https://images.unsplash.com/photo-1519331379826-f10be5486c6f?w=800', TRUE, 1);
+
+-- =====================================================
+-- SPOT TAGS
+-- =====================================================
+
 INSERT INTO spot_tags (spot_id, tag_name) VALUES
--- Ueno Zoo
-(1, 'outdoor'),(1, 'animals'),(1, 'rain_ok'),(1, 'age_2-5'),(1, 'age_6-12'),(1, 'educational'),(1, 'nature'),
--- National Museum
-(2, 'indoor'),(2, 'educational'),(2, 'crafts'),(2, 'age_4-8'),(2, 'age_9-15'),(2, 'science'),(2, 'museum'),
--- Tokyo Skytree
-(3, 'indoor'),(3, 'sightseeing'),(3, 'age_0-3'),(3, 'age_4-8'),(3, 'age_9-15'),(3, 'age_16-18'),(3, 'family'),
--- Odaiba Seaside Park
-(4, 'outdoor'),(4, 'water'),(4, 'free'),(4, 'age_0-3'),(4, 'age_4-8'),(4, 'age_9-15'),(4, 'beach'),(4, 'picnic'),
--- KidZania Tokyo
-(5, 'indoor'),(5, 'roleplay'),(5, 'educational'),(5, 'age_4-8'),(5, 'age_9-12'),(5, 'interactive'),(5, 'career'),
--- Kasai Rinkai Aquarium
-(6, 'indoor'),(6, 'animals'),(6, 'water'),(6, 'age_0-3'),(6, 'age_4-8'),(6, 'age_9-15'),(6, 'age_16-18'),(6, 'marine_life'),
--- Yoyogi Park
-(7, 'outdoor'),(7, 'free'),(7, 'picnic'),(7, 'age_0-3'),(7, 'age_4-8'),(7, 'age_9-15'),(7, 'nature'),(7, 'sports'),
--- teamLab Borderless
-(8, 'indoor'),(8, 'art'),(8, 'digital'),(8, 'age_0-3'),(8, 'age_4-8'),(8, 'age_9-15'),(8, 'age_16-18'),(8, 'interactive'),
--- Asobono
-(9, 'indoor'),(9, 'play'),(9, 'kids_only'),(9, 'age_0-3'),(9, 'age_4-8'),(9, 'safe'),(9, 'toddler'),
--- Inokashira Park Zoo
-(10, 'outdoor'),(10, 'animals'),(10, 'cheap'),(10, 'age_2-5'),(10, 'age_6-12'),(10, 'nature'),(10, 'small_zoo');
+-- Zoo (1)
+(1, '動物園'), (1, '屋外'), (1, '教育的'), (1, '家族向け'), (1, '自然'), (1, '動物'),
 
--- Reviews
-INSERT INTO reviews (spot_id, user_id, rating, comment, image_url, facilities_check, report_count, is_hidden) VALUES
-(1, 2, 5, 'Kids loved seeing the pandas!', 'https://images.unsplash.com/photo-1564349683136-77e08dba1ef7', '{"clean":true,"safe":true,"kid_friendly":true}', 0, FALSE),
-(1, 3, 4, 'Large zoo, can spend full day', NULL, '{"clean":true,"safe":true}', 0, FALSE),
-(2, 2, 5, 'Dinosaur exhibition is amazing!', NULL, '{"clean":true,"educational":true}', 0, FALSE),
-(3, 3, 5, 'Best view of Tokyo!', NULL, '{"clean":true}', 0, FALSE),
-(4, 2, 4, 'Fun beach area for kids', NULL, '{"safe":true}', 0, FALSE),
-(5, 4, 5, 'Realistic occupational experience', NULL, '{"educational":true,"kid_friendly":true}', 0, FALSE),
-(6, 2, 5, 'Tuna tank is spectacular', NULL, '{"clean":true,"kid_friendly":true}', 0, FALSE),
-(7, 4, 4, 'Perfect for picnic', NULL, '{"safe":true}', 0, FALSE),
-(8, 2, 5, 'Magical art experience!', NULL, '{"clean":true}', 0, FALSE),
-(9, 3, 5, 'Safe playground for small kids', NULL, '{"safe":true,"kid_friendly":true}', 0, FALSE);
+-- Museum Ethnology (2)
+(2, '博物館'), (2, '文化'), (2, '教育的'), (2, '体験型'), (2, '雨OK'),
 
--- Favorites
+-- Thu Le Park (3)
+(3, '公園'), (3, '屋外'), (3, '無料'), (3, 'ボート'), (3, '散歩'), (3, 'ピクニック'),
+
+-- KidZone (4)
+(4, '室内'), (4, '遊び場'), (4, '雨OK'), (4, '幼児向け'), (4, 'エアコン'), (4, '有料'),
+
+-- Hoan Kiem Lake (5)
+(5, '公園'), (5, '無料'), (5, '歴史'), (5, '散歩'), (5, '写真撮影'), (5, '屋外'),
+
+-- Ho Chi Minh Museum (6)
+(6, '博物館'), (6, '無料'), (6, '室内'), (6, '雨OK'), (6, '教育的'), (6, '歴史'),
+
+-- Water Park (7)
+(7, '室内'), (7, 'プール'), (7, '雨OK'), (7, '夏向け'), (7, 'スリル'), (7, '有料'),
+
+-- Nghia Do Park (8)
+(8, '公園'), (8, '無料'), (8, '遊具'), (8, '屋外'), (8, '家族向け'),
+
+-- Library (9)
+(9, '図書館'), (9, '無料'), (9, '室内'), (9, '雨OK'), (9, '静か'), (9, '教育的'),
+
+-- Adventure Park (10)
+(10, '屋外'), (10, '冒険'), (10, 'スポーツ'), (10, '体験型'), (10, 'スリル'), (10, '有料'),
+
+-- History Museum (11)
+(11, '博物館'), (11, '室内'), (11, '雨OK'), (11, '教育的'), (11, '歴史'), (11, '有料'),
+
+-- Lotte Mart (12)
+(12, '室内'), (12, '無料'), (12, '雨OK'), (12, '幼児向け'), (12, 'ショッピング'),
+
+-- Astronomy Park (13)
+(13, '科学'), (13, '教育的'), (13, '屋外'), (13, '体験型'), (13, '星空'), (13, '有料'),
+
+-- VinKE (14)
+(14, '室内'), (14, '雨OK'), (14, 'ゲーム'), (14, '遊び場'), (14, 'エアコン'), (14, '有料'),
+
+-- Indira Gandhi Park (15)
+(15, '公園'), (15, '無料'), (15, '屋外'), (15, 'ピクニック'), (15, '静か');
+
+-- =====================================================
+-- REVIEWS
+-- =====================================================
+
+INSERT INTO reviews (spot_id, user_id, rating, comment, created_at) VALUES
+-- Zoo reviews
+(1, 2, 5, '子供たちが動物を見て大喜びでした！広くて1日楽しめます。ライオンとゾウが特に人気でした。', '2025-11-20 10:30:00'),
+(1, 3, 4, '動物の種類が豊富で良かったです。少し古い施設もありますが、子供は楽しんでいました。', '2025-11-18 14:20:00'),
+(1, 4, 5, 'ベトナム最古の動物園だけあって、歴史を感じます。写真もたくさん撮れました。', '2025-11-15 09:15:00'),
+
+-- Museum reviews
+(2, 2, 4, '文化体験ができて良かったです。子供にとって新しい発見がたくさんありました。', '2025-11-19 11:00:00'),
+(2, 5, 5, '伝統工芸のワークショップが楽しかったです。スタッフも親切で丁寧に教えてくれました。', '2025-11-17 15:30:00'),
+
+-- Thu Le Park reviews
+(3, 3, 5, '無料で楽しめる素晴らしい公園。ボート遊びが子供に大人気でした。', '2025-11-22 08:45:00'),
+(3, 4, 4, '散歩に最適な場所。週末は少し混雑していますが、十分に楽しめます。', '2025-11-21 16:00:00'),
+
+-- KidZone reviews
+(4, 2, 5, '雨の日でも安心して遊べます。清潔で安全な施設です。スタッフの対応も素晴らしい。', '2025-11-20 13:20:00'),
+(4, 5, 4, '子供が3時間遊び続けました。料金は少し高めですが、その価値はあります。', '2025-11-16 10:50:00'),
+
+-- Hoan Kiem Lake reviews
+(5, 3, 5, 'ハノイの象徴的な場所。週末の歩行者天国は家族連れに最高です。', '2025-11-23 07:30:00'),
+(5, 4, 4, '美しい湖と歴史的な寺院。子供と散歩するのに良い場所です。', '2025-11-22 17:45:00'),
+
+-- Water Park reviews
+(7, 2, 5, '屋内なので天候に関係なく楽しめます。スライダーが最高！子供が大喜びでした。', '2025-11-19 12:00:00'),
+(7, 3, 5, '子供たちが一日中楽しんでいました。施設も清潔で管理が行き届いています。', '2025-11-18 14:30:00'),
+(7, 5, 4, 'プールの種類が豊富で飽きません。少し高いですが、十分な価値があります。', '2025-11-17 11:15:00'),
+
+-- VinKE reviews
+(14, 2, 5, 'ゲームとアトラクションが豊富！子供が大満足でした。終日チケットがお得です。', '2025-11-21 15:00:00'),
+(14, 4, 5, '雨の日に最適。たくさんのゲームで遊べます。おすすめです！', '2025-11-20 10:00:00');
+
+-- =====================================================
+-- FAVORITES
+-- =====================================================
+
 INSERT INTO favorites (user_id, spot_id, collection_tag) VALUES
-(2, 1, 'Animals'),(2, 6, 'Animals'),(2, 2, 'Indoor'),
-(3, 7, 'Free'),(3, 4, 'Outdoor'),(3, 1, 'Weekend Plans'),
-(4, 5, 'Educational'),(4, 9, 'Indoor'),
-(5, 8, 'Art & Culture'),(5, 3, 'Sightseeing');
+-- Admin favorites
+(1, 1, 'Family Favorite'),
+(1, 4, 'Rainy Day'),
+(1, 7, 'Summer Fun'),
+(1, 12, 'Free Activities'),
 
--- Schedules
-INSERT INTO schedules (user_id, spot_id, scheduled_date, time_slot, status, notes) VALUES
-(2, 1, '2025-11-16', 'AM', 'PLANNED', 'Visit pandas with Minh'),
-(2, 6, '2025-11-17', 'PM', 'PLANNED', 'Aquarium date'),
-(3, 7, '2025-11-16', 'FULL_DAY', 'PLANNED', 'Picnic with Taro and Hanako'),
-(4, 5, '2025-11-23', 'AM', 'PLANNED', 'Reserved for Kenta'),
-(5, 8, '2025-11-24', 'PM', 'PLANNED', 'teamLab with Misaki');
+-- User 2 favorites
+(2, 3, 'Parks'),
+(2, 5, 'Cultural'),
+(2, 8, 'Nearby'),
 
--- Kid swipe history (updated with spot_id instead of tag_name)
-INSERT INTO kid_swipe (child_id, spot_id, action) VALUES
--- Minh (child_id=1) liked zoo and aquarium, skipped museum
-(1, 1, 'LIKE'),  -- Ueno Zoo
-(1, 6, 'LIKE'),  -- Kasai Rinkai Aquarium
-(1, 2, 'SKIP'),  -- National Museum
--- An (child_id=2) liked indoor play, skipped outdoor park
-(2, 9, 'LIKE'),  -- Asobono
-(2, 5, 'LIKE'),  -- KidZania
-(2, 7, 'SKIP'),  -- Yoyogi Park
--- Taro (child_id=3) liked outdoor activities
-(3, 1, 'LIKE'),  -- Ueno Zoo
-(3, 4, 'LIKE'),  -- Odaiba Seaside Park
-(3, 7, 'LIKE'),  -- Yoyogi Park
--- Hanako (child_id=4) liked art and indoor
-(4, 8, 'LIKE'),  -- teamLab
-(4, 2, 'LIKE'),  -- National Museum
-(4, 4, 'SKIP'),  -- Odaiba (outdoor)
--- Kenta (child_id=5) adventurous, likes variety
-(5, 1, 'LIKE'),  -- Ueno Zoo
-(5, 5, 'LIKE'),  -- KidZania
-(5, 8, 'LIKE'),  -- teamLab
-(5, 10, 'SKIP'); -- Inokashira Park Zoo
+-- User 3 favorites
+(3, 2, 'Educational'),
+(3, 6, 'Free'),
+(3, 9, 'Library'),
 
--- Weather cache
-INSERT INTO weather_cache (date, location, weather_condition, temperature) VALUES
-('2025-11-11', 'Tokyo', 'SUNNY', 18.5),
-('2025-11-12', 'Tokyo', 'CLOUDY', 16.2),
-('2025-11-13', 'Tokyo', 'RAINY', 14.8);
+-- User 4 favorites
+(4, 10, 'Adventure'),
+(4, 13, 'Science'),
+(4, 14, 'Indoor Fun');
 
-SELECT 'Seed data inserted successfully' AS status;
-SELECT COUNT(*) AS total_users FROM users;
-SELECT COUNT(*) AS total_spots FROM spots;
-SELECT COUNT(*) AS total_reviews FROM reviews;
+-- =====================================================
+-- KID SWIPES
+-- =====================================================
+
+INSERT INTO kid_swipe (child_id, spot_id, action, created_at) VALUES
+-- Child 1 (Minh - loves animals)
+(1, 1, 'LIKE', '2025-11-20 10:00:00'),
+(1, 10, 'LIKE', '2025-11-20 10:05:00'),
+(1, 3, 'LIKE', '2025-11-20 10:10:00'),
+(1, 6, 'SKIP', '2025-11-20 10:15:00'),
+(1, 8, 'LIKE', '2025-11-20 10:20:00'),
+
+-- Child 2 (An - loves books)
+(2, 9, 'LIKE', '2025-11-21 14:00:00'),
+(2, 2, 'LIKE', '2025-11-21 14:05:00'),
+(2, 12, 'LIKE', '2025-11-21 14:10:00'),
+(2, 7, 'SKIP', '2025-11-21 14:15:00'),
+(2, 6, 'LIKE', '2025-11-21 14:20:00'),
+
+-- Child 3 (太郎 - loves sports)
+(3, 10, 'LIKE', '2025-11-22 09:00:00'),
+(3, 8, 'LIKE', '2025-11-22 09:05:00'),
+(3, 14, 'LIKE', '2025-11-22 09:10:00'),
+(3, 3, 'LIKE', '2025-11-22 09:15:00'),
+
+-- Child 5 (Hương - curious)
+(5, 2, 'LIKE', '2025-11-23 11:00:00'),
+(5, 11, 'LIKE', '2025-11-23 11:05:00'),
+(5, 13, 'LIKE', '2025-11-23 11:10:00'),
+(5, 6, 'LIKE', '2025-11-23 11:15:00');
+
+-- =====================================================
+-- CHILD PREFERENCES (auto-generated from swipes)
+-- =====================================================
+
+INSERT INTO child_preferences (child_id, preference_type, tag_name) VALUES
+-- Child 1 preferences (from zoo, adventure, parks)
+(1, 'LIKE', '動物園'),
+(1, 'LIKE', '屋外'),
+(1, 'LIKE', '自然'),
+(1, 'LIKE', '冒険'),
+(1, 'LIKE', '公園'),
+
+-- Child 2 preferences (from library, museum, free places)
+(2, 'LIKE', '図書館'),
+(2, 'LIKE', '室内'),
+(2, 'LIKE', '静か'),
+(2, 'LIKE', '文化'),
+(2, 'LIKE', '無料'),
+(2, 'LIKE', '博物館'),
+
+-- Child 3 preferences (from sports, adventure, games)
+(3, 'LIKE', 'スポーツ'),
+(3, 'LIKE', '屋外'),
+(3, 'LIKE', '冒険'),
+(3, 'LIKE', 'ゲーム'),
+(3, 'LIKE', '公園'),
+
+-- Child 5 preferences (from museums, science)
+(5, 'LIKE', '博物館'),
+(5, 'LIKE', '教育的'),
+(5, 'LIKE', '科学'),
+(5, 'LIKE', '体験型'),
+(5, 'LIKE', '歴史');
+
+-- =====================================================
+-- SCHEDULES
+-- =====================================================
+
+INSERT INTO schedules (user_id, spot_id, scheduled_date, time_slot, status, notes, created_at) VALUES
+-- Admin schedules
+(1, 1, '2025-11-30', 'AM', 'PLANNED', '動物園で朝の時間を楽しむ。お弁当持参。', '2025-11-24 10:00:00'),
+(1, 7, '2025-12-01', 'FULL_DAY', 'PLANNED', 'プール一日券購入済み。水着とタオル準備。', '2025-11-24 10:30:00'),
+
+-- User 2 schedules
+(2, 3, '2025-11-28', 'PM', 'PLANNED', 'ピクニック準備。ボート遊びも予定。', '2025-11-23 15:00:00'),
+(2, 14, '2025-12-02', 'AM', 'PLANNED', '子供の誕生日パーティー。友達も一緒。', '2025-11-23 15:30:00'),
+
+-- User 3 schedules
+(3, 2, '2025-11-29', 'FULL_DAY', 'PLANNED', '文化体験ツアー。ワークショップ参加予定。', '2025-11-22 09:00:00'),
+
+-- User 4 schedules
+(4, 10, '2025-12-05', 'AM', 'PLANNED', 'アドベンチャーコース予約済み。運動靴持参。', '2025-11-21 11:00:00');
+
+-- =====================================================
+-- SUCCESS MESSAGE
+-- =====================================================
+
+SELECT 
+    'Database seeded successfully!' as message,
+    (SELECT COUNT(*) FROM users) as total_users,
+    (SELECT COUNT(*) FROM children) as total_children,
+    (SELECT COUNT(*) FROM spots) as total_spots,
+    (SELECT COUNT(*) FROM spot_images) as total_images,
+    (SELECT COUNT(*) FROM spot_tags) as total_tags,
+    (SELECT COUNT(*) FROM reviews) as total_reviews,
+    (SELECT COUNT(*) FROM favorites) as total_favorites,
+    (SELECT COUNT(*) FROM kid_swipe) as total_swipes,
+    (SELECT COUNT(*) FROM schedules) as total_schedules;

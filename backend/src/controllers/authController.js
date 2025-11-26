@@ -30,13 +30,13 @@ const register = async (req, res) => {
         if (!firstName || !lastName || !email || !password || !confirmPassword) {
             return res.status(400).json({
                 success: false,
-                message: 'すべての必須フィールドを入力してください (Vui lòng điền tất cả các trường bắt buộc)',
+                message: 'すべての必須フィールドを入力してください',
                 errors: {
-                    firstName: !firstName ? '名前を入力してください (Vui lòng nhập tên)' : null,
-                    lastName: !lastName ? '姓を入力してください (Vui lòng nhập họ)' : null,
-                    email: !email ? 'メールアドレスを入力してください (Vui lòng nhập email)' : null,
-                    password: !password ? 'パスワードを入力してください (Vui lòng nhập mật khẩu)' : null,
-                    confirmPassword: !confirmPassword ? 'パスワード確認を入力してください (Vui lòng xác nhận mật khẩu)' : null
+                    firstName: !firstName ? '名前を入力してください ' : null,
+                    lastName: !lastName ? '姓を入力してください ' : null,
+                    email: !email ? 'メールアドレスを入力してください ' : null,
+                    password: !password ? 'パスワードを入力してください ' : null,
+                    confirmPassword: !confirmPassword ? 'パスワード確認を入力してください ' : null
                 }
             });
         }
@@ -46,7 +46,7 @@ const register = async (req, res) => {
         if (!emailRegex.test(email)) {
             return res.status(400).json({
                 success: false,
-                message: '有効なメールアドレスを入力してください (Vui lòng nhập email hợp lệ)'
+                message: '有効なメールアドレスを入力してください '
             });
         }
 
@@ -54,7 +54,7 @@ const register = async (req, res) => {
         if (password.length < 8) {
             return res.status(400).json({
                 success: false,
-                message: 'パスワードは8文字以上にしてください (Mật khẩu phải có ít nhất 8 ký tự)'
+                message: 'パスワードは8文字以上にしてください '
             });
         }
 
@@ -62,7 +62,7 @@ const register = async (req, res) => {
         if (password !== confirmPassword) {
             return res.status(400).json({
                 success: false,
-                message: 'パスワードが一致しません (Mật khẩu không khớp)'
+                message: 'パスワードが一致しません '
             });
         }
 
@@ -70,7 +70,7 @@ const register = async (req, res) => {
         if (!agreement) {
             return res.status(400).json({
                 success: false,
-                message: '利用規約とプライバシーポリシーに同意してください (Vui lòng đồng ý với điều khoản sử dụng và chính sách bảo mật)'
+                message: '利用規約とプライバシーポリシーに同意してください '
             });
         }
 
@@ -83,7 +83,7 @@ const register = async (req, res) => {
         if (existingUsers.length > 0) {
             return res.status(409).json({
                 success: false,
-                message: 'このメールアドレスは既に登録されています (Email này đã được đăng ký)'
+                message: 'このメールアドレスは既に登録されています '
             });
         }
 
@@ -114,7 +114,7 @@ const register = async (req, res) => {
         // === RESPONSE ===
         res.status(201).json({
             success: true,
-            message: '登録が完了しました (Đăng ký thành công)',
+            message: '登録が完了しました ',
             data: {
                 user: {
                     userId,
@@ -132,7 +132,7 @@ const register = async (req, res) => {
         console.error('❌ Register Error:', error);
         res.status(500).json({
             success: false,
-            message: 'サーバーエラーが発生しました (Đã xảy ra lỗi server)',
+            message: 'サーバーエラーが発生しました ',
             error: process.env.NODE_ENV === 'development' ? error.message : undefined
         });
     }
@@ -154,7 +154,7 @@ const login = async (req, res) => {
         if (!email || !password) {
             return res.status(400).json({
                 success: false,
-                message: 'メールアドレスとパスワードを入力してください (Vui lòng nhập email và mật khẩu)'
+                message: 'メールアドレスとパスワードを入力してください '
             });
         }
 
@@ -167,7 +167,7 @@ const login = async (req, res) => {
         if (users.length === 0) {
             return res.status(401).json({
                 success: false,
-                message: 'メールアドレスまたはパスワードが間違っています (Email hoặc mật khẩu không đúng)'
+                message: 'メールアドレスまたはパスワードが間違っています '
             });
         }
 
@@ -177,7 +177,7 @@ const login = async (req, res) => {
         if (user.status === 'BANNED') {
             return res.status(403).json({
                 success: false,
-                message: 'アカウントが停止されています。管理者にお問い合わせください (Tài khoản đã bị khóa. Vui lòng liên hệ quản trị viên)'
+                message: 'アカウントが停止されています。管理者にお問い合わせください '
             });
         }
 
@@ -187,7 +187,7 @@ const login = async (req, res) => {
         if (!isPasswordValid) {
             return res.status(401).json({
                 success: false,
-                message: 'メールアドレスまたはパスワードが間違っています (Email hoặc mật khẩu không đúng)'
+                message: 'メールアドレスまたはパスワードが間違っています '
             });
         }
 
@@ -203,7 +203,7 @@ const login = async (req, res) => {
         // === RESPONSE ===
         res.status(200).json({
             success: true,
-            message: 'ログインに成功しました (Đăng nhập thành công)',
+            message: 'ログインに成功しました ',
             data: {
                 user: {
                     userId: user.user_id,
@@ -221,7 +221,7 @@ const login = async (req, res) => {
         console.error('❌ Login Error:', error);
         res.status(500).json({
             success: false,
-            message: 'サーバーエラーが発生しました (Đã xảy ra lỗi server)',
+            message: 'サーバーエラーが発生しました',
             error: process.env.NODE_ENV === 'development' ? error.message : undefined
         });
     }
@@ -240,13 +240,13 @@ const logout = async (req, res) => {
         // Frontend sẽ xóa token khỏi localStorage/sessionStorage
         res.status(200).json({
             success: true,
-            message: 'ログアウトしました (Đã đăng xuất)'
+            message: 'ログアウトしました '
         });
     } catch (error) {
         console.error('❌ Logout Error:', error);
         res.status(500).json({
             success: false,
-            message: 'サーバーエラーが発生しました (Đã xảy ra lỗi server)'
+            message: 'サーバーエラーが発生しました '
         });
     }
 };
@@ -276,7 +276,7 @@ const getProfile = async (req, res) => {
         if (users.length === 0) {
             return res.status(404).json({
                 success: false,
-                message: 'ユーザーが見つかりません (Không tìm thấy người dùng)'
+                message: 'ユーザーが見つかりません '
             });
         }
 
@@ -305,7 +305,110 @@ const getProfile = async (req, res) => {
         console.error('❌ Get Profile Error:', error);
         res.status(500).json({
             success: false,
-            message: 'サーバーエラーが発生しました (Đã xảy ra lỗi server)'
+            message: 'サーバーエラーが発生しました '
+        });
+    }
+};
+
+/**
+ * PUT /api/auth/profile
+ * Cập nhật thông tin user
+ * 
+ * Headers:
+ * - Authorization: Bearer TOKEN
+ * 
+ * Body:
+ * - firstName: Tên (optional)
+ * - lastName: Họ (optional)
+ * - email: Email (optional)
+ */
+const updateProfile = async (req, res) => {
+    try {
+        const userId = req.user.userId; // Từ middleware authenticateToken
+        const { firstName, lastName, email } = req.body;
+
+        // Kiểm tra ít nhất 1 trường được cung cấp
+        if (!firstName && !lastName && !email) {
+            return res.status(400).json({
+                success: false,
+                message: '更新する情報を入力してください'
+            });
+        }
+
+        // Validate email format nếu có
+        if (email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                return res.status(400).json({
+                    success: false,
+                    message: '有効なメールアドレスを入力してください'
+                });
+            }
+
+            // Kiểm tra email đã tồn tại chưa (trừ email của chính user)
+            const existingUsers = await db.query(
+                'SELECT user_id FROM users WHERE email = ? AND user_id != ?',
+                [email, userId]
+            );
+
+            if (existingUsers.length > 0) {
+                return res.status(409).json({
+                    success: false,
+                    message: 'このメールアドレスは既に使用されています'
+                });
+            }
+        }
+
+        // Chuẩn bị câu query động
+        const updateFields = [];
+        const values = [];
+
+        if (firstName) {
+            updateFields.push('first_name = ?');
+            values.push(firstName);
+        }
+        if (lastName) {
+            updateFields.push('last_name = ?');
+            values.push(lastName);
+        }
+        if (email) {
+            updateFields.push('email = ?');
+            values.push(email);
+        }
+
+        values.push(userId); // Thêm userId cho WHERE clause
+
+        // Cập nhật database
+        await db.query(
+            `UPDATE users SET ${updateFields.join(', ')} WHERE user_id = ?`,
+            values
+        );
+
+        // Lấy thông tin user đã cập nhật
+        const updatedUsers = await db.query(
+            `SELECT user_id, email, first_name, last_name, role FROM users WHERE user_id = ?`,
+            [userId]
+        );
+
+        const updatedUser = updatedUsers[0];
+
+        res.status(200).json({
+            success: true,
+            message: 'プロフィールを更新しました',
+            data: {
+                userId: updatedUser.user_id,
+                email: updatedUser.email,
+                firstName: updatedUser.first_name,
+                lastName: updatedUser.last_name,
+                role: updatedUser.role
+            }
+        });
+
+    } catch (error) {
+        console.error('❌ Update Profile Error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'サーバーエラーが発生しました'
         });
     }
 };
@@ -314,5 +417,6 @@ module.exports = {
     register,
     login,
     logout,
-    getProfile
+    getProfile,
+    updateProfile
 };

@@ -55,14 +55,14 @@ const getSchedules = async (req, res) => {
       SELECT 
         sc.schedule_id,
         sc.spot_id,
-        sc.scheduled_date,
+        DATE_FORMAT(sc.scheduled_date, '%Y-%m-%d') as scheduled_date,
         sc.time_slot,
         sc.status,
         sc.notes,
         sc.created_at,
         s.name as spot_name,
         s.category,
-        s.address,
+        s.address as spot_address,
         s.latitude,
         s.longitude,
         s.price_range,
@@ -124,7 +124,7 @@ const getScheduleById = async (req, res) => {
         sc.schedule_id,
         sc.user_id,
         sc.spot_id,
-        sc.scheduled_date,
+        DATE_FORMAT(sc.scheduled_date, '%Y-%m-%d') as scheduled_date,
         sc.time_slot,
         sc.status,
         sc.notes,
@@ -281,7 +281,7 @@ const addSchedule = async (req, res) => {
       SELECT 
         sc.schedule_id,
         sc.spot_id,
-        sc.scheduled_date,
+        DATE_FORMAT(sc.scheduled_date, '%Y-%m-%d') as scheduled_date,
         sc.time_slot,
         sc.status,
         sc.notes,
@@ -417,7 +417,7 @@ const updateSchedule = async (req, res) => {
       SELECT 
         sc.schedule_id,
         sc.spot_id,
-        sc.scheduled_date,
+        DATE_FORMAT(sc.scheduled_date, '%Y-%m-%d') as scheduled_date,
         sc.time_slot,
         sc.status,
         sc.notes,
@@ -539,7 +539,7 @@ const getCalendarSchedules = async (req, res) => {
       SELECT 
         sc.schedule_id,
         sc.spot_id,
-        sc.scheduled_date,
+        DATE_FORMAT(sc.scheduled_date, '%Y-%m-%d') as scheduled_date,
         sc.time_slot,
         sc.status,
         s.name as spot_name,
@@ -563,7 +563,7 @@ const getCalendarSchedules = async (req, res) => {
     // Group by date
     const schedulesByDate = {};
     schedules.forEach(schedule => {
-      const dateKey = schedule.scheduled_date.toISOString().split('T')[0];
+      const dateKey = schedule.scheduled_date; // Already formatted as YYYY-MM-DD
       if (!schedulesByDate[dateKey]) {
         schedulesByDate[dateKey] = [];
       }

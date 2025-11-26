@@ -17,7 +17,8 @@ module.exports = {
     queueLimit: 0,
     enableKeepAlive: true,
     keepAliveInitialDelay: 0,
-    timezone: '+09:00' // JST (Japan Standard Time)
+    timezone: '+09:00', // JST (Japan Standard Time)
+    charset: 'utf8mb4' // Fix Japanese character encoding
   },
 
   // JWT config

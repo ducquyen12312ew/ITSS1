@@ -321,8 +321,7 @@ const getSpotReviews = async (req, res) => {
         r.created_at,
         r.updated_at,
         u.user_id,
-        u.first_name,
-        u.last_name,
+        CONCAT(u.first_name, ' ', u.last_name) as user_name,
         u.email
       FROM reviews r
       JOIN users u ON r.user_id = u.user_id

@@ -40,4 +40,13 @@ router.post('/logout', authenticateToken, authController.logout);
  */
 router.get('/profile', authenticateToken, authController.getProfile);
 
+/**
+ * @route   PUT /api/auth/profile
+ * @desc    Cập nhật thông tin user
+ * @access  Private (cần token)
+ * @headers Authorization: Bearer TOKEN
+ * @body    { firstName?, lastName?, email? }
+ */
+router.put('/profile', authenticateToken, authController.updateProfile);
+
 module.exports = router;

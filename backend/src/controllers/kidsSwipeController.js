@@ -95,21 +95,7 @@ const swipeSpot = async (req, res) => {
         }
       }
 
-      // 2. Add to favorites if not already there
-      try {
-        await connection.execute(
-          `INSERT INTO favorites (user_id, spot_id, collection_tag)
-           VALUES (?, ?, ?)`,
-          [userId, spot_id, 'Kids Swipe']
-        );
-      } catch (error) {
-        // Ignore if already favorited
-        if (error.code !== 'ER_DUP_ENTRY') {
-          throw error;
-        }
-      }
-
-      // 3. Log swipe action to kid_swipe table
+      // 2. Log swipe action to kid_swipe table
       try {
         await connection.execute(
           `INSERT INTO kid_swipe (child_id, spot_id, action)
@@ -600,9 +586,143 @@ const getSpotsForSwipe = async (req, res) => {
   }
 };
 
+/**
+ * DELETE /api/kids-swipe/:childId/swipe/:spotId
+ * Xóa swipe của trẻ (remove từ kid_swipe)
+ */
+const deleteKidSwipe = async (req, res) => {
+  const connection = await getConnection();
+  try {
+    const userId = req.user.userId;
+    const { childId, spotId } = req.params;
+
+    // Check if child belongs to user
+    const [childCheck] = await connection.execute(
+      'SELECT child_id FROM children WHERE child_id = ? AND user_id = ?',
+      [childId, userId]
+    );
+
+    if (childCheck.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Không tìm thấy trẻ hoặc bạn không có quyền truy cập'
+      });
+    }
+
+    // Delete from kid_swipe
+    const [result] = await connection.execute(
+      'DELETE FROM kid_swipe WHERE child_id = ? AND spot_id = ?',
+      [childId, spotId]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Không tìm thấy swipe'
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Đã xóa khỏi yêu thích của trẻ'
+    });
+
+  } catch (error) {
+    console.error('Delete kid swipe error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Lỗi khi xóa swipe',
+      error: error.message
+    });
+  } finally {
+    connection.release();
+  }
+};
+
+/**
+ * GET /api/kids-swipe/:childId/favorites
+ * Lấy danh sách spots mà trẻ đã LIKE (từ kid_swipe table)
+ */
+const getKidFavorites = async (req, res) => {
+  const connection = await getConnection();
+  try {
+    const userId = req.user.userId;
+    const { childId } = req.params;
+
+    // Check if child belongs to user
+    const [childCheck] = await connection.execute(
+      'SELECT child_id, name FROM children WHERE child_id = ? AND user_id = ?',
+      [childId, userId]
+    );
+
+    if (childCheck.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Không tìm thấy trẻ hoặc bạn không có quyền truy cập'
+      });
+    }
+
+    // Get all liked spots from kid_swipe
+    const query = `
+      SELECT 
+        ks.swipe_id,
+        ks.spot_id,
+        ks.created_at,
+        s.name,
+        s.category,
+        s.min_age,
+        s.max_age,
+        s.price_range,
+        s.address,
+        s.latitude,
+        s.longitude,
+        s.average_rating,
+        s.review_count,
+        s.is_indoor,
+        s.weather_suitable,
+        (SELECT image_url FROM spot_images WHERE spot_id = s.spot_id AND is_main = TRUE LIMIT 1) as main_image,
+        (SELECT GROUP_CONCAT(tag_name) FROM spot_tags WHERE spot_id = s.spot_id) as tags
+      FROM kid_swipe ks
+      JOIN spots s ON ks.spot_id = s.spot_id
+      WHERE ks.child_id = ? AND ks.action = 'LIKE' AND s.status = 'PUBLIC'
+      ORDER BY ks.created_at DESC
+    `;
+
+    const [favorites] = await connection.execute(query, [childId]);
+
+    // Parse tags
+    const favoritesWithParsedTags = favorites.map(fav => ({
+      ...fav,
+      tags: fav.tags ? fav.tags.split(',') : [],
+      child_id: parseInt(childId)
+    }));
+
+    res.json({
+      success: true,
+      data: {
+        child: childCheck[0],
+        favorites: favoritesWithParsedTags,
+        total: favorites.length
+      }
+    });
+
+  } catch (error) {
+    console.error('Get kid favorites error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Lỗi khi lấy yêu thích của trẻ',
+      error: error.message
+    });
+  } finally {
+    connection.release();
+  }
+};
+
 module.exports = {
   swipeSpot,
   getChildPreferences,
   getRecommendations,
-  getSpotsForSwipe
+  getSpotsForSwipe,
+  getKidFavorites,
+  deleteKidSwipe
 };
