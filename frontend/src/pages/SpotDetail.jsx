@@ -15,7 +15,7 @@ const SpotDetail = () => {
   const [scheduleOpen, setScheduleOpen] = useState(false);
   const [scheduleData, setScheduleData] = useState({
     date: '',
-    timeSlot: 'FULL_DAY',
+    time: 9,
     note: '',
   });
   const [existingSchedules, setExistingSchedules] = useState([]);
@@ -101,13 +101,13 @@ const SpotDetail = () => {
       await api.post('/schedules', {
         spot_id: parseInt(id),
         scheduled_date: scheduleData.date,
-        time_slot: scheduleData.timeSlot,
+        time: scheduleData.time,
         notes: scheduleData.note || null,
       });
 
       alert('スケジュールに追加しました');
       setScheduleOpen(false);
-      setScheduleData({ date: '', timeSlot: 'FULL_DAY', note: '' });
+      setScheduleData({ date: '', time: 9, note: '' });
       fetchExistingSchedules(); // Refresh schedule list
     } catch (error) {
       console.error('Error adding to schedule:', error);
@@ -128,13 +128,8 @@ const SpotDetail = () => {
     }
   };
 
-  const getTimeSlotLabel = (timeSlot) => {
-    const labels = {
-      'AM': '午前',
-      'PM': '午後',
-      'FULL_DAY': '終日'
-    };
-    return labels[timeSlot] || timeSlot;
+  const formatTime = (time) => {
+    return `${time}:00`;
   };
 
   const handleSubmitReview = async () => {
@@ -161,8 +156,14 @@ const SpotDetail = () => {
   };
 
   const openRoute = () => {
-    if (spot?.address) {
-      window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(spot.address)}`, '_blank');
+    if (spot?.latitude && spot?.longitude) {
+      // Default origin: HUST (21.0055°N, 105.8433°E)
+      const origin = '21.0055,105.8433';
+      const destination = `${spot.latitude},${spot.longitude}`;
+      window.open(`https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}&travelmode=driving`, '_blank');
+    } else if (spot?.address) {
+      const origin = 'Đại+học+Bách+khoa+Hà+Nội';
+      window.open(`https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${encodeURIComponent(spot.address)}&travelmode=driving`, '_blank');
     }
   };
 
@@ -230,6 +231,27 @@ const SpotDetail = () => {
               <i className="fa-solid fa-location-dot"></i> {spot.area}
             </span>
           )}
+          {spot.latitude && spot.longitude && (
+            <span className="m">
+              <i className="fa-solid fa-route"></i> 
+              {(() => {
+                // Default location: HUST (21.0055°N, 105.8433°E)
+                const defaultLat = 21.0055;
+                const defaultLng = 105.8433;
+                const toRad = (val) => val * Math.PI / 180;
+                const lat1 = toRad(defaultLat);
+                const lat2 = toRad(spot.latitude);
+                const dLat = toRad(spot.latitude - defaultLat);
+                const dLng = toRad(spot.longitude - defaultLng);
+                const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                          Math.cos(lat1) * Math.cos(lat2) *
+                          Math.sin(dLng/2) * Math.sin(dLng/2);
+                const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+                const distance = 6371 * c;
+                return distance.toFixed(1);
+              })()}km
+            </span>
+          )}
           {spot.average_rating && (
             <span className="m">
               <i className="fa-solid fa-star"></i> {Number(spot.average_rating).toFixed(1)} ({spot.review_count || 0})
@@ -240,10 +262,17 @@ const SpotDetail = () => {
         {/* Pill info */}
         <div className="pilltab">
           <span className="tabb">
-            {spot.min_age || 0}〜{spot.max_age || 0}歳
+            {(() => {
+              const ageTags = spot.tags?.filter(tag => ['0-2歳', '3-5歳', '6-8歳', '9-12歳', '13-18歳'].includes(tag));
+              return ageTags?.length > 0 ? ageTags.join(', ') : '全年齢';
+            })()}
           </span>
           <span className="tabb">
-            {spot.min_price === 0 || !spot.min_price ? '無料' : `¥${Number(spot.min_price || 0).toLocaleString()}〜¥${Number(spot.max_price || 0).toLocaleString()}`}
+            {(() => {
+              const priceTags = ['無料', '1000円以下', '1000-3000円', '3000-5000円', '5000円以上'];
+              const priceTag = spot.tags?.find(tag => priceTags.includes(tag));
+              return priceTag || '料金不明';
+            })()}
           </span>
         </div>
 
@@ -338,17 +367,16 @@ const SpotDetail = () => {
               </div>
               <div>
                 <label style={{ display: 'block', marginBottom: '4px', fontSize: '14px', color: '#666' }}>
-                  時間帯
+                  時間 (0-24時)
                 </label>
-                <select
+                <input
+                  type="number"
+                  min="0"
+                  max="24"
                   className="field"
-                  value={scheduleData.timeSlot}
-                  onChange={(e) => setScheduleData({ ...scheduleData, timeSlot: e.target.value })}
-                >
-                  <option value="AM">午前</option>
-                  <option value="PM">午後</option>
-                  <option value="FULL_DAY">終日</option>
-                </select>
+                  value={scheduleData.time}
+                  onChange={(e) => setScheduleData({ ...scheduleData, time: parseInt(e.target.value) || 0 })}
+                />
               </div>
             </div>
             <div style={{ marginTop: '10px' }}>

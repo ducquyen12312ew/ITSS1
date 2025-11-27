@@ -7,14 +7,12 @@ CREATE TABLE users (
     user_id INT PRIMARY KEY AUTO_INCREMENT,
     email VARCHAR(255) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
-    first_name VARCHAR(100) NOT NULL,
-    last_name VARCHAR(100) NOT NULL,
+    name VARCHAR(200) NOT NULL,
     role ENUM('USER', 'ADMIN') DEFAULT 'USER',
     status ENUM('ACTIVE', 'INACTIVE', 'BANNED') DEFAULT 'ACTIVE',
     agreement BOOLEAN DEFAULT FALSE,
     location_lat DECIMAL(10, 8),
     location_lng DECIMAL(11, 8),
-    location_name VARCHAR(255),
     last_login_at TIMESTAMP NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -50,19 +48,12 @@ CREATE TABLE spots (
     spot_id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(255) NOT NULL,
     description TEXT,
-    category ENUM('PARK', 'MUSEUM', 'ZOO', 'AQUARIUM', 'THEME_PARK', 'INDOOR_PLAY', 'OTHER') DEFAULT 'OTHER',
-    min_age INT DEFAULT 0,
-    max_age INT DEFAULT 18,
-    price_range ENUM('FREE', 'UNDER_1000', '1000_3000', '3000_5000', 'OVER_5000') DEFAULT 'FREE',
-    is_indoor BOOLEAN DEFAULT FALSE,
     address VARCHAR(255),
     latitude DECIMAL(10, 8),
     longitude DECIMAL(11, 8),
     google_maps_url VARCHAR(255),
     operating_hours JSON,
     is_open_today BOOLEAN DEFAULT TRUE,
-    weather_suitable ENUM('ALL_WEATHER', 'SUNNY_ONLY', 'RAIN_OK') DEFAULT 'ALL_WEATHER',
-    estimated_visit_duration INT,
     facilities JSON,
     status ENUM('PUBLIC', 'PRIVATE', 'DRAFT') DEFAULT 'PUBLIC',
     average_rating DECIMAL(3,2) DEFAULT 0,
@@ -73,7 +64,6 @@ CREATE TABLE spots (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (created_by_admin_id) REFERENCES users(user_id) ON DELETE SET NULL,
-    INDEX idx_category (category),
     INDEX idx_location (latitude, longitude)
 );
 
@@ -133,7 +123,7 @@ CREATE TABLE schedules (
     user_id INT NOT NULL,
     spot_id INT NOT NULL,
     scheduled_date DATE NOT NULL,
-    time_slot ENUM('AM', 'PM', 'FULL_DAY') DEFAULT 'FULL_DAY',
+    time INT NOT NULL CHECK (time >= 0 AND time <= 24),
     status ENUM('PLANNED', 'COMPLETED', 'CANCELLED') DEFAULT 'PLANNED',
     notes TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -155,16 +145,6 @@ CREATE TABLE kid_swipe (
     UNIQUE KEY unique_child_spot (child_id, spot_id),
     INDEX idx_child_id (child_id),
     INDEX idx_spot_id (spot_id)
-);
-
-CREATE TABLE weather_cache (
-    weather_id INT PRIMARY KEY AUTO_INCREMENT,
-    date DATE NOT NULL,
-    location VARCHAR(100) NOT NULL,
-    weather_condition ENUM('SUNNY', 'CLOUDY', 'RAINY', 'SNOWY') NOT NULL,
-    temperature DECIMAL(4,1),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE KEY unique_date_location (date, location)
 );
 
 CREATE TABLE admin_logs (

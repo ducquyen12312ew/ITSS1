@@ -42,17 +42,14 @@ const getFavorites = async (req, res) => {
         f.collection_tag,
         f.created_at,
         s.name,
-        s.category,
-        s.min_age,
-        s.max_age,
-        s.price_range,
+        s.description,
         s.address,
         s.latitude,
         s.longitude,
         s.average_rating,
         s.review_count,
-        s.is_indoor,
-        s.weather_suitable,
+        s.operating_hours,
+        s.facilities,
         (SELECT image_url FROM spot_images WHERE spot_id = s.spot_id AND is_main = TRUE LIMIT 1) as main_image,
         (SELECT GROUP_CONCAT(tag_name) FROM spot_tags WHERE spot_id = s.spot_id) as tags
       FROM favorites f
@@ -193,7 +190,7 @@ const addFavorite = async (req, res) => {
         f.collection_tag,
         f.created_at,
         s.name,
-        s.category,
+        s.address,
         s.average_rating,
         (SELECT image_url FROM spot_images WHERE spot_id = s.spot_id AND is_main = TRUE LIMIT 1) as main_image,
         (SELECT GROUP_CONCAT(tag_name) FROM spot_tags WHERE spot_id = s.spot_id) as tags
@@ -265,7 +262,7 @@ const updateFavorite = async (req, res) => {
         f.collection_tag,
         f.created_at,
         s.name,
-        s.category,
+        s.address,
         (SELECT GROUP_CONCAT(tag_name) FROM spot_tags WHERE spot_id = s.spot_id) as tags
       FROM favorites f
       JOIN spots s ON f.spot_id = s.spot_id

@@ -22,23 +22,11 @@ const SpotCard = ({ spot }) => {
     is_free = false,
   } = spot;
 
-  // Format price range from ENUM
-  const formatPrice = () => {
-    if (!price_range) return '料金不明';
-    switch (price_range) {
-      case 'FREE':
-        return '無料';
-      case 'UNDER_1000':
-        return '¥1,000以下';
-      case '1000_3000':
-        return '¥1,000〜3,000';
-      case '3000_5000':
-        return '¥3,000〜5,000';
-      case 'OVER_5000':
-        return '¥5,000以上';
-      default:
-        return '料金不明';
-    }
+  // Get price from tags
+  const getPriceTag = () => {
+    const priceTags = ['無料', '1000円以下', '1000-3000円', '3000-5000円', '5000円以上'];
+    const priceTag = tags.find(tag => priceTags.includes(tag));
+    return priceTag || '料金不明';
   };
 
   // Format age range
@@ -80,13 +68,22 @@ const SpotCard = ({ spot }) => {
         <div className="tags">
           <span className="tag">{formatAge()}</span>
           {area && <span className="tag">{area}</span>}
-          <span className="tag">{formatPrice()}</span>
+          <span className="tag">{getPriceTag()}</span>
         </div>
         {tags.length > 0 && (
           <div className="tags thin">
-            {tags.slice(0, 3).map((tag, index) => (
-              <span key={index} className="tag">{tag}</span>
-            ))}
+            {tags
+              .filter(tag => {
+                // Filter out age, price, indoor/outdoor, and area tags
+                const excludeTags = ['0-2歳', '3-5歳', '6-8歳', '9-12歳', '13-18歳', 
+                                     '無料', '1000円以下', '1000-3000円', '3000-5000円', '5000円以上',
+                                     '室内', '屋外', '雨OK'];
+                return !excludeTags.includes(tag);
+              })
+              .slice(0, 3)
+              .map((tag, index) => (
+                <span key={index} className="tag">{tag}</span>
+              ))}
           </div>
         )}
       </div>

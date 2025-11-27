@@ -1,12 +1,11 @@
 -- Kodomo Weekend Navi - Seed Data (Hanoi Locations)
--- Complete database seed with realistic Hanoi spots
+-- Updated from current database snapshot
 
 USE kodomo_weekend_navi;
 
 -- Clear existing data
 SET FOREIGN_KEY_CHECKS = 0;
 TRUNCATE TABLE admin_logs;
-TRUNCATE TABLE weather_cache;
 TRUNCATE TABLE kid_swipe;
 TRUNCATE TABLE child_preferences;
 TRUNCATE TABLE schedules;
@@ -25,15 +24,15 @@ SET FOREIGN_KEY_CHECKS = 1;
 -- Password for all users: password123 (hashed with bcrypt)
 -- Admin password: B@o140804 (will need to be hashed properly)
 
-INSERT INTO users (email, password_hash, first_name, last_name, role, status, agreement) VALUES
+INSERT INTO users (email, password_hash, name, role, status, agreement) VALUES
 -- Admin user (temporary hash - please update via app registration)
-('buibaomoyu@gmail.com', '$2a$10$rXK5WZxQfJYmeW8X6JZRr.vGQ6P4YH3fN4uMxP7F5vZ3qP9pX7Y8u', 'Bảo', 'Bùi', 'ADMIN', 'ACTIVE', TRUE),
+('buibaomoyu@gmail.com', '$2a$10$rXK5WZxQfJYmeW8X6JZRr.vGQ6P4YH3fN4uMxP7F5vZ3qP9pX7Y8u', 'Bùi Bảo', 'ADMIN', 'ACTIVE', TRUE),
 
 -- Regular users
-('tanaka.yuki@example.com', '$2a$10$rXK5WZxQfJYmeW8X6JZRr.vGQ6P4YH3fN4uMxP7F5vZ3qP9pX7Y8u', '由紀', '田中', 'USER', 'ACTIVE', TRUE),
-('nguyenvan@example.com', '$2a$10$rXK5WZxQfJYmeW8X6JZRr.vGQ6P4YH3fN4uMxP7F5vZ3qP9pX7Y8u', 'Văn', 'Nguyễn', 'USER', 'ACTIVE', TRUE),
-('tranthihue@example.com', '$2a$10$rXK5WZxQfJYmeW8X6JZRr.vGQ6P4YH3fN4uMxP7F5vZ3qP9pX7Y8u', 'Huệ', 'Trần Thị', 'USER', 'ACTIVE', TRUE),
-('satoyuki@example.com', '$2a$10$rXK5WZxQfJYmeW8X6JZRr.vGQ6P4YH3fN4uMxP7F5vZ3qP9pX7Y8u', '由紀', '佐藤', 'USER', 'ACTIVE', TRUE);
+('tanaka.yuki@example.com', '$2a$10$rXK5WZxQfJYmeW8X6JZRr.vGQ6P4YH3fN4uMxP7F5vZ3qP9pX7Y8u', '田中 由紀', 'USER', 'ACTIVE', TRUE),
+('nguyenvan@example.com', '$2a$10$rXK5WZxQfJYmeW8X6JZRr.vGQ6P4YH3fN4uMxP7F5vZ3qP9pX7Y8u', 'Nguyễn Văn', 'USER', 'ACTIVE', TRUE),
+('tranthihue@example.com', '$2a$10$rXK5WZxQfJYmeW8X6JZRr.vGQ6P4YH3fN4uMxP7F5vZ3qP9pX7Y8u', 'Trần Thị Huệ', 'USER', 'ACTIVE', TRUE),
+('satoyuki@example.com', '$2a$10$rXK5WZxQfJYmeW8X6JZRr.vGQ6P4YH3fN4uMxP7F5vZ3qP9pX7Y8u', '佐藤 由紀', 'USER', 'ACTIVE', TRUE);
 
 -- =====================================================
 -- CHILDREN
@@ -61,158 +60,158 @@ INSERT INTO children (user_id, name, birth_date, notes) VALUES
 -- SPOTS (Hanoi Locations with Real Data)
 -- =====================================================
 
-INSERT INTO spots (name, description, category, min_age, max_age, price_range, is_indoor, address, latitude, longitude, operating_hours, weather_suitable, facilities, status, average_rating, review_count, created_by_admin_id) VALUES
+INSERT INTO spots (name, description, address, latitude, longitude, operating_hours, facilities, status, average_rating, review_count, created_by_admin_id) VALUES
 
--- 1. Thảo Cầm Viên Hà Nội (Hanoi Zoo)
-('Thảo Cầm Viên Hà Nội', 'ベトナム最古の動物園。1000頭以上、100種類以上の動物がいます。ライオン、ゾウ、キリン、サルなど様々な動物を観察できます。子供向けの遊び場もあり、週末には多くの家族連れで賑わいます。広大な敷地内には緑も多く、ピクニックにも最適です。', 'ZOO', 0, 12, '1000_3000', FALSE, 'Đường Láng, Ngọc Khánh, Ba Đình, Hà Nội', 21.0329, 105.8089, '{"monday": "7:00-17:00", "tuesday": "7:00-17:00", "wednesday": "7:00-17:00", "thursday": "7:00-17:00", "friday": "7:00-17:00", "saturday": "7:00-17:00", "sunday": "7:00-17:00"}', 'SUNNY_ONLY', '{"parking": true, "restroom": true, "vending_machine": true, "restaurant": true, "stroller_accessible": true, "nursing_room": false, "wheelchair_accessible": true}', 'PUBLIC', 4.5, 120, 1),
+-- 1. ハノイ動植物園
+('ハノイ動植物園', 'ベトナム最古の動物園。1000頭以上、100種類以上の動物がいます。ライオン、ゾウ、キリン、サルなど様々な動物を観察できます。子供向けの遊び場もあり、週末には多くの家族連れで賑わいます。広大な敷地内には緑も多く、ピクニックにも最適です。', 'Đường Láng, Ngọc Khánh, Ba Đình, Hà Nội', 21.0329, 105.8089, '{"monday": "7:00-17:00", "tuesday": "7:00-17:00", "wednesday": "7:00-17:00", "thursday": "7:00-17:00", "friday": "7:00-17:00", "saturday": "7:00-17:00", "sunday": "7:00-17:00"}', '{"parking": true, "nursing_room": false, "medical_station": true, "restaurant": true, "smoking_area": true}', 'PUBLIC', 4.50, 120, 1),
 
--- 2. Bảo tàng Dân tộc học Việt Nam
-('ベトナム民族学博物館', '3.27ヘクタールの広大な野外博物館で、ベトナムの54民族の文化を紹介。伝統的な家屋の展示、文化体験プログラム、伝統工芸のワークショップに参加できます。子供たちは実際に民族衣装を着たり、伝統楽器を演奏したりする体験ができます。', 'MUSEUM', 6, 18, '1000_3000', FALSE, 'Đường Nguyễn Văn Huyên, Nghĩa Đô, Cầu Giấy, Hà Nội', 21.0378, 105.7938, '{"monday": "休館", "tuesday": "8:30-17:30", "wednesday": "8:30-17:30", "thursday": "8:30-17:30", "friday": "8:30-17:30", "saturday": "8:30-17:30", "sunday": "8:30-17:30"}', 'RAIN_OK', '{"parking": true, "restroom": true, "wheelchair_accessible": true, "restaurant": false, "gift_shop": true}', 'PUBLIC', 4.2, 85, 1),
+-- 2. ベトナム民族学博物館
+('ベトナム民族学博物館', '3.27ヘクタールの広大な野外博物館で、ベトナムの54民族の文化を紹介。伝統的な家屋の展示、文化体験プログラム、伝統工芸のワークショップに参加できます。子供たちは実際に民族衣装を着たり、伝統楽器を演奏したりする体験ができます。', 'Đường Nguyễn Văn Huyên, Nghĩa Đô, Cầu Giấy, Hà Nội', 21.0378, 105.7938, '{"monday": "休館", "tuesday": "8:30-17:30", "wednesday": "8:30-17:30", "thursday": "8:30-17:30", "friday": "8:30-17:30", "saturday": "8:30-17:30", "sunday": "8:30-17:30"}', '{"parking": true, "nursing_room": false, "medical_station": false, "restaurant": false, "smoking_area": false}', 'PUBLIC', 4.20, 85, 1),
 
--- 3. Công viên Thủ Lệ
-('トゥーレー公園', '大きな湖のある広い公園。ペダルボート遊び、遊歩道、子供の遊び場があります。週末には多くの家族連れが訪れ、ピクニックやスポーツを楽しんでいます。湖の周りを散歩したり、ボートに乗ったり、芝生でのんびり過ごすことができます。入園無料なので気軽に訪れることができます。', 'PARK', 0, 12, 'FREE', FALSE, 'Đường Thụy Khuê, Thuỵ Khuê, Tây Hồ, Hà Nội', 21.0497, 105.8178, '{"monday": "5:00-22:00", "tuesday": "5:00-22:00", "wednesday": "5:00-22:00", "thursday": "5:00-22:00", "friday": "5:00-22:00", "saturday": "5:00-22:00", "sunday": "5:00-22:00"}', 'SUNNY_ONLY', '{"parking": true, "restroom": true, "vending_machine": true, "stroller_accessible": true, "playground": true}', 'PUBLIC', 4.6, 200, 1),
+-- 3. トゥーレー公園
+('トゥーレー公園', '大きな湖のある広い公園。ペダルボート遊び、遊歩道、子供の遊び場があります。週末には多くの家族連れが訪れ、ピクニックやスポーツを楽しんでいます。湖の周りを散歩したり、ボートに乗ったり、芝生でのんびり過ごすことができます。入園無料なので気軽に訪れることができます。', 'Đường Thụy Khuê, Thuỵ Khuê, Tây Hồ, Hà Nội', 21.0497, 105.8178, '{"monday": "5:00-22:00", "tuesday": "5:00-22:00", "wednesday": "5:00-22:00", "thursday": "5:00-22:00", "friday": "5:00-22:00", "saturday": "5:00-22:00", "sunday": "5:00-22:00"}', '{"parking": true, "nursing_room": false, "medical_station": false, "restaurant": false, "smoking_area": true}', 'PUBLIC', 4.60, 200, 1),
 
--- 4. KidZone Vincom Center
-('キッズゾーン ビンコムセンター', '最新の屋内遊び場。ボールプール、大型滑り台、トランポリン、創造エリアなど充実の設備。幼児から小学生まで安全に楽しめます。エアコン完備で雨の日でも快適。スタッフが常駐しており、安全管理も徹底されています。', 'INDOOR_PLAY', 1, 8, '3000_5000', TRUE, 'Vincom Center Bà Triệu, 191 Bà Triệu, Hai Bà Trưng, Hà Nội', 21.0144, 105.8459, '{"monday": "10:00-22:00", "tuesday": "10:00-22:00", "wednesday": "10:00-22:00", "thursday": "10:00-22:00", "friday": "10:00-22:00", "saturday": "9:00-22:00", "sunday": "9:00-22:00"}', 'ALL_WEATHER', '{"parking": true, "restroom": true, "nursing_room": true, "diaper_changing": true, "lockers": true, "air_conditioning": true}', 'PUBLIC', 4.7, 150, 1),
+-- 4. キッズゾーン ビンコムセンター
+('キッズゾーン ビンコムセンター', '最新の屋内遊び場。ボールプール、大型滑り台、トランポリン、創造エリアなど充実の設備。幼児から小学生まで安全に楽しめます。エアコン完備で雨の日でも快適。スタッフが常駐しており、安全管理も徹底されています。', 'Vincom Center Bà Triệu, 191 Bà Triệu, Hai Bà Trưng, Hà Nội', 21.0144, 105.8459, '{"monday": "10:00-22:00", "tuesday": "10:00-22:00", "wednesday": "10:00-22:00", "thursday": "10:00-22:00", "friday": "10:00-22:00", "saturday": "9:00-22:00", "sunday": "9:00-22:00"}', '{"parking": true, "nursing_room": true, "medical_station": false, "restaurant": true, "smoking_area": false}', 'PUBLIC', 4.70, 150, 1),
 
--- 5. Hồ Hoàn Kiếm
-('ホアンキエム湖', 'ハノイの中心にある美しい湖。湖の周りを散歩したり、玉山祠を訪れたり、週末の歩行者天国で子供と安全に遊べます。朝は太極拳をする人々、夕方は散歩する家族連れで賑わいます。湖畔にはカフェやアイスクリーム屋さんもあり、休憩にも最適です。', 'PARK', 0, 18, 'FREE', FALSE, 'Hoàn Kiếm, Hà Nội', 21.0285, 105.8542, '{"monday": "24時間", "tuesday": "24時間", "wednesday": "24時間", "thursday": "24時間", "friday": "24時間", "saturday": "24時間", "sunday": "24時間"}', 'ALL_WEATHER', '{"parking": false, "restroom": true, "vending_machine": true, "stroller_accessible": true, "cafes": true}', 'PUBLIC', 4.8, 500, 1),
+-- 5. ホアンキエム湖
+('ホアンキエム湖', 'ハノイの中心にある美しい湖。湖の周りを散歩したり、玉山祠を訪れたり、週末の歩行者天国で子供と安全に遊べます。朝は太極拳をする人々、夕方は散歩する家族連れで賑わいます。湖畔にはカフェやアイスクリーム屋さんもあり、休憩にも最適です。', 'Hoàn Kiếm, Hà Nội', 21.0285, 105.8542, '{"monday": "24時間", "tuesday": "24時間", "wednesday": "24時間", "thursday": "24時間", "friday": "24時間", "saturday": "24時間", "sunday": "24時間"}', '{"parking": false, "nursing_room": false, "medical_station": false, "restaurant": true, "smoking_area": true}', 'PUBLIC', 4.80, 500, 1),
 
--- 6. Bảo tàng Hồ Chí Minh
-('ホーチミン博物館', 'ホーチミン主席の生涯と業績を紹介する博物館。ユニークな建築デザイン、広い庭園があります。ベトナムの歴史を学ぶのに最適で、学校の社会科見学でもよく訪れられます。入場無料なのも魅力的です。', 'MUSEUM', 6, 18, 'FREE', TRUE, 'Số 19 Ngọc Hà, Ba Đình, Hà Nội', 21.0368, 105.8346, '{"monday": "休館", "tuesday": "8:00-12:00, 14:00-17:00", "wednesday": "8:00-12:00, 14:00-17:00", "thursday": "8:00-12:00, 14:00-17:00", "friday": "8:00-12:00, 14:00-17:00", "saturday": "8:00-12:00, 14:00-17:00", "sunday": "8:00-12:00, 14:00-17:00"}', 'ALL_WEATHER', '{"parking": true, "restroom": true, "wheelchair_accessible": true, "guided_tours": true}', 'PUBLIC', 4.0, 60, 1),
+-- 6. ホーチミン博物館
+('ホーチミン博物館', 'ホーチミン主席の生涯と業績を紹介する博物館。ユニークな建築デザイン、広い庭園があります。ベトナムの歴史を学ぶのに最適で、学校の社会科見学でもよく訪れられます。入場無料なのも魅力的です。', 'Số 19 Ngọc Hà, Ba Đình, Hà Nội', 21.0368, 105.8346, '{"monday": "休館", "tuesday": "8:00-12:00, 14:00-17:00", "wednesday": "8:00-12:00, 14:00-17:00", "thursday": "8:00-12:00, 14:00-17:00", "friday": "8:00-12:00, 14:00-17:00", "saturday": "8:00-12:00, 14:00-17:00", "sunday": "8:00-12:00, 14:00-17:00"}', '{"parking": true, "nursing_room": false, "medical_station": false, "restaurant": false, "smoking_area": false}', 'PUBLIC', 4.00, 60, 1),
 
--- 7. Times City Water Park
-('タイムズシティウォーターパーク', 'ハノイ最大の屋内ウォーターパーク。多数のウォータースライダー、造波プール、子供用浅いプール、流れるプールなど充実の設備。年中楽しめる温水プールで、冬でも快適に遊べます。家族全員で一日中楽しめる人気スポットです。', 'INDOOR_PLAY', 3, 18, 'OVER_5000', TRUE, 'Times City, 458 Minh Khai, Hai Bà Trưng, Hà Nội', 20.9952, 105.8689, '{"monday": "10:00-21:00", "tuesday": "10:00-21:00", "wednesday": "10:00-21:00", "thursday": "10:00-21:00", "friday": "10:00-21:00", "saturday": "9:00-22:00", "sunday": "9:00-22:00"}', 'ALL_WEATHER', '{"parking": true, "restroom": true, "nursing_room": true, "diaper_changing": true, "lockers": true, "restaurant": true, "life_guards": true}', 'PUBLIC', 4.6, 180, 1),
+-- 7. タイムズシティウォーターパーク
+('タイムズシティウォーターパーク', 'ハノイ最大の屋内ウォーターパーク。多数のウォータースライダー、造波プール、子供用浅いプール、流れるプールなど充実の設備。年中楽しめる温水プールで、冬でも快適に遊べます。家族全員で一日中楽しめる人気スポットです。', 'Times City, 458 Minh Khai, Hai Bà Trưng, Hà Nội', 20.9952, 105.8689, '{"monday": "10:00-21:00", "tuesday": "10:00-21:00", "wednesday": "10:00-21:00", "thursday": "10:00-21:00", "friday": "10:00-21:00", "saturday": "9:00-22:00", "sunday": "9:00-22:00"}', '{"parking": true, "nursing_room": true, "medical_station": true, "restaurant": true, "smoking_area": false}', 'PUBLIC', 4.60, 180, 1),
 
--- 8. Công viên Nghĩa Đô
-('ギアドー公園', '滑り台、ブランコ、シーソーなどの遊具がある現代的なコミュニティパーク。スポーツコート、ランニングトラック、フィットネス器具も完備。住宅地にあるため、地元の子供たちで賑わっています。無料で利用できる公園です。', 'PARK', 1, 12, 'FREE', FALSE, 'Hoàng Quốc Việt, Nghĩa Đô, Cầu Giấy, Hà Nội', 21.0334, 105.7952, '{"monday": "5:00-22:00", "tuesday": "5:00-22:00", "wednesday": "5:00-22:00", "thursday": "5:00-22:00", "friday": "5:00-22:00", "saturday": "5:00-22:00", "sunday": "5:00-22:00"}', 'SUNNY_ONLY', '{"parking": true, "restroom": true, "stroller_accessible": true, "playground": true, "sports_court": true}', 'PUBLIC', 4.4, 95, 1),
+-- 8. ギアドー公園
+('ギアドー公園', '滑り台、ブランコ、シーソーなどの遊具がある現代的なコミュニティパーク。スポーツコート、ランニングトラック、フィットネス器具も完備。住宅地にあるため、地元の子供たちで賑わっています。無料で利用できる公園です。', 'Hoàng Quốc Việt, Nghĩa Đô, Cầu Giấy, Hà Nội', 21.0334, 105.7952, '{"monday": "5:00-22:00", "tuesday": "5:00-22:00", "wednesday": "5:00-22:00", "thursday": "5:00-22:00", "friday": "5:00-22:00", "saturday": "5:00-22:00", "sunday": "5:00-22:00"}', '{"parking": true, "nursing_room": false, "medical_station": false, "restaurant": false, "smoking_area": false}', 'PUBLIC', 4.40, 95, 1),
 
--- 9. Thư viện Khoa học Tổng hợp
-('ハノイ総合科学図書館', '子供向けエリアがある公共図書館。絵本、児童書、学習スペースがあります。定期的な読み聞かせ会やワークショップも開催。静かで落ち着いた環境で、読書好きな子供に最適です。無料で利用できます。', 'OTHER', 3, 15, 'FREE', TRUE, '31 Tràng Thi, Hoàn Kiếm, Hà Nội', 21.0242, 105.8523, '{"monday": "8:00-21:00", "tuesday": "8:00-21:00", "wednesday": "8:00-21:00", "thursday": "8:00-21:00", "friday": "8:00-21:00", "saturday": "8:00-17:00", "sunday": "8:00-17:00"}', 'ALL_WEATHER', '{"parking": false, "restroom": true, "wheelchair_accessible": true, "elevator": true, "wifi": true}', 'PUBLIC', 4.3, 70, 1),
+-- 9. ハノイ総合科学図書館
+('ハノイ総合科学図書館', '子供向けエリアがある公共図書館。絵本、児童書、学習スペースがあります。定期的な読み聞かせ会やワークショップも開催。静かで落ち着いた環境で、読書好きな子供に最適です。無料で利用できます。', '31 Tràng Thi, Hoàn Kiếm, Hà Nội', 21.0242, 105.8523, '{"monday": "8:00-21:00", "tuesday": "8:00-21:00", "wednesday": "8:00-21:00", "thursday": "8:00-21:00", "friday": "8:00-21:00", "saturday": "8:00-17:00", "sunday": "8:00-17:00"}', '{"parking": false, "nursing_room": false, "medical_station": false, "restaurant": false, "smoking_area": false}', 'PUBLIC', 4.30, 70, 1),
 
--- 10. Ecopark Adventure Park
-('エコパークアドベンチャーパーク', 'アウトドアアドベンチャーパーク。クライミング、吊り橋、ジップライン、ロープコースなど。子供向けから大人向けまで様々なレベルのコースがあります。安全装備完備で、インストラクターが指導します。自然の中で冒険を楽しめます。', 'THEME_PARK', 5, 18, '1000_3000', FALSE, 'Khu đô thị Ecopark, Văn Giang, Hưng Yên', 20.9461, 105.9458, '{"monday": "8:00-18:00", "tuesday": "8:00-18:00", "wednesday": "8:00-18:00", "thursday": "8:00-18:00", "friday": "8:00-18:00", "saturday": "8:00-19:00", "sunday": "8:00-19:00"}', 'SUNNY_ONLY', '{"parking": true, "restroom": true, "restaurant": true, "lockers": true, "safety_equipment": true}', 'PUBLIC', 4.5, 110, 1),
+-- 10. エコパークアドベンチャーパーク
+('エコパークアドベンチャーパーク', 'アウトドアアドベンチャーパーク。クライミング、吊り橋、ジップライン、ロープコースなど。子供向けから大人向けまで様々なレベルのコースがあります。安全装備完備で、インストラクターが指導します。自然の中で冒険を楽しめます。', 'Khu đô thị Ecopark, Văn Giang, Hưng Yên', 20.9461, 105.9458, '{"monday": "8:00-18:00", "tuesday": "8:00-18:00", "wednesday": "8:00-18:00", "thursday": "8:00-18:00", "friday": "8:00-18:00", "saturday": "8:00-19:00", "sunday": "8:00-19:00"}', '{"parking": true, "nursing_room": false, "medical_station": true, "restaurant": true, "smoking_area": true}', 'PUBLIC', 4.50, 110, 1),
 
--- 11. Bảo tàng Lịch sử Quốc gia
-('国立歴史博物館', 'ベトナムの先史時代から現代までの歴史を展示。貴重な遺物や歴史的文書を見ることができます。学生向けの教育プログラムも充実。歴史好きな子供や、社会科の勉強に最適です。', 'MUSEUM', 8, 18, '1000_3000', TRUE, '1 Tràng Tiền, Hoàn Kiếm, Hà Nội', 21.0237, 105.8580, '{"monday": "8:00-12:00, 13:30-17:00", "tuesday": "8:00-12:00, 13:30-17:00", "wednesday": "8:00-12:00, 13:30-17:00", "thursday": "8:00-12:00, 13:30-17:00", "friday": "8:00-12:00, 13:30-17:00", "saturday": "8:00-12:00, 13:30-17:00", "sunday": "8:00-12:00, 13:30-17:00"}', 'ALL_WEATHER', '{"parking": false, "restroom": true, "wheelchair_accessible": true, "guided_tours": true}', 'PUBLIC', 4.1, 55, 1),
+-- 11. 国立歴史博物館
+('国立歴史博物館', 'ベトナムの先史時代から現代までの歴史を展示。貴重な遺物や歴史的文書を見ることができます。学生向けの教育プログラムも充実。歴史好きな子供や、社会科の勉強に最適です。', '1 Tràng Tiền, Hoàn Kiếm, Hà Nội', 21.0237, 105.8580, '{"monday": "8:00-12:00, 13:30-17:00", "tuesday": "8:00-12:00, 13:30-17:00", "wednesday": "8:00-12:00, 13:30-17:00", "thursday": "8:00-12:00, 13:30-17:00", "friday": "8:00-12:00, 13:30-17:00", "saturday": "8:00-12:00, 13:30-17:00", "sunday": "8:00-12:00, 13:30-17:00"}', '{"parking": false, "nursing_room": false, "medical_station": false, "restaurant": false, "smoking_area": false}', 'PUBLIC', 4.10, 55, 1),
 
--- 12. Lotte Mart Kids Playground
-('ロッテマートキッズプレイグラウンド', 'ロッテマート内の無料遊び場。幼児に安全な遊具、ソフトプレイエリア。保護者が買い物中に子供が遊べる便利なスポット。清潔で安全管理もしっかりしています。', 'INDOOR_PLAY', 2, 8, 'FREE', TRUE, 'Lotte Mart, 54 Liễu Giai, Ba Đình, Hà Nội', 21.0314, 105.8138, '{"monday": "9:00-22:00", "tuesday": "9:00-22:00", "wednesday": "9:00-22:00", "thursday": "9:00-22:00", "friday": "9:00-22:00", "saturday": "9:00-22:00", "sunday": "9:00-22:00"}', 'ALL_WEATHER', '{"parking": true, "restroom": true, "nursing_room": true, "diaper_changing": true, "elevator": true, "restaurant": true}', 'PUBLIC', 4.4, 130, 1),
+-- 12. ロッテマートキッズプレイグラウンド
+('ロッテマートキッズプレイグラウンド', 'ロッテマート内の無料遊び場。幼児に安全な遊具、ソフトプレイエリア。保護者が買い物中に子供が遊べる便利なスポット。清潔で安全管理もしっかりしています。', 'Lotte Mart, 54 Liễu Giai, Ba Đình, Hà Nội', 21.0314, 105.8138, '{"monday": "9:00-22:00", "tuesday": "9:00-22:00", "wednesday": "9:00-22:00", "thursday": "9:00-22:00", "friday": "9:00-22:00", "saturday": "9:00-22:00", "sunday": "9:00-22:00"}', '{"parking": true, "nursing_room": true, "medical_station": false, "restaurant": true, "smoking_area": false}', 'PUBLIC', 4.40, 130, 1),
 
--- 13. Công viên Thiên văn học
-('ハノイ天文公園', '宇宙と天文学をテーマにした教育的な公園。惑星のモデル、望遠鏡、天文学の展示があります。夜間には星空観察イベントも開催。科学好きな子供に人気のスポットです。', 'OTHER', 6, 18, 'UNDER_1000', FALSE, 'Hoàng Quốc Việt, Nghĩa Tân, Cầu Giấy, Hà Nội', 21.0342, 105.7888, '{"monday": "8:00-17:00", "tuesday": "8:00-17:00", "wednesday": "8:00-17:00", "thursday": "8:00-17:00", "friday": "8:00-17:00", "saturday": "8:00-20:00", "sunday": "8:00-20:00"}', 'SUNNY_ONLY', '{"parking": true, "restroom": true, "stroller_accessible": true, "telescopes": true}', 'PUBLIC', 4.2, 45, 1),
+-- 13. ハノイ天文公園
+('ハノイ天文公園', '宇宙と天文学をテーマにした教育的な公園。惑星のモデル、望遠鏡、天文学の展示があります。夜間には星空観察イベントも開催。科学好きな子供に人気のスポットです。', 'Hoàng Quốc Việt, Nghĩa Tân, Cầu Giấy, Hà Nội', 21.0342, 105.7888, '{"monday": "8:00-17:00", "tuesday": "8:00-17:00", "wednesday": "8:00-17:00", "thursday": "8:00-17:00", "friday": "8:00-17:00", "saturday": "8:00-20:00", "sunday": "8:00-20:00"}', '{"parking": true, "nursing_room": false, "medical_station": false, "restaurant": false, "smoking_area": false}', 'PUBLIC', 4.20, 45, 1),
 
--- 14. VinKE Royal City
-('ビンケ ロイヤルシティ', '50以上のゲーム機、ソフトプレイエリア、バンパーカー、エア遊具がある大型屋内エンターテイメント施設。終日チケットで遊び放題。雨の日や暑い日に最適な屋内施設です。', 'INDOOR_PLAY', 2, 15, '3000_5000', TRUE, 'Vincom Mega Mall Royal City, 72A Nguyễn Trãi, Thanh Xuân, Hà Nội', 21.0007, 105.8081, '{"monday": "9:30-22:00", "tuesday": "9:30-22:00", "wednesday": "9:30-22:00", "thursday": "9:30-22:00", "friday": "9:30-22:00", "saturday": "9:00-22:30", "sunday": "9:00-22:30"}', 'ALL_WEATHER', '{"parking": true, "restroom": true, "nursing_room": true, "diaper_changing": true, "lockers": true, "restaurant": true, "air_conditioning": true}', 'PUBLIC', 4.8, 220, 1),
+-- 14. ビンケ ロイヤルシティ
+('ビンケ ロイヤルシティ', '50以上のゲーム機、ソフトプレイエリア、バンパーカー、エア遊具がある大型屋内エンターテイメント施設。終日チケットで遊び放題。雨の日や暑い日に最適な屋内施設です。', 'Vincom Mega Mall Royal City, 72A Nguyễn Trãi, Thanh Xuân, Hà Nội', 21.0007, 105.8081, '{"monday": "9:30-22:00", "tuesday": "9:30-22:00", "wednesday": "9:30-22:00", "thursday": "9:30-22:00", "friday": "9:30-22:00", "saturday": "9:00-22:30", "sunday": "9:00-22:30"}', '{"parking": true, "nursing_room": true, "medical_station": false, "restaurant": true, "smoking_area": false}', 'PUBLIC', 4.80, 220, 1),
 
--- 15. Công viên Indira Gandhi
-('インディラガンディー公園', '多くの緑、鯉の池、子供の遊び場がある静かな公園。家族でのピクニック、散歩、軽い運動に最適。都会の喧騒から離れてリラックスできる癒しのスポットです。', 'PARK', 0, 12, 'FREE', FALSE, 'Láng Hạ, Đống Đa, Hà Nội', 21.0194, 105.8124, '{"monday": "5:00-22:00", "tuesday": "5:00-22:00", "wednesday": "5:00-22:00", "thursday": "5:00-22:00", "friday": "5:00-22:00", "saturday": "5:00-22:00", "sunday": "5:00-22:00"}', 'ALL_WEATHER', '{"parking": true, "restroom": true, "stroller_accessible": true, "vending_machine": true, "pond": true}', 'PUBLIC', 4.5, 88, 1);
+-- 15. インディラガンディー公園
+('インディラガンディー公園', '多くの緑、鯉の池、子供の遊び場がある静かな公園。家族でのピクニック、散歩、軽い運動に最適。都会の喧騒から離れてリラックスできる癒しのスポットです。', 'Láng Hạ, Đống Đa, Hà Nội', 21.0194, 105.8124, '{"monday": "5:00-22:00", "tuesday": "5:00-22:00", "wednesday": "5:00-22:00", "thursday": "5:00-22:00", "friday": "5:00-22:00", "saturday": "5:00-22:00", "sunday": "5:00-22:00"}', '{"parking": true, "nursing_room": false, "medical_station": false, "restaurant": false, "smoking_area": false}', 'PUBLIC', 4.50, 88, 1);
 
 -- =====================================================
 -- SPOT IMAGES
 -- =====================================================
 
 INSERT INTO spot_images (spot_id, image_url, is_main, display_order) VALUES
--- Zoo images
-(1, 'https://images.unsplash.com/photo-1564349683136-77e08dba1ef7?w=800', TRUE, 1),
-(1, 'https://images.unsplash.com/photo-1581888227599-779811939961?w=800', FALSE, 2),
-
--- Museum Ethnology
-(2, 'https://images.unsplash.com/photo-1569704449284-135a0c0e0d8f?w=800', TRUE, 1),
-(2, 'https://images.unsplash.com/photo-1608452964553-9b4d97b2752f?w=800', FALSE, 2),
-
--- Thu Le Park
-(3, 'https://images.unsplash.com/photo-1516302752625-fcc3c50ae61f?w=800', TRUE, 1),
-(3, 'https://images.unsplash.com/photo-1519832979-6fa011b87667?w=800', FALSE, 2),
-
--- KidZone
-(4, 'https://images.unsplash.com/photo-1587654780291-39c9404d746b?w=800', TRUE, 1),
-(4, 'https://images.unsplash.com/photo-1612198188060-c7c2a3b66eae?w=800', FALSE, 2),
-
--- Hoan Kiem Lake
-(5, 'https://images.unsplash.com/photo-1555881788-a4e75baa1205?w=800', TRUE, 1),
-(5, 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800', FALSE, 2),
-
--- Ho Chi Minh Museum
-(6, 'https://images.unsplash.com/photo-1566127444977-eb86e0a1318f?w=800', TRUE, 1),
-
--- Water Park
-(7, 'https://images.unsplash.com/photo-1587139223877-04cb899fa3e8?w=800', TRUE, 1),
-(7, 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800', FALSE, 2),
-
--- Nghia Do Park
-(8, 'https://images.unsplash.com/photo-1560421683-6856ea585c78?w=800', TRUE, 1),
-
--- Library
-(9, 'https://images.unsplash.com/photo-1521587760476-6c12a4b040da?w=800', TRUE, 1),
-
--- Adventure Park
-(10, 'https://images.unsplash.com/photo-1535923163756-a31799c41fd9?w=800', TRUE, 1),
-
--- History Museum
-(11, 'https://images.unsplash.com/photo-1566127444977-eb86e0a1318f?w=800', TRUE, 1),
-
--- Lotte Mart
-(12, 'https://images.unsplash.com/photo-1587654780291-39c9404d746b?w=800', TRUE, 1),
-
--- Astronomy Park
-(13, 'https://images.unsplash.com/photo-1614732414444-096e5f1122d5?w=800', TRUE, 1),
-
--- VinKE
-(14, 'https://images.unsplash.com/photo-1597524936625-72cd840bc8f4?w=800', TRUE, 1),
-
--- Indira Gandhi Park
-(15, 'https://images.unsplash.com/photo-1519331379826-f10be5486c6f?w=800', TRUE, 1);
+-- Updated with current database image URLs
+(1, 'https://atshotelhanoi.com.vn/wp-content/uploads/2025/04/kham-pha-thao-cam-vien-ha-noi-diem-den-hap-dan-cho-du-khach-1.jpg', TRUE, 1),
+(2, 'https://bizweb.dktcdn.net/thumb/grande/100/101/075/articles/bt1.jpg?v=1554374302363', TRUE, 1),
+(3, 'https://www.homepaylater.vn/static/cbc559a50342f637d94e0cc84d990d36/cdc7b/1_thien_nhien_xanh_mat_giua_long_thu_do_tai_cong_vien_thu_le_00b4895447.jpg', TRUE, 1),
+(4, 'https://statics.vincom.com.vn/vincom-tttm/gioi_thieu/anh_bai_viet/Hinh-anh-cac-thuong-hieu-o-Vincom-Ba-Trieu-so-1_1632322535.jpeg', TRUE, 1),
+(5, 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/79/Thap_Rua.jpg/250px-Thap_Rua.jpg', TRUE, 1),
+(6, 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQB4Z_egZ5uX9SFZCT9GsrGbMK0cC61d4VEMg&s', TRUE, 1),
+(7, 'https://statics.vinpearl.com/times-city-co-gi-choi-3_1634993213.jpg', TRUE, 1),
+(8, 'https://cdn.vntrip.vn/cam-nang/wp-content/uploads/2017/08/cong-vien-nghia-do.jpg', TRUE, 1),
+(9, 'https://vienkyluc.vn/Userfiles/Upload/images/Download/2022/6/28/d741c0f63fdc49c898f2182e8424fbeb.jpg', TRUE, 1),
+(10, 'https://ecoparkcity.com.vn/wp-content/uploads/2018/06/Tien-ich-Ecopark-01.jpg', TRUE, 1),
+(11, 'https://static.vinwonders.com/production/bao-tang-lich-su-quoc-gia-1.jpg', TRUE, 1),
+(12, 'https://www.robins.vn/wp-content/uploads/2025/07/1700537210-justfly-lotte-center-hanoi9.jpg.jpg', TRUE, 1),
+(13, 'https://cdn.24h.com.vn/upload/2-2020/images/2020-06-19/1592529212-ha-noi-toan-canh-cong-vien-thien-van-hoc-chuan-bi-mo-cua-don-khach.jpg', TRUE, 1),
+(14, 'https://cf.bstatic.com/xdata/images/hotel/max1024x768/462797009.jpg?k=14e29c8a69bdaa1c801309c32b13acea97778c2f66ae975cabc309250745ae76&o=', TRUE, 1),
+(15, 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/T%C6%B0%E1%BB%A3ng_L%C3%BD_Th%C3%A1i_T%E1%BB%95.jpeg/960px-T%C6%B0%E1%BB%A3ng_L%C3%BD_Th%C3%A1i_T%E1%BB%95.jpeg', TRUE, 1);
 
 -- =====================================================
 -- SPOT TAGS
 -- =====================================================
+-- Tag categories:
+-- 1. Category tags: 動物園, 博物館, 公園, 図書館, 遊び場, プール, 科学
+-- 2. Price tags: 無料, 1000円以下, 1000-3000円, 3000-5000円, 5000円以上
+-- 3. Age range tags: 0-2歳, 3-5歳, 6-8歳, 9-12歳, 13-18歳
+-- 4. Indoor/Outdoor: 室内, 屋外, 雨OK
+-- 5. Facilities: 駐車場, 授乳室, 医療施設, レストラン, 喫煙所
 
 INSERT INTO spot_tags (spot_id, tag_name) VALUES
--- Zoo (1)
-(1, '動物園'), (1, '屋外'), (1, '教育的'), (1, '家族向け'), (1, '自然'), (1, '動物'),
+-- Zoo (1) - Ages: 0-12, Price: 1000-3000, Outdoor
+(1, '動物園'), (1, '0-2歳'), (1, '3-5歳'), (1, '6-8歳'), (1, '9-12歳'), 
+(1, '1000-3000円'), (1, '屋外'),
+(1, '駐車場'), (1, '医療施設'), (1, 'レストラン'), (1, '喫煙所'),
 
--- Museum Ethnology (2)
-(2, '博物館'), (2, '文化'), (2, '教育的'), (2, '体験型'), (2, '雨OK'),
+-- Museum Ethnology (2) - Ages: 6-18, Price: 1000-3000, Outdoor (but has indoor sections)
+(2, '博物館'), (2, '6-8歳'), (2, '9-12歳'), (2, '13-18歳'),
+(2, '1000-3000円'), (2, '屋外'),
+(2, '駐車場'),
 
--- Thu Le Park (3)
-(3, '公園'), (3, '屋外'), (3, '無料'), (3, 'ボート'), (3, '散歩'), (3, 'ピクニック'),
+-- Thu Le Park (3) - Ages: 0-12, Price: FREE, Outdoor
+(3, '公園'), (3, '0-2歳'), (3, '3-5歳'), (3, '6-8歳'), (3, '9-12歳'),
+(3, '無料'), (3, '屋外'),
+(3, '駐車場'), (3, '喫煙所'),
 
--- KidZone (4)
-(4, '室内'), (4, '遊び場'), (4, '雨OK'), (4, '幼児向け'), (4, 'エアコン'), (4, '有料'),
+-- KidZone (4) - Ages: 1-8, Price: 3000-5000, Indoor
+(4, '遊び場'), (4, '0-2歳'), (4, '3-5歳'), (4, '6-8歳'),
+(4, '3000-5000円'), (4, '室内'), (4, '雨OK'),
+(4, '駐車場'), (4, '授乳室'), (4, 'レストラン'),
 
--- Hoan Kiem Lake (5)
-(5, '公園'), (5, '無料'), (5, '歴史'), (5, '散歩'), (5, '写真撮影'), (5, '屋外'),
+-- Hoan Kiem Lake (5) - Ages: 0-18, Price: FREE, Outdoor
+(5, '公園'), (5, '0-2歳'), (5, '3-5歳'), (5, '6-8歳'), (5, '9-12歳'), (5, '13-18歳'),
+(5, '無料'), (5, '屋外'),
+(5, 'レストラン'), (5, '喫煙所'),
 
--- Ho Chi Minh Museum (6)
-(6, '博物館'), (6, '無料'), (6, '室内'), (6, '雨OK'), (6, '教育的'), (6, '歴史'),
+-- Ho Chi Minh Museum (6) - Ages: 6-18, Price: FREE, Indoor
+(6, '博物館'), (6, '6-8歳'), (6, '9-12歳'), (6, '13-18歳'),
+(6, '無料'), (6, '室内'), (6, '雨OK'),
+(6, '駐車場'),
 
--- Water Park (7)
-(7, '室内'), (7, 'プール'), (7, '雨OK'), (7, '夏向け'), (7, 'スリル'), (7, '有料'),
+-- Water Park (7) - Ages: 3-18, Price: 5000+, Indoor
+(7, 'プール'), (7, '3-5歳'), (7, '6-8歳'), (7, '9-12歳'), (7, '13-18歳'),
+(7, '5000円以上'), (7, '室内'), (7, '雨OK'),
+(7, '駐車場'), (7, '授乳室'), (7, '医療施設'), (7, 'レストラン'),
 
--- Nghia Do Park (8)
-(8, '公園'), (8, '無料'), (8, '遊具'), (8, '屋外'), (8, '家族向け'),
+-- Nghia Do Park (8) - Ages: 1-12, Price: FREE, Outdoor
+(8, '公園'), (8, '0-2歳'), (8, '3-5歳'), (8, '6-8歳'), (8, '9-12歳'),
+(8, '無料'), (8, '屋外'),
+(8, '駐車場'),
 
--- Library (9)
-(9, '図書館'), (9, '無料'), (9, '室内'), (9, '雨OK'), (9, '静か'), (9, '教育的'),
+-- Library (9) - Ages: 3-15, Price: FREE, Indoor
+(9, '図書館'), (9, '3-5歳'), (9, '6-8歳'), (9, '9-12歳'), (9, '13-18歳'),
+(9, '無料'), (9, '室内'), (9, '雨OK'),
 
--- Adventure Park (10)
-(10, '屋外'), (10, '冒険'), (10, 'スポーツ'), (10, '体験型'), (10, 'スリル'), (10, '有料'),
+-- Adventure Park (10) - Ages: 5-18, Price: 1000-3000, Outdoor
+(10, '遊び場'), (10, '3-5歳'), (10, '6-8歳'), (10, '9-12歳'), (10, '13-18歳'),
+(10, '1000-3000円'), (10, '屋外'),
+(10, '駐車場'), (10, '医療施設'), (10, 'レストラン'), (10, '喫煙所'),
 
--- History Museum (11)
-(11, '博物館'), (11, '室内'), (11, '雨OK'), (11, '教育的'), (11, '歴史'), (11, '有料'),
+-- History Museum (11) - Ages: 8-18, Price: 1000-3000, Indoor
+(11, '博物館'), (11, '6-8歳'), (11, '9-12歳'), (11, '13-18歳'),
+(11, '1000-3000円'), (11, '室内'), (11, '雨OK'),
 
--- Lotte Mart (12)
-(12, '室内'), (12, '無料'), (12, '雨OK'), (12, '幼児向け'), (12, 'ショッピング'),
+-- Lotte Mart (12) - Ages: 2-8, Price: FREE, Indoor
+(12, '遊び場'), (12, '0-2歳'), (12, '3-5歳'), (12, '6-8歳'),
+(12, '無料'), (12, '室内'), (12, '雨OK'),
+(12, '駐車場'), (12, '授乳室'), (12, 'レストラン'),
 
--- Astronomy Park (13)
-(13, '科学'), (13, '教育的'), (13, '屋外'), (13, '体験型'), (13, '星空'), (13, '有料'),
+-- Astronomy Park (13) - Ages: 6-18, Price: <1000, Outdoor
+(13, '科学'), (13, '6-8歳'), (13, '9-12歳'), (13, '13-18歳'),
+(13, '1000円以下'), (13, '屋外'),
+(13, '駐車場'),
 
--- VinKE (14)
-(14, '室内'), (14, '雨OK'), (14, 'ゲーム'), (14, '遊び場'), (14, 'エアコン'), (14, '有料'),
+-- VinKE (14) - Ages: 2-15, Price: 3000-5000, Indoor
+(14, '遊び場'), (14, '0-2歳'), (14, '3-5歳'), (14, '6-8歳'), (14, '9-12歳'), (14, '13-18歳'),
+(14, '3000-5000円'), (14, '室内'), (14, '雨OK'),
+(14, '駐車場'), (14, '授乳室'), (14, 'レストラン'),
 
--- Indira Gandhi Park (15)
-(15, '公園'), (15, '無料'), (15, '屋外'), (15, 'ピクニック'), (15, '静か');
+-- Indira Gandhi Park (15) - Ages: 0-12, Price: FREE, Outdoor
+(15, '公園'), (15, '0-2歳'), (15, '3-5歳'), (15, '6-8歳'), (15, '9-12歳'),
+(15, '無料'), (15, '屋外'),
+(15, '駐車場');
 
 -- =====================================================
 -- REVIEWS
@@ -344,20 +343,20 @@ INSERT INTO child_preferences (child_id, preference_type, tag_name) VALUES
 -- SCHEDULES
 -- =====================================================
 
-INSERT INTO schedules (user_id, spot_id, scheduled_date, time_slot, status, notes, created_at) VALUES
+INSERT INTO schedules (user_id, spot_id, scheduled_date, time, status, notes, created_at) VALUES
 -- Admin schedules
-(1, 1, '2025-11-30', 'AM', 'PLANNED', '動物園で朝の時間を楽しむ。お弁当持参。', '2025-11-24 10:00:00'),
-(1, 7, '2025-12-01', 'FULL_DAY', 'PLANNED', 'プール一日券購入済み。水着とタオル準備。', '2025-11-24 10:30:00'),
+(1, 1, '2025-11-30', 9, 'PLANNED', '動物園で朝の時間を楽しむ。お弁当持参。', '2025-11-24 10:00:00'),
+(1, 7, '2025-12-01', 10, 'PLANNED', 'プール一日券購入済み。水着とタオル準備。', '2025-11-24 10:30:00'),
 
 -- User 2 schedules
-(2, 3, '2025-11-28', 'PM', 'PLANNED', 'ピクニック準備。ボート遊びも予定。', '2025-11-23 15:00:00'),
-(2, 14, '2025-12-02', 'AM', 'PLANNED', '子供の誕生日パーティー。友達も一緒。', '2025-11-23 15:30:00'),
+(2, 3, '2025-11-28', 14, 'PLANNED', 'ピクニック準備。ボート遊びも予定。', '2025-11-23 15:00:00'),
+(2, 14, '2025-12-02', 10, 'PLANNED', '子供の誕生日パーティー。友達も一緒。', '2025-11-23 15:30:00'),
 
 -- User 3 schedules
-(3, 2, '2025-11-29', 'FULL_DAY', 'PLANNED', '文化体験ツアー。ワークショップ参加予定。', '2025-11-22 09:00:00'),
+(3, 2, '2025-11-29', 9, 'PLANNED', '文化体験ツアー。ワークショップ参加予定。', '2025-11-22 09:00:00'),
 
 -- User 4 schedules
-(4, 10, '2025-12-05', 'AM', 'PLANNED', 'アドベンチャーコース予約済み。運動靴持参。', '2025-11-21 11:00:00');
+(4, 10, '2025-12-05', 8, 'PLANNED', 'アドベンチャーコース予約済み。運動靴持参。', '2025-11-21 11:00:00');
 
 -- =====================================================
 -- SUCCESS MESSAGE

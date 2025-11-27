@@ -12,8 +12,7 @@ const { generateToken } = require('../middleware/auth');
  * Đăng ký tài khoản mới
  * 
  * Body:
- * - firstName: Tên (bắt buộc)
- * - lastName: Họ (bắt buộc)
+ * - name: Họ tên đầy đủ (bắt buộc)
  * - email: Email (bắt buộc, unique)
  * - password: Mật khẩu (bắt buộc, tối thiểu 8 ký tự)
  * - confirmPassword: Xác nhận mật khẩu (bắt buộc)
@@ -22,18 +21,17 @@ const { generateToken } = require('../middleware/auth');
  */
 const register = async (req, res) => {
     try {
-        const { firstName, lastName, email, password, confirmPassword, agreement, role } = req.body;
+        const { name, email, password, confirmPassword, agreement, role } = req.body;
 
         // === VALIDATION ===
         
         // 1. Kiểm tra các trường bắt buộc
-        if (!firstName || !lastName || !email || !password || !confirmPassword) {
+        if (!name || !email || !password || !confirmPassword) {
             return res.status(400).json({
                 success: false,
                 message: 'すべての必須フィールドを入力してください',
                 errors: {
-                    firstName: !firstName ? '名前を入力してください ' : null,
-                    lastName: !lastName ? '姓を入力してください ' : null,
+                    name: !name ? '名前を入力してください ' : null,
                     email: !email ? 'メールアドレスを入力してください ' : null,
                     password: !password ? 'パスワードを入力してください ' : null,
                     confirmPassword: !confirmPassword ? 'パスワード確認を入力してください ' : null
@@ -95,9 +93,9 @@ const register = async (req, res) => {
         const userRole = role === 'ADMIN' ? 'ADMIN' : 'USER'; // Mặc định là USER
         
         const result = await db.query(
-            `INSERT INTO users (email, password_hash, first_name, last_name, role, status, agreement, created_at) 
-             VALUES (?, ?, ?, ?, ?, 'ACTIVE', ?, NOW())`,
-            [email, passwordHash, firstName, lastName, userRole, agreement ? 1 : 0]
+            `INSERT INTO users (email, password_hash, name, role, status, agreement, created_at) 
+             VALUES (?, ?, ?, ?, 'ACTIVE', ?, NOW())`,
+            [email, passwordHash, name, userRole, agreement ? 1 : 0]
         );
 
         const userId = result.insertId;
@@ -119,8 +117,7 @@ const register = async (req, res) => {
                 user: {
                     userId,
                     email,
-                    firstName,
-                    lastName,
+                    name,
                     role: userRole
                 },
                 token,
@@ -160,7 +157,7 @@ const login = async (req, res) => {
 
         // === TÌM USER THEO EMAIL ===
         const users = await db.query(
-            'SELECT user_id, email, password_hash, first_name, last_name, role, status FROM users WHERE email = ?',
+            'SELECT user_id, email, password_hash, name, role, status FROM users WHERE email = ?',
             [email]
         );
 
@@ -208,8 +205,7 @@ const login = async (req, res) => {
                 user: {
                     userId: user.user_id,
                     email: user.email,
-                    firstName: user.first_name,
-                    lastName: user.last_name,
+                    name: user.name,
                     role: user.role
                 },
                 token,

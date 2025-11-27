@@ -48,8 +48,7 @@ export const AuthProvider = ({ children }) => {
     try {
       // Thêm agreement = true vào payload
       const payload = {
-        firstName: userData.first_name,
-        lastName: userData.last_name,
+        name: userData.name,
         email: userData.email,
         password: userData.password,
         confirmPassword: userData.password,

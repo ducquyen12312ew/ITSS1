@@ -12,8 +12,7 @@ const Profile = () => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
+    name: '',
     email: '',
     newPassword: ''
   });
@@ -21,8 +20,7 @@ const Profile = () => {
   useEffect(() => {
     if (user) {
       setFormData({
-        firstName: user.firstName || '',
-        lastName: user.lastName || '',
+        name: user.name || '',
         email: user.email || '',
         newPassword: ''
       });
@@ -32,8 +30,7 @@ const Profile = () => {
   const handleCancel = () => {
     setIsEditing(false);
     setFormData({
-      firstName: user.firstName || '',
-      lastName: user.lastName || '',
+      name: user.name || '',
       email: user.email || '',
       newPassword: ''
     });
@@ -42,7 +39,7 @@ const Profile = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!formData.firstName.trim() || !formData.lastName.trim() || !formData.email.trim()) {
+    if (!formData.name.trim() || !formData.email.trim()) {
       alert('すべての項目を入力してください');
       return;
     }
@@ -50,8 +47,7 @@ const Profile = () => {
     try {
       setLoading(true);
       const updateData = {
-        firstName: formData.firstName,
-        lastName: formData.lastName,
+        name: formData.name,
         email: formData.email
       };
 
@@ -88,104 +84,33 @@ const Profile = () => {
           {/* Avatar Section */}
           <div className="profile-avatar-wrapper">
             <div className="profile-avatar">
-              <span className="avatar-text">{user?.firstName?.[0] || 'V'}</span>
+              <span className="avatar-text">{user?.name?.[0] || 'V'}</span>
             </div>
-            <h2 className="user-name">{user?.firstName} {user?.lastName}</h2>
+            <h2 className="user-name">{user?.name}</h2>
             <p className="user-subtitle">安全に情報を更新できます</p>
           </div>
 
-          {/* Form Section */}
-          <form onSubmit={handleSubmit} className="profile-form">
+          {/* Info Section - Read Only */}
+          <div className="profile-form">
             <div className="form-group">
               <label className="form-label">名前</label>
-              <input
-                type="text"
-                className="form-input"
-                value={`${formData.firstName} ${formData.lastName}`}
-                onChange={(e) => {
-                  const names = e.target.value.split(' ');
-                  setFormData({ 
-                    ...formData, 
-                    firstName: names[0] || '',
-                    lastName: names.slice(1).join(' ') || ''
-                  });
-                }}
-                disabled={!isEditing}
-                placeholder="Bui Quoc Bao"
-                required
-              />
+              <div className="form-value">{formData.name || '未設定'}</div>
             </div>
 
             <div className="form-group">
               <label className="form-label">メールアドレス</label>
-              <input
-                type="email"
-                className="form-input"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                disabled={!isEditing}
-                placeholder="ngduc4897@gmail.com"
-                required
-              />
+              <div className="form-value">{formData.email || '未設定'}</div>
             </div>
 
             <div className="form-group">
-              <label className="form-label">新しいパスワード (任意)</label>
-              <div className="password-input-wrapper">
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  className="form-input"
-                  value={formData.newPassword}
-                  onChange={(e) => setFormData({ ...formData, newPassword: e.target.value })}
-                  disabled={!isEditing}
-                  placeholder="------"
-                />
-                <button
-                  type="button"
-                  className="toggle-password"
-                  onClick={() => setShowPassword(!showPassword)}
-                  disabled={!isEditing}
-                >
-                  {showPassword ? '👁️' : '👁️'}
-                </button>
+              <label className="form-label">ロール</label>
+              <div className="form-value">
+                <span className={`role-badge ${user?.role?.toLowerCase()}`}>
+                  {user?.role === 'ADMIN' ? '管理者' : 'ユーザー'}
+                </span>
               </div>
-              <small className="form-hint">空欄の場合は変更されません</small>
             </div>
-
-            {/* Action Buttons */}
-            <div className="form-actions">
-              {!isEditing ? (
-                <button
-                  type="button"
-                  onClick={() => setIsEditing(true)}
-                  className="btn-edit-profile"
-                >
-                  <i className="fa-solid fa-pen"></i>
-                  変更する
-                </button>
-              ) : (
-                <>
-                  <button
-                    type="submit"
-                    className="btn-save"
-                    disabled={loading}
-                  >
-                    <i className="fa-solid fa-floppy-disk"></i>
-                    {loading ? '保存中...' : '保存する'}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleCancel}
-                    className="btn-cancel"
-                    disabled={loading}
-                  >
-                    <i className="fa-solid fa-xmark"></i>
-                    キャンセル
-                  </button>
-                </>
-              )}
-            </div>
-          </form>
+          </div>
         </div>
 
         {/* Footer Message */}

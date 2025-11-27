@@ -5,8 +5,7 @@ import './Auth.css';
 
 const Register = () => {
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
+    name: '',
     email: '',
     password: '',
     confirmPassword: '',
@@ -28,7 +27,7 @@ const Register = () => {
 
   const validateForm = () => {
     // Check all fields filled
-    if (!formData.firstName || !formData.lastName || !formData.email || !formData.password || !formData.confirmPassword) {
+    if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
       setError('すべての項目を入力してください');
       return false;
     }
@@ -73,8 +72,7 @@ const Register = () => {
     setLoading(true);
 
     const result = await register({
-      first_name: formData.firstName,
-      last_name: formData.lastName,
+      name: formData.name,
       email: formData.email,
       password: formData.password,
     });
@@ -110,27 +108,14 @@ const Register = () => {
           
           <form onSubmit={handleSubmit} noValidate>
             <div className="form-group">
-              <label htmlFor="firstName">名<span className="required">*</span></label>
+              <label htmlFor="name">お名前<span className="required">*</span></label>
               <input
                 type="text"
-                id="firstName"
-                name="firstName"
-                value={formData.firstName}
+                id="name"
+                name="name"
+                value={formData.name}
                 onChange={handleChange}
-                placeholder="太郎"
-                disabled={loading}
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="lastName">姓<span className="required">*</span></label>
-              <input
-                type="text"
-                id="lastName"
-                name="lastName"
-                value={formData.lastName}
-                onChange={handleChange}
-                placeholder="山田"
+                placeholder="山田 太郎"
                 disabled={loading}
               />
             </div>

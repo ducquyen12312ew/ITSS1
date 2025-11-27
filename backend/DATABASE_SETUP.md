@@ -11,14 +11,6 @@ Hướng dẫn này sẽ giúp bạn cài đặt và cấu hình database MySQL 
 cd backend
 npm install
 
-# 2. Tạo file .env từ .env.example
-cp .env.example .env
-
-# 3. Chỉnh sửa thông tin database trong .env
-# DB_HOST=localhost
-# DB_USER=root
-# DB_PASSWORD=your_password
-# DB_NAME=kodomo_weekend_navi
 
 # 4. Chạy lệnh reset database (tạo + seed data)
 npm run db:reset
@@ -80,34 +72,6 @@ SHOW DATABASES;
 
 -- Thoát
 EXIT;
-```
-
-### Bước 4: Cấu hình .env
-
-Tạo file `.env` từ `.env.example`:
-
-```bash
-cd backend
-cp .env.example .env
-```
-
-Chỉnh sửa `.env`:
-
-```env
-# Server
-PORT=3000
-NODE_ENV=development
-
-# MySQL - QUAN TRỌNG: Sửa đúng thông tin của bạn
-DB_HOST=localhost
-DB_PORT=3306
-DB_USER=root
-DB_PASSWORD=your_mysql_password_here
-DB_NAME=kodomo_weekend_navi
-
-# JWT
-JWT_SECRET=kodomo_secret_key_2025
-JWT_EXPIRES_IN=7d
 ```
 
 ### Bước 5: Chạy Migration và Seed

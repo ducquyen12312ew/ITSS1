@@ -5,7 +5,7 @@
 const express = require('express');
 const router = express.Router();
 const spotsController = require('../controllers/spotsController');
-const { authenticateToken, requireAdmin } = require('../middleware/auth');
+const { authenticateToken, optionalAuth, requireAdmin } = require('../middleware/auth');
 
 // ============================================
 // PUBLIC ROUTES (Không cần đăng nhập)
@@ -15,8 +15,9 @@ const { authenticateToken, requireAdmin } = require('../middleware/auth');
  * GET /api/spots/search
  * Tìm kiếm địa điểm với filters và sorting
  * Query params: keyword, category, min_age, max_age, price_range, is_indoor, weather, min_rating, lat, lng, distance, sort, limit, offset
+ * Uses optionalAuth to enable age-based sorting for logged-in users
  */
-router.get('/search', spotsController.searchSpots);
+router.get('/search', optionalAuth, spotsController.searchSpots);
 
 /**
  * GET /api/spots/suggestions

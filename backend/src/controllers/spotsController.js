@@ -6,21 +6,52 @@
 const db = require('../database/db');
 
 /**
+ * Helper function to get user's children ages
+ * Returns array of age tags like ['3-5歳', '6-8歳']
+ */
+const getUserChildrenAges = async (userId) => {
+  try {
+    const children = await db.query(
+      'SELECT birth_date FROM children WHERE user_id = ?',
+      [userId]
+    );
+    
+    if (children.length === 0) return [];
+    
+    const ageTags = children.map(child => {
+      const birthDate = new Date(child.birth_date);
+      const today = new Date();
+      const ageYears = Math.floor((today - birthDate) / (365.25 * 24 * 60 * 60 * 1000));
+      
+      // Map age to tag ranges
+      if (ageYears <= 2) return '0-2歳';
+      if (ageYears <= 5) return '3-5歳';
+      if (ageYears <= 8) return '6-8歳';
+      if (ageYears <= 12) return '9-12歳';
+      return '13-18歳';
+    });
+    
+    // Remove duplicates
+    return [...new Set(ageTags)];
+  } catch (error) {
+    console.error('Error getting children ages:', error);
+    return [];
+  }
+};
+
+/**
  * GET /api/spots/search
- * Tìm kiếm địa điểm theo keyword (tên hoặc category)
+ * Tìm kiếm địa điểm theo keyword (tên hoặc tag)
  * Không cần đăng nhập (Public API cho cả Guest)
  */
 const searchSpots = async (req, res) => {
   try {
     const { 
-      keyword = '',           // Từ khóa tìm kiếm
-      category,               // Lọc theo category
-      min_age,                // Lọc theo độ tuổi
-      max_age,
-      price_range,            // Lọc theo giá
-      is_indoor,              // Lọc trong nhà/ngoài trời
-      weather,                // Lọc theo thời tiết
-      min_rating,             // Lọc theo đánh giá
+      keyword = '',           // Từ khóa tìm kiếm (tên, mô tả hoặc tag)
+      category,               // Lọc theo category tags (動物園, 博物館, 公園, 室内, 屋外, 雨OK, etc.)
+      age,                    // Lọc theo độ tuổi tags (3-5歳, 6-8歳, etc.)
+      price,                  // Lọc theo giá tags (無料, 1000円以下, etc.)
+      rating,                 // Lọc theo đánh giá (can be comma-separated for multiple ratings)
       lat,                    // Vĩ độ (để tính khoảng cách)
       lng,                    // Kinh độ
       distance,               // Khoảng cách tối đa (km)
@@ -29,56 +60,115 @@ const searchSpots = async (req, res) => {
       offset = 0              // Vị trí bắt đầu
     } = req.query;
 
-    // Build WHERE conditions
+    // Build base query with tag filtering
+    let tagJoins = '';
+    let tagConditions = [];
+    let tagParams = [];
+    
+    // Build WHERE conditions for spots table
     let conditions = ['spots.status = ?'];
     let params = ['PUBLIC'];
 
-    // Keyword search (tên hoặc mô tả)
+    // Keyword search (tên, mô tả hoặc tags)
     if (keyword) {
-      conditions.push('(spots.name LIKE ? OR spots.description LIKE ? OR spots.category LIKE ?)');
+      // Search in name, description, or tags using subquery to avoid JOIN duplicates
       const searchPattern = `%${keyword}%`;
+      conditions.push(`(
+        spots.name LIKE ? 
+        OR spots.description LIKE ? 
+        OR EXISTS (
+          SELECT 1 FROM spot_tags 
+          WHERE spot_tags.spot_id = spots.spot_id 
+          AND spot_tags.tag_name LIKE ?
+        )
+      )`);
       params.push(searchPattern, searchPattern, searchPattern);
     }
 
-    // Filter by category
+    // Filter by category tags (動物園, 博物館, 公園, 図書館, 遊び場, プール, 科学, 室内, 屋外, 雨OK, 施設)
+    // Each selected category must exist (AND logic) - spot must have ALL selected tags
+    // Example: 雨OK + 屋外 → spot must have BOTH tags (which is impossible, so 0 results)
     if (category) {
-      conditions.push('spots.category = ?');
-      params.push(category);
+      const categories = category.split(',');
+      categories.forEach(cat => {
+        tagConditions.push(`EXISTS (
+          SELECT 1 FROM spot_tags 
+          WHERE spot_tags.spot_id = spots.spot_id 
+          AND spot_tags.tag_name = ?
+        )`);
+        tagParams.push(cat);
+      });
     }
 
-    // Filter by age range
-    if (min_age !== undefined) {
-      conditions.push('spots.max_age >= ?');
-      params.push(parseInt(min_age));
-    }
-    if (max_age !== undefined) {
-      conditions.push('spots.min_age <= ?');
-      params.push(parseInt(max_age));
-    }
-
-    // Filter by price range
-    if (price_range) {
-      conditions.push('spots.price_range = ?');
-      params.push(price_range);
-    }
-
-    // Filter by indoor/outdoor
-    if (is_indoor !== undefined) {
-      conditions.push('spots.is_indoor = ?');
-      params.push(is_indoor === 'true' ? 1 : 0);
+    // Filter by age tags (0-2歳, 3-5歳, 6-8歳, 9-12歳, 13-18歳)
+    // Each selected age must exist (AND logic) - spot must be suitable for ALL selected ages
+    if (age) {
+      const ages = age.split(',');
+      // Convert age like "3-5" to tag format "3-5歳"
+      const ageTags = ages.map(a => a.includes('歳') ? a : `${a}歳`);
+      ageTags.forEach(ageTag => {
+        tagConditions.push(`EXISTS (
+          SELECT 1 FROM spot_tags 
+          WHERE spot_tags.spot_id = spots.spot_id 
+          AND spot_tags.tag_name = ?
+        )`);
+        tagParams.push(ageTag);
+      });
     }
 
-    // Filter by weather
-    if (weather) {
-      conditions.push('spots.weather_suitable = ?');
-      params.push(weather);
+    // Filter by price tags (無料, 1000円以下, 1000-3000円, 3000-5000円, 5000円以上)
+    // Each selected price must exist (AND logic) - spot must match ALL selected prices
+    if (price) {
+      const prices = price.split(',');
+      prices.forEach(priceTag => {
+        tagConditions.push(`EXISTS (
+          SELECT 1 FROM spot_tags 
+          WHERE spot_tags.spot_id = spots.spot_id 
+          AND spot_tags.tag_name = ?
+        )`);
+        tagParams.push(priceTag);
+      });
     }
 
-    // Filter by rating
-    if (min_rating) {
+    // indoor, rain parameters are now handled via category parameter above
+
+    // Handle age-based filtering for sort='age' BEFORE merging tag conditions
+    if (sort === 'age' && req.user && req.user.user_id) {
+      const childrenAges = await getUserChildrenAges(req.user.user_id);
+      
+      if (childrenAges.length > 0) {
+        // Add filter condition: ONLY show spots that match children's age tags
+        const ageFilterConditions = childrenAges.map(ageTag => {
+          return `EXISTS (SELECT 1 FROM spot_tags WHERE spot_tags.spot_id = spots.spot_id AND spot_tags.tag_name = ?)`;
+        });
+        
+        // Use OR logic for age filter when sorting by age (show if matches ANY child's age)
+        tagConditions.push(`(${ageFilterConditions.join(' OR ')})`);
+        childrenAges.forEach(ageTag => tagParams.push(ageTag));
+      }
+    }
+
+    // Merge tag conditions into main conditions (using AND between different filter types)
+    if (tagConditions.length > 0) {
+      conditions.push(...tagConditions);
+      params.push(...tagParams);
+    }
+
+    // Filter by rating - take the highest rating value if multiple selected
+    if (rating) {
+      const ratings = rating.split(',').map(r => parseFloat(r));
+      const minRating = Math.max(...ratings); // Use highest rating selected
       conditions.push('spots.average_rating >= ?');
-      params.push(parseFloat(min_rating));
+      params.push(minRating);
     }
+
+    // Debug logging
+    console.log('=== SEARCH FILTERS DEBUG ===');
+    console.log('Filters received:', { keyword, category, age, price, rating, sort });
+    console.log('User authenticated:', !!req.user, 'User ID:', req.user?.user_id);
+    console.log('SQL Conditions:', conditions);
+    console.log('SQL Params:', params);
+    console.log('==========================');
 
     // Calculate distance if lat/lng provided
     let distanceSelect = 'NULL as distance';
@@ -116,14 +206,48 @@ const searchSpots = async (req, res) => {
         if (lat && lng) {
           orderBy = 'distance ASC';
         } else {
-          orderBy = 'spots.created_at DESC'; // Fallback if no location
+          // Default location: Hanoi University of Science and Technology (HUST)
+          // Coordinates: 21.0055° N, 105.8433° E
+          const defaultLat = 21.0055;
+          const defaultLng = 105.8433;
+          // Calculate distance from default location
+          distanceSelect = `
+            (6371 * acos(
+              cos(radians(${defaultLat})) * cos(radians(spots.latitude)) 
+              * cos(radians(spots.longitude) - radians(${defaultLng})) 
+              + sin(radians(${defaultLat})) * sin(radians(spots.latitude))
+            )) as distance
+          `;
+          orderBy = 'distance ASC';
         }
         break;
       case 'rating':
-        orderBy = 'spots.average_rating DESC, spots.review_count DESC';
+        // Sort by rating DESC (highest first), then by review count
+        orderBy = 'CAST(spots.average_rating AS DECIMAL(3,2)) DESC, spots.review_count DESC';
         break;
-      case 'name':
-        orderBy = 'spots.name ASC';
+      case 'age':
+        // Age-appropriate sorting based on user's children
+        // For logged-in users: get children ages and prioritize matching spots
+        // For guest users: fallback to recommended sorting
+        if (req.user && req.user.user_id) {
+          // Get user's children ages (filtering already done above)
+          const childrenAges = await getUserChildrenAges(req.user.user_id);
+          
+          if (childrenAges.length > 0) {
+            // Add age match score to prioritize spots matching children's ages
+            const ageMatchCase = childrenAges.map((ageTag, index) => 
+              `WHEN EXISTS (SELECT 1 FROM spot_tags WHERE spot_tags.spot_id = spots.spot_id AND spot_tags.tag_name = '${ageTag}') THEN ${childrenAges.length - index}`
+            ).join(' ');
+            
+            orderBy = `(CASE ${ageMatchCase} ELSE 0 END) DESC, CAST(spots.average_rating AS DECIMAL(3,2)) DESC, spots.review_count DESC`;
+          } else {
+            // User has no children - sort by rating
+            orderBy = 'CAST(spots.average_rating AS DECIMAL(3,2)) DESC, spots.review_count DESC';
+          }
+        } else {
+          // Guest user - use recommended algorithm
+          orderBy = '(spots.average_rating * 0.7 + LEAST(spots.review_count / 10, 5) * 0.3) DESC';
+        }
         break;
       case 'recommended':
       default:
@@ -150,7 +274,7 @@ const searchSpots = async (req, res) => {
     const countResult = await db.query(countQuery, countParams);
     const total = countResult[0].total;
 
-    // Main query with pagination
+    // Main query with pagination - no joins needed, all filtering via subqueries
     const query = `
       SELECT 
         spots.*,
@@ -189,11 +313,9 @@ const searchSpots = async (req, res) => {
         filters_applied: {
           keyword: keyword || null,
           category: category || null,
-          age_range: min_age || max_age ? { min: min_age, max: max_age } : null,
-          price_range: price_range || null,
-          is_indoor: is_indoor !== undefined ? is_indoor === 'true' : null,
-          weather: weather || null,
-          min_rating: min_rating || null,
+          age: age || null,
+          price: price || null,
+          rating: rating || null,
           distance: distance || null
         },
         sort_by: sort
@@ -305,7 +427,7 @@ const getSpotReviews = async (req, res) => {
       oldest: 'r.created_at ASC',
       highest_rating: 'r.rating DESC, r.created_at DESC',
       lowest_rating: 'r.rating ASC, r.created_at DESC',
-      most_helpful: 'r.helpful_count DESC, r.created_at DESC'
+      most_helpful: 'r.report_count ASC, r.created_at DESC' // Use report_count (lower is better)
     };
 
     const orderBy = validSorts[sort] || validSorts.newest;
@@ -321,7 +443,7 @@ const getSpotReviews = async (req, res) => {
         r.created_at,
         r.updated_at,
         u.user_id,
-        CONCAT(u.first_name, ' ', u.last_name) as user_name,
+        u.name as user_name,
         u.email
       FROM reviews r
       JOIN users u ON r.user_id = u.user_id

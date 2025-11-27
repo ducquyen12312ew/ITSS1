@@ -56,25 +56,20 @@ const getSchedules = async (req, res) => {
         sc.schedule_id,
         sc.spot_id,
         DATE_FORMAT(sc.scheduled_date, '%Y-%m-%d') as scheduled_date,
-        sc.time_slot,
+        sc.time,
         sc.status,
         sc.notes,
         sc.created_at,
         s.name as spot_name,
-        s.category,
         s.address as spot_address,
         s.latitude,
         s.longitude,
-        s.price_range,
-        s.is_indoor,
-        s.weather_suitable,
-        s.estimated_visit_duration,
         (SELECT image_url FROM spot_images WHERE spot_id = s.spot_id AND is_main = TRUE LIMIT 1) as main_image,
         (SELECT GROUP_CONCAT(tag_name) FROM spot_tags WHERE spot_id = s.spot_id) as tags
       FROM schedules sc
       JOIN spots s ON sc.spot_id = s.spot_id
       WHERE ${conditions.join(' AND ')}
-      ORDER BY sc.scheduled_date ASC, sc.time_slot ASC
+      ORDER BY sc.scheduled_date ASC, sc.time ASC
       LIMIT ? OFFSET ?
     `;
 
@@ -125,25 +120,18 @@ const getScheduleById = async (req, res) => {
         sc.user_id,
         sc.spot_id,
         DATE_FORMAT(sc.scheduled_date, '%Y-%m-%d') as scheduled_date,
-        sc.time_slot,
+        sc.time,
         sc.status,
         sc.notes,
         sc.created_at,
         sc.updated_at,
         s.name as spot_name,
         s.description as spot_description,
-        s.category,
-        s.min_age,
-        s.max_age,
-        s.price_range,
-        s.is_indoor,
         s.address,
         s.latitude,
         s.longitude,
         s.google_maps_url,
         s.operating_hours,
-        s.weather_suitable,
-        s.estimated_visit_duration,
         s.facilities,
         s.average_rating,
         s.review_count,
@@ -191,12 +179,12 @@ const getScheduleById = async (req, res) => {
 /**
  * POST /api/schedules
  * Thêm lịch trình mới
- * Body: { spot_id, scheduled_date, time_slot, notes }
+ * Body: { spot_id, scheduled_date, time, notes }
  */
 const addSchedule = async (req, res) => {
   try {
     const userId = req.user.userId;
-    const { spot_id, scheduled_date, time_slot, notes } = req.body;
+    const { spot_id, scheduled_date, time, notes } = req.body;
 
     // Validate required fields
     if (!spot_id || !scheduled_date) {
@@ -206,11 +194,12 @@ const addSchedule = async (req, res) => {
       });
     }
 
-    // Validate time_slot
-    if (time_slot && !['AM', 'PM', 'FULL_DAY'].includes(time_slot)) {
+    // Validate time (0-24)
+    const scheduleTime = time !== undefined ? parseInt(time) : 9;
+    if (scheduleTime < 0 || scheduleTime > 24) {
       return res.status(400).json({
         success: false,
-        message: 'time_slot phải là AM, PM hoặc FULL_DAY'
+        message: 'time phải là số từ 0-24'
       });
     }
 
@@ -246,11 +235,11 @@ const addSchedule = async (req, res) => {
       });
     }
 
-    // Check for duplicate schedule (same spot, same date, same time_slot)
+    // Check for duplicate schedule (same spot, same date, same time)
     const duplicateCheck = await db.query(
       `SELECT schedule_id FROM schedules 
-       WHERE user_id = ? AND spot_id = ? AND scheduled_date = ? AND time_slot = ? AND status = 'PLANNED'`,
-      [userId, spot_id, scheduled_date, time_slot || 'FULL_DAY']
+       WHERE user_id = ? AND spot_id = ? AND scheduled_date = ? AND time = ? AND status = 'PLANNED'`,
+      [userId, spot_id, scheduled_date, scheduleTime]
     );
 
     if (duplicateCheck.length > 0) {
@@ -262,7 +251,7 @@ const addSchedule = async (req, res) => {
 
     // Insert schedule
     const insertQuery = `
-      INSERT INTO schedules (user_id, spot_id, scheduled_date, time_slot, notes, status)
+      INSERT INTO schedules (user_id, spot_id, scheduled_date, time, notes, status)
       VALUES (?, ?, ?, ?, ?, 'PLANNED')
     `;
 
@@ -270,7 +259,7 @@ const addSchedule = async (req, res) => {
       userId,
       spot_id,
       scheduled_date,
-      time_slot || 'FULL_DAY',
+      scheduleTime,
       notes || null
     ]);
 
@@ -282,14 +271,12 @@ const addSchedule = async (req, res) => {
         sc.schedule_id,
         sc.spot_id,
         DATE_FORMAT(sc.scheduled_date, '%Y-%m-%d') as scheduled_date,
-        sc.time_slot,
+        sc.time,
         sc.status,
         sc.notes,
         sc.created_at,
         s.name as spot_name,
-        s.category,
         s.address,
-        s.price_range,
         (SELECT image_url FROM spot_images WHERE spot_id = s.spot_id AND is_main = TRUE LIMIT 1) as main_image,
         (SELECT GROUP_CONCAT(tag_name) FROM spot_tags WHERE spot_id = s.spot_id) as tags
       FROM schedules sc
@@ -322,13 +309,13 @@ const addSchedule = async (req, res) => {
 /**
  * PUT /api/schedules/:scheduleId
  * Cập nhật lịch trình
- * Body: { scheduled_date, time_slot, notes, status }
+ * Body: { scheduled_date, time, notes, status }
  */
 const updateSchedule = async (req, res) => {
   try {
     const userId = req.user.userId;
     const { scheduleId } = req.params;
-    const { scheduled_date, time_slot, notes, status } = req.body;
+    const { scheduled_date, time, notes, status } = req.body;
 
     // Check if schedule exists and belongs to user
     const scheduleCheck = await db.query(
@@ -343,11 +330,11 @@ const updateSchedule = async (req, res) => {
       });
     }
 
-    // Validate time_slot
-    if (time_slot && !['AM', 'PM', 'FULL_DAY'].includes(time_slot)) {
+    // Validate time (0-24)
+    if (time !== undefined && (typeof time !== 'number' || time < 0 || time > 24)) {
       return res.status(400).json({
         success: false,
-        message: 'time_slot phải là AM, PM hoặc FULL_DAY'
+        message: 'time phải là số từ 0 đến 24'
       });
     }
 
@@ -380,9 +367,9 @@ const updateSchedule = async (req, res) => {
       updateValues.push(scheduled_date);
     }
 
-    if (time_slot !== undefined) {
-      updateFields.push('time_slot = ?');
-      updateValues.push(time_slot);
+    if (time !== undefined) {
+      updateFields.push('time = ?');
+      updateValues.push(time);
     }
 
     if (notes !== undefined) {
@@ -419,11 +406,11 @@ const updateSchedule = async (req, res) => {
         sc.spot_id,
         DATE_FORMAT(sc.scheduled_date, '%Y-%m-%d') as scheduled_date,
         sc.time_slot,
+        sc.time,
         sc.status,
         sc.notes,
         sc.updated_at,
         s.name as spot_name,
-        s.category,
         s.address,
         (SELECT image_url FROM spot_images WHERE spot_id = s.spot_id AND is_main = TRUE LIMIT 1) as main_image,
         (SELECT GROUP_CONCAT(tag_name) FROM spot_tags WHERE spot_id = s.spot_id) as tags

@@ -314,9 +314,18 @@ const getRecommendations = async (req, res) => {
 
     // Build tag matching subquery
     const tagPlaceholders = tagNames.map(() => '?').join(',');
-    params.push(...tagNames, age, age, parseInt(min_match));
+    
+    // Determine age tag for child
+    let ageTag = '';
+    if (age <= 2) ageTag = '0-2歳';
+    else if (age <= 5) ageTag = '3-5歳';
+    else if (age <= 8) ageTag = '6-8歳';
+    else if (age <= 12) ageTag = '9-12歳';
+    else if (age <= 18) ageTag = '13-18歳';
+    
+    params.push(...tagNames, ageTag, parseInt(min_match));
 
-    // Main query: Find spots with matching tags
+    // Main query: Find spots with matching tags and age-appropriate
     const query = `
       SELECT 
         spots.*,
@@ -331,8 +340,11 @@ const getRecommendations = async (req, res) => {
         ) as match_score
       FROM spots
       WHERE spots.status = 'PUBLIC'
-        AND spots.min_age <= ?
-        AND spots.max_age >= ?
+        AND EXISTS (
+          SELECT 1 FROM spot_tags st_age 
+          WHERE st_age.spot_id = spots.spot_id 
+          AND st_age.tag_name = ?
+        )
         ${distanceCondition}
       HAVING match_score >= ?
       ORDER BY match_score DESC, spots.average_rating DESC, spots.review_count DESC
@@ -359,13 +371,16 @@ const getRecommendations = async (req, res) => {
       FROM spots
       JOIN spot_tags st ON st.spot_id = spots.spot_id
       WHERE spots.status = 'PUBLIC'
-        AND spots.min_age <= ?
-        AND spots.max_age >= ?
+        AND EXISTS (
+          SELECT 1 FROM spot_tags st_age 
+          WHERE st_age.spot_id = spots.spot_id 
+          AND st_age.tag_name = ?
+        )
         AND st.tag_name IN (${tagPlaceholders})
         ${distanceCondition}
     `;
 
-    let countParams = [age, age, ...tagNames];
+    let countParams = [ageTag, ...tagNames];
     if (lat && lng && distance) {
       const userLat = parseFloat(lat);
       const userLng = parseFloat(lng);
@@ -445,23 +460,28 @@ const getSpotsForSwipe = async (req, res) => {
       age--;
     }
 
+    // Determine age tag for child
+    let ageTag = '';
+    if (age <= 2) ageTag = '0-2歳';
+    else if (age <= 5) ageTag = '3-5歳';
+    else if (age <= 8) ageTag = '6-8歳';
+    else if (age <= 12) ageTag = '9-12歳';
+    else if (age <= 18) ageTag = '13-18歳';
+
     // Build query to get spots NOT yet swiped by this child
     let query = `
       SELECT 
         s.spot_id,
         s.name,
         s.description,
-        s.category,
-        s.min_age,
-        s.max_age,
-        s.price_range,
-        s.is_indoor,
         s.address,
         s.latitude,
         s.longitude,
         s.average_rating,
         s.review_count,
         s.favorite_count,
+        s.operating_hours,
+        s.facilities,
         (SELECT image_url FROM spot_images WHERE spot_id = s.spot_id AND is_main = 1 LIMIT 1) as main_image,
         (SELECT GROUP_CONCAT(tag_name) FROM spot_tags WHERE spot_id = s.spot_id) as tags
     `;
@@ -470,10 +490,13 @@ const getSpotsForSwipe = async (req, res) => {
     let conditions = ['s.status = ?'];
     params.push('PUBLIC');
 
-    // Filter by age compatibility
-    conditions.push('s.min_age <= ?');
-    conditions.push('s.max_age >= ?');
-    params.push(age, age);
+    // Filter by age compatibility using tags
+    conditions.push(`EXISTS (
+      SELECT 1 FROM spot_tags st_age 
+      WHERE st_age.spot_id = s.spot_id 
+      AND st_age.tag_name = ?
+    )`);
+    params.push(ageTag);
 
     // Exclude already swiped spots
     query += `
@@ -486,7 +509,11 @@ const getSpotsForSwipe = async (req, res) => {
 
     // Apply other filters
     if (category) {
-      conditions.push('s.category = ?');
+      conditions.push(`EXISTS (
+        SELECT 1 FROM spot_tags st_cat 
+        WHERE st_cat.spot_id = s.spot_id 
+        AND st_cat.tag_name = ?
+      )`);
       params.push(category);
     }
 
@@ -543,13 +570,20 @@ const getSpotsForSwipe = async (req, res) => {
         SELECT spot_id FROM kid_swipe WHERE child_id = ?
       )
       AND s.status = ?
-      AND s.min_age <= ?
-      AND s.max_age >= ?
+      AND EXISTS (
+        SELECT 1 FROM spot_tags st_age 
+        WHERE st_age.spot_id = s.spot_id 
+        AND st_age.tag_name = ?
+      )
     `;
-    let countParams = [childId, 'PUBLIC', age, age];
+    let countParams = [childId, 'PUBLIC', ageTag];
 
     if (category) {
-      countQuery += ' AND s.category = ?';
+      countQuery += ` AND EXISTS (
+        SELECT 1 FROM spot_tags st_cat 
+        WHERE st_cat.spot_id = s.spot_id 
+        AND st_cat.tag_name = ?
+      )`;
       countParams.push(category);
     }
 
@@ -669,17 +703,14 @@ const getKidFavorites = async (req, res) => {
         ks.spot_id,
         ks.created_at,
         s.name,
-        s.category,
-        s.min_age,
-        s.max_age,
-        s.price_range,
+        s.description,
         s.address,
         s.latitude,
         s.longitude,
         s.average_rating,
         s.review_count,
-        s.is_indoor,
-        s.weather_suitable,
+        s.operating_hours,
+        s.facilities,
         (SELECT image_url FROM spot_images WHERE spot_id = s.spot_id AND is_main = TRUE LIMIT 1) as main_image,
         (SELECT GROUP_CONCAT(tag_name) FROM spot_tags WHERE spot_id = s.spot_id) as tags
       FROM kid_swipe ks

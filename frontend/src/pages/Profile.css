@@ -128,6 +128,33 @@
 
 .form-input:disabled {
   background: #f9f9f9;
+}
+
+.form-value {
+  padding: 12px 16px;
+  font-size: 15px;
+  color: #333;
+  background: #f9f9f9;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+}
+
+.role-badge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.role-badge.admin {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.role-badge.user {
+  background: #dbeafe;
+  color: #1e40af;
   color: #999;
   cursor: not-allowed;
 }

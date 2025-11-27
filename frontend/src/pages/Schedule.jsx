@@ -13,8 +13,9 @@ const Schedule = () => {
   const [formData, setFormData] = useState({
     spot_id: '',
     scheduled_date: '',
-    time_slot: 'FULL_DAY',
+    time: 9,
     notes: '',
+    status: 'PLANNED',
   });
 
   useEffect(() => {
@@ -56,8 +57,9 @@ const Schedule = () => {
     setFormData({
       spot_id: schedule.spot_id,
       scheduled_date: schedule.scheduled_date,
-      time_slot: schedule.time_slot || 'FULL_DAY',
+      time: schedule.time || 9,
       notes: schedule.notes || '',
+      status: schedule.status || 'PLANNED',
     });
   };
 
@@ -167,7 +169,14 @@ const Schedule = () => {
                     <div key={schedule.schedule_id} className="schedule-card">
                       <div className="schedule-time">
                         <i className="fa-regular fa-clock"></i>
-                        {schedule.time_slot === 'AM' ? '午前' : schedule.time_slot === 'PM' ? '午後' : schedule.time_slot === 'FULL_DAY' ? '終日' : schedule.time_slot}
+                        {schedule.time}:00
+                        {schedule.status && (
+                          <span className={`status-badge ${schedule.status.toLowerCase()}`}>
+                            {schedule.status === 'PLANNED' && '予定'}
+                            {schedule.status === 'COMPLETED' && '完了'}
+                            {schedule.status === 'CANCELLED' && 'キャンセル'}
+                          </span>
+                        )}
                       </div>
                       <div className="schedule-content">
                         <h4
@@ -247,17 +256,30 @@ const Schedule = () => {
                   />
                 </div>
                 <div className="form-group">
-                  <label>時間帯</label>
-                  <select
-                    value={formData.time_slot}
-                    onChange={(e) => setFormData({ ...formData, time_slot: e.target.value })}
+                  <label>時間 (0-24時)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="24"
+                    value={formData.time}
+                    onChange={(e) => setFormData({ ...formData, time: parseInt(e.target.value) || 0 })}
                     className="field"
-                  >
-                    <option value="AM">午前</option>
-                    <option value="PM">午後</option>
-                    <option value="FULL_DAY">終日</option>
-                  </select>
+                    required
+                  />
                 </div>
+              </div>
+              <div className="form-group">
+                <label>ステータス *</label>
+                <select
+                  value={formData.status}
+                  onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                  className="field"
+                  required
+                >
+                  <option value="PLANNED">予定</option>
+                  <option value="COMPLETED">完了</option>
+                  <option value="CANCELLED">キャンセル</option>
+                </select>
               </div>
               <div className="form-group">
                 <label>メモ</label>

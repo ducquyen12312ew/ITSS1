@@ -122,23 +122,44 @@ const getSmartRecommendations = async (req, res) => {
     ) <= ?`);
     params.push(userLat, userLng, userLat, parseFloat(distance));
 
-    // Age filter (if child provided)
+    // Age filter (if child provided) - Use age tags instead of min_age/max_age
     if (childAge !== null) {
-      conditions.push('s.min_age <= ?');
-      conditions.push('s.max_age >= ?');
-      params.push(childAge, childAge);
+      // Determine which age tag(s) match
+      let ageTags = [];
+      if (childAge <= 2) ageTags.push('0-2歳');
+      if (childAge >= 3 && childAge <= 5) ageTags.push('3-5歳');
+      if (childAge >= 6 && childAge <= 8) ageTags.push('6-8歳');
+      if (childAge >= 9 && childAge <= 12) ageTags.push('9-12歳');
+      if (childAge >= 13 && childAge <= 18) ageTags.push('13-18歳');
+      
+      if (ageTags.length > 0) {
+        conditions.push(`EXISTS (
+          SELECT 1 FROM spot_tags st_age 
+          WHERE st_age.spot_id = s.spot_id 
+          AND st_age.tag_name IN (${ageTags.map(() => '?').join(',')})
+        )`);
+        params.push(...ageTags);
+      }
     }
 
-    // Weather-based filters
+    // Weather-based filters - Use tags instead of is_indoor/weather_suitable
     if (weather === 'RAIN' || rain_ok === 'true') {
-      // Ưu tiên indoor hoặc rain-friendly
-      conditions.push("(s.is_indoor = 1 OR s.weather_suitable IN ('ALL_WEATHER', 'RAIN_OK'))");
+      // Ưu tiên indoor hoặc rain-friendly (室内 or 雨OK tags)
+      conditions.push(`EXISTS (
+        SELECT 1 FROM spot_tags st_weather 
+        WHERE st_weather.spot_id = s.spot_id 
+        AND st_weather.tag_name IN ('室内', '雨OK')
+      )`);
     } else if (weather === 'HOT') {
-      // Ưu tiên indoor có AC
-      conditions.push("(s.is_indoor = 1 OR s.weather_suitable = 'ALL_WEATHER')");
+      // Ưu tiên indoor có AC (室内 tag)
+      conditions.push(`EXISTS (
+        SELECT 1 FROM spot_tags st_weather 
+        WHERE st_weather.spot_id = s.spot_id 
+        AND st_weather.tag_name = '室内'
+      )`);
     } else if (weather === 'SUNNY') {
-      // Outdoor spots for sunny day
-      // No filter, all spots OK
+      // Outdoor spots for sunny day (屋外 tag)
+      // Optional: can add preference for outdoor
     }
 
     // Operating hours filter (open now)
@@ -304,7 +325,11 @@ const getWeatherAlternatives = async (req, res) => {
         (SELECT GROUP_CONCAT(tag_name) FROM spot_tags WHERE spot_id = s.spot_id) as tags
       FROM spots s
       WHERE s.status = 'PUBLIC'
-        AND (s.is_indoor = 1 OR s.weather_suitable IN ('ALL_WEATHER', 'RAIN_OK'))
+        AND EXISTS (
+          SELECT 1 FROM spot_tags st 
+          WHERE st.spot_id = s.spot_id 
+          AND st.tag_name IN ('室内', '雨OK')
+        )
         AND (
           6371 * acos(
             cos(radians(?)) * cos(radians(s.latitude)) *

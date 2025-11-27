@@ -79,6 +79,60 @@ const authenticateToken = async (req, res, next) => {
 };
 
 /**
+ * Middleware: Optional Authentication
+ * Tries to authenticate but continues even if no token
+ * Used for public endpoints that have enhanced features for logged-in users
+ */
+const optionalAuth = async (req, res, next) => {
+    try {
+        const authHeader = req.headers['authorization'];
+        const token = authHeader && authHeader.split(' ')[1];
+
+        if (!token) {
+            // No token - continue as guest
+            req.user = null;
+            return next();
+        }
+
+        // Verify token
+        jwt.verify(token, JWT_SECRET, async (err, decoded) => {
+            if (err) {
+                // Invalid token - continue as guest
+                req.user = null;
+                return next();
+            }
+
+            // Check if user exists
+            const users = await db.query(
+                'SELECT user_id, email, role, status FROM users WHERE user_id = ?',
+                [decoded.userId]
+            );
+
+            if (users.length === 0 || users[0].status === 'BANNED') {
+                // User not found or banned - continue as guest
+                req.user = null;
+                return next();
+            }
+
+            const user = users[0];
+            req.user = {
+                user_id: user.user_id,
+                userId: user.user_id,
+                email: user.email,
+                role: user.role,
+                status: user.status
+            };
+
+            next();
+        });
+    } catch (error) {
+        console.error('❌ Optional Auth Error:', error);
+        req.user = null;
+        next();
+    }
+};
+
+/**
  * Middleware: Kiểm tra quyền ADMIN
  * Chỉ cho phép user có role = 'ADMIN' truy cập
  */
@@ -136,6 +190,7 @@ const generateToken = (userId, email, role) => {
 
 module.exports = {
     authenticateToken,
+    optionalAuth,
     requireAdmin,
     requireUser,
     generateToken,
