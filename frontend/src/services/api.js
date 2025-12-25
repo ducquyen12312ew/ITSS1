@@ -1,13 +1,8 @@
 import axios from 'axios';
 
-// API Base URL - automatically switch between dev and production
-const API_BASE_URL = import.meta.env.MODE === 'production'
-  ? '/api'  // Production: relative path, Vercel will handle routing
-  : 'http://localhost:3000/api';  // Development: direct to backend
-
 // Create axios instance with default config
 const api = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: '/api',
   headers: {
     'Content-Type': 'application/json',
   },

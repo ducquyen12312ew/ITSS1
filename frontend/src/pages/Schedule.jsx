@@ -57,7 +57,7 @@ const Schedule = () => {
     setFormData({
       spot_id: schedule.spot_id,
       scheduled_date: schedule.scheduled_date,
-      time: schedule.time || 9,
+      time: parseInt(schedule.time) || 9,
       notes: schedule.notes || '',
       status: schedule.status || 'PLANNED',
     });
@@ -72,13 +72,25 @@ const Schedule = () => {
     }
 
     try {
-      await api.put(`/schedules/${editingSchedule.schedule_id}`, formData);
+      // Chỉ gửi các field được phép update (không bao gồm spot_id)
+      const updateData = {
+        scheduled_date: formData.scheduled_date,
+        time: parseInt(formData.time, 10), // Đảm bảo time là number
+        notes: formData.notes || '',
+        status: formData.status,
+      };
+      
+      console.log('Sending update data:', updateData);
+      
+      await api.put(`/schedules/${editingSchedule.schedule_id}`, updateData);
       alert('スケジュールを更新しました');
       setEditingSchedule(null);
       fetchSchedules();
     } catch (error) {
       console.error('Error updating schedule:', error);
-      alert('更新に失敗しました');
+      console.error('Error response:', error.response?.data);
+      const errorMsg = error.response?.data?.message || '更新に失敗しました';
+      alert(errorMsg);
     }
   };
 

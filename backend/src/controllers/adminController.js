@@ -135,7 +135,6 @@ const getDashboardKPIs = async (req, res) => {
       SELECT 
         s.spot_id,
         s.name,
-        s.category,
         s.average_rating,
         s.review_count,
         s.favorite_count,
@@ -178,18 +177,9 @@ const getDashboardKPIs = async (req, res) => {
     const ratingDistributionRows = await db.query(ratingDistributionQuery);
     const ratingDistribution = Array.isArray(ratingDistributionRows) ? ratingDistributionRows : [];
 
-    // 7. Category Distribution of Spots
-    const categoryDistributionQuery = `
-      SELECT 
-        category,
-        COUNT(*) as count
-      FROM spots
-      WHERE status = 'PUBLIC'
-      GROUP BY category
-      ORDER BY count DESC
-    `;
-    const categoryDistributionRows = await db.query(categoryDistributionQuery);
-    const categoryDistribution = Array.isArray(categoryDistributionRows) ? categoryDistributionRows : [];
+    // 7. Category Distribution of Spots - SKIPPED (spots table doesn't have category column)
+    // Using tags instead would require complex JOIN with spot_tags table
+    const categoryDistribution = [];
 
     // 8. User Engagement Metrics
     const engagementQuery = `
@@ -268,7 +258,6 @@ const getDashboardKPIs = async (req, res) => {
       popular_spots: popularSpots.map(s => ({
         spot_id: s.spot_id,
         name: s.name,
-        category: s.category,
         average_rating: s.average_rating,
         review_count: s.review_count,
         favorite_count: s.favorite_count,

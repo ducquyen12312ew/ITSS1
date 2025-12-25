@@ -70,9 +70,27 @@
   background: rgba(255, 255, 255, 0.2);
 }
 
+/* Hero content wrapper - flexbox layout */
+.hero-content-wrapper {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  margin-top: 14px;
+}
+
+.hero-main-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.hero-sidebar {
+  flex-shrink: 0;
+  width: 200px;
+}
+
 /* Search box */
 .search-row {
-  margin-top: 14px;
+  margin-bottom: 14px;
 }
 
 .search-box {
@@ -416,6 +434,15 @@
 @media (max-width: 1020px) {
   .card-grid {
     grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .hero-content-wrapper {
+    flex-direction: column;
+  }
+  
+  .hero-sidebar {
+    width: 100%;
+    max-width: 400px;
   }
 }
 

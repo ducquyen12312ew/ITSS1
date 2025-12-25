@@ -65,7 +65,18 @@ const swipeSpot = async (req, res) => {
 
     const spotName = spotCheck[0].name;
 
+    // Check if already swiped before and what was the previous action
+    const [previousSwipe] = await connection.execute(
+      'SELECT action FROM kid_swipe WHERE child_id = ? AND spot_id = ?',
+      [childId, spot_id]
+    );
+
+    const previousAction = previousSwipe.length > 0 ? previousSwipe[0].action : null;
+
     if (action === 'LIKE') {
+      // If previously was SKIP, we need to delete old SKIP preferences first
+      // (though SKIP doesn't save preferences, just being thorough)
+      
       // Get all tags of the spot
       const [tags] = await connection.execute(
         'SELECT tag_name FROM spot_tags WHERE spot_id = ?',
@@ -95,19 +106,15 @@ const swipeSpot = async (req, res) => {
         }
       }
 
-      // 2. Log swipe action to kid_swipe table
-      try {
-        await connection.execute(
-          `INSERT INTO kid_swipe (child_id, spot_id, action)
-           VALUES (?, ?, ?)`,
-          [childId, spot_id, 'LIKE']
-        );
-      } catch (error) {
-        // Ignore if already swiped (unique constraint)
-        if (error.code !== 'ER_DUP_ENTRY') {
-          throw error;
-        }
-      }
+      // 2. Log swipe action to kid_swipe table (Update if already exists)
+      await connection.execute(
+        `INSERT INTO kid_swipe (child_id, spot_id, action, created_at)
+         VALUES (?, ?, ?, NOW())
+         ON DUPLICATE KEY UPDATE 
+           action = VALUES(action),
+           created_at = NOW()`,
+        [childId, spot_id, 'LIKE']
+      );
 
       res.json({
         success: true,
@@ -121,19 +128,34 @@ const swipeSpot = async (req, res) => {
         }
       });
     } else {
-      // SKIP - Log vào kid_swipe để không hiển thị lại địa điểm này
-      try {
-        await connection.execute(
-          `INSERT INTO kid_swipe (child_id, spot_id, action)
-           VALUES (?, ?, ?)`,
-          [childId, spot_id, 'SKIP']
+      // SKIP action
+      
+      // If previously was LIKE, we need to remove the preferences (tags) for this spot
+      if (previousAction === 'LIKE') {
+        // Get tags of this spot to remove from child_preferences
+        const [tagsToRemove] = await connection.execute(
+          'SELECT tag_name FROM spot_tags WHERE spot_id = ?',
+          [spot_id]
         );
-      } catch (error) {
-        // Ignore if already swiped
-        if (error.code !== 'ER_DUP_ENTRY') {
-          throw error;
+        
+        // Remove each tag from child_preferences
+        for (const tag of tagsToRemove) {
+          await connection.execute(
+            'DELETE FROM child_preferences WHERE child_id = ? AND tag_name = ? AND preference_type = ?',
+            [childId, tag.tag_name, 'LIKE']
+          );
         }
       }
+      
+      // SKIP - Log vào kid_swipe để không hiển thị lại địa điểm này (Update if already exists)
+      await connection.execute(
+        `INSERT INTO kid_swipe (child_id, spot_id, action, created_at)
+         VALUES (?, ?, ?, NOW())
+         ON DUPLICATE KEY UPDATE 
+           action = VALUES(action),
+           created_at = NOW()`,
+        [childId, spot_id, 'SKIP']
+      );
 
       res.json({
         success: true,

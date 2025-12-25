@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
 import SpotCard from '../components/SpotCard';
 import Tabbar from '../components/Tabbar';
+import WeatherWidget from '../components/WeatherWidget';
 import './Home.css';
 
 const Home = () => {
@@ -70,28 +71,57 @@ const Home = () => {
     try {
       setLoading(true);
       
-      // Fetch all spots
+      // Fetch all spots với limit lớn hơn
       const response = await api.get('/spots/search', {
-        params: { limit: 20 }
+        params: { limit: 50 }
       });
       
       const allSpots = response.data.data?.spots || [];
       
-      // Categorize spots
-      const nearby = allSpots.filter(s => s.distance && s.distance < 5).slice(0, 3);
-      const popular = allSpots
+      // Shuffle array để random hóa
+      const shuffled = [...allSpots].sort(() => Math.random() - 0.5);
+      
+      // Chia thành 3 nhóm không trùng lặp
+      const usedIds = new Set();
+      
+      // Nearby spots - lấy những spot có distance gần hoặc random 6 spots đầu
+      let nearby = shuffled.filter(s => s.distance && s.distance < 5);
+      if (nearby.length < 6) {
+        const additional = shuffled
+          .filter(s => !nearby.some(n => n.spot_id === s.spot_id))
+          .slice(0, 6 - nearby.length);
+        nearby = [...nearby, ...additional];
+      }
+      nearby = nearby.slice(0, 6);
+      nearby.forEach(spot => usedIds.add(spot.spot_id));
+      
+      // Popular spots - lấy những spot có rating cao và chưa được dùng
+      const popular = shuffled
+        .filter(s => !usedIds.has(s.spot_id))
         .sort((a, b) => (b.average_rating || 0) - (a.average_rating || 0))
-        .slice(0, 4);
-      const rainy = allSpots.filter(s => {
+        .slice(0, 6);
+      popular.forEach(spot => usedIds.add(spot.spot_id));
+      
+      // Rainy day spots - lấy những spot có tag rain/室内 và chưa được dùng
+      let rainy = shuffled.filter(s => {
+        if (usedIds.has(s.spot_id)) return false;
         const tags = s.tags || [];
         const tagsStr = Array.isArray(tags) ? tags.join(',') : String(tags);
         return tagsStr.includes('雨OK') || tagsStr.includes('室内');
-      }).slice(0, 3);
+      });
+      
+      if (rainy.length < 6) {
+        const additional = shuffled
+          .filter(s => !usedIds.has(s.spot_id))
+          .slice(0, 6 - rainy.length);
+        rainy = [...rainy, ...additional];
+      }
+      rainy = rainy.slice(0, 6);
       
       setSpots({
-        nearby: nearby.length > 0 ? nearby : allSpots.slice(0, 3),
+        nearby,
         popular,
-        rainy: rainy.length > 0 ? rainy : allSpots.slice(0, 3),
+        rainy,
       });
     } catch (error) {
       console.error('Error fetching spots:', error);
@@ -207,8 +237,10 @@ const Home = () => {
             <Link to="/profile" className="profile-btn">プロフィール</Link>
           </div>
 
-          {/* Search box */}
-          <div className="search-row">
+          <div className="hero-content-wrapper">
+            <div className="hero-main-content">
+              {/* Search box */}
+              <div className="search-row">
             <form onSubmit={handleSearch} className="search-box">
               <i className="fa-solid fa-magnifying-glass"></i>
               <input
@@ -248,8 +280,13 @@ const Home = () => {
     <i className="fa-solid fa-location-crosshairs mr-1"></i> 現在地から探す
   </button>
 </div>
+            </div>
 
-
+            {/* Weather Widget - Right Side */}
+            <div className="hero-sidebar">
+              <WeatherWidget />
+            </div>
+          </div>
         </div>
       </header>
 

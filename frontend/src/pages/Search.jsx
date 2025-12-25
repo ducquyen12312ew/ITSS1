@@ -14,6 +14,7 @@ const Search = () => {
   const [spots, setSpots] = useState([]);
   const [loading, setLoading] = useState(false);
   const [filterPanelOpen, setFilterPanelOpen] = useState(false);
+  const [userLocation, setUserLocation] = useState(null);
   
   // Advanced filters
   const [filters, setFilters] = useState({
@@ -30,11 +31,18 @@ const Search = () => {
   // No need for allTags object, using inline arrays matching database
 
   useEffect(() => {
-    performSearch();
+    // Always use ĐHBK Hanoi coordinates
+    setUserLocation({ lat: 21.0054, lng: 105.8433 });
+  }, []);
+
+  useEffect(() => {
+    if (userLocation) {
+      performSearch();
+    }
     
     // Load current filters from URL to display in filter panel
     loadFiltersFromURL();
-  }, [searchParams, sortBy]);
+  }, [searchParams, sortBy, userLocation]);
   
   const loadFiltersFromURL = () => {
     const urlFilters = {
@@ -90,6 +98,7 @@ const Search = () => {
       
       // Location-based search
       if (searchParams.get('lat') && searchParams.get('lng')) {
+        // Use location from URL if provided
         params.lat = searchParams.get('lat');
         params.lng = searchParams.get('lng');
         // Force distance sort for location-based search
@@ -97,6 +106,10 @@ const Search = () => {
           params.sort = 'distance';
           setSortBy('distance');
         }
+      } else if (params.sort === 'distance' && userLocation) {
+        // If sorting by distance but no URL location, use current location
+        params.lat = userLocation.lat;
+        params.lng = userLocation.lng;
       }
 
       console.log('🔍 Frontend sending params:', params);
@@ -266,6 +279,13 @@ const Search = () => {
                 onClick={() => toggleFilter('category', '無料')}
               >
                 無料
+              </button>
+              <button
+                className={`filter-chip ${filters.open ? 'active' : ''}`}
+                onClick={() => toggleFilter('open', true)}
+              >
+                <i className="fa-solid fa-clock" style={{ marginRight: '4px' }}></i>
+                今日営業中
               </button>
             </div>
 

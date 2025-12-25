@@ -11,31 +11,23 @@ import Schedule from './pages/Schedule';
 import KidsSwipe from './pages/KidsSwipe';
 import Profile from './pages/Profile';
 import ProtectedRoute from './components/ProtectedRoute';
+import AdminRoute from './components/AdminRoute';
+import AdminDashboard from './pages/AdminDashboard';
+import UserManagement from './pages/UserManagement';
+import ReviewManagement from './pages/ReviewManagement';
 
 function App() {
   return (
     <AuthProvider>
       <Routes>
-        {/* Public routes */}
+        {/* Public routes - Không cần đăng nhập */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/search" element={<Search />} />
+        <Route path="/spot/:id" element={<SpotDetail />} />
 
-        {/* Protected routes */}
-        <Route path="/" element={
-          <ProtectedRoute>
-            <Home />
-          </ProtectedRoute>
-        } />
-        <Route path="/search" element={
-          <ProtectedRoute>
-            <Search />
-          </ProtectedRoute>
-        } />
-        <Route path="/spot/:id" element={
-          <ProtectedRoute>
-            <SpotDetail />
-          </ProtectedRoute>
-        } />
+        {/* Protected routes - Cần đăng nhập */}
         <Route path="/kids" element={
           <ProtectedRoute>
             <ChildrenProfile />
@@ -60,6 +52,23 @@ function App() {
           <ProtectedRoute>
             <Profile />
           </ProtectedRoute>
+        } />
+
+        {/* Admin routes - Chỉ dành cho Admin */}
+        <Route path="/admin/dashboard" element={
+          <AdminRoute>
+            <AdminDashboard />
+          </AdminRoute>
+        } />
+        <Route path="/admin/users" element={
+          <AdminRoute>
+            <UserManagement />
+          </AdminRoute>
+        } />
+        <Route path="/admin/reviews" element={
+          <AdminRoute>
+            <ReviewManagement />
+          </AdminRoute>
         } />
 
         {/* Redirect unknown routes */}

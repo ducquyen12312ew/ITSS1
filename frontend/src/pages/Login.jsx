@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import './Auth.css';
 
@@ -11,6 +11,7 @@ const Login = () => {
   
   const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -28,7 +29,9 @@ const Login = () => {
     const result = await login(email, password);
     
     if (result.success) {
-      navigate('/');
+      // Redirect về trang trước đó hoặc home page
+      const from = location.state?.from || '/';
+      navigate(from, { replace: true });
     } else {
       setError(result.message || 'ログインに失敗しました');
       window.scrollTo({ top: 0, behavior: 'smooth' });

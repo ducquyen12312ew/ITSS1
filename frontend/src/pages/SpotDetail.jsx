@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../services/api';
+import { useAuthAction } from '../hooks/useAuthAction';
 import Tabbar from '../components/Tabbar';
 import './SpotDetail.css';
 
 const SpotDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { requireAuth, isAuthenticated } = useAuthAction();
   
   const [spot, setSpot] = useState(null);
   const [reviews, setReviews] = useState([]);
@@ -28,19 +30,23 @@ const SpotDetail = () => {
 
   useEffect(() => {
     fetchSpotDetail();
-    checkFavoriteStatus();
-    fetchExistingSchedules();
-  }, [id]);
+    
+    // Only check favorite status if authenticated
+    if (isAuthenticated) {
+      checkFavoriteStatus();
+      fetchExistingSchedules();
+    }
+  }, [id, isAuthenticated]);
 
   const fetchSpotDetail = async () => {
     try {
       setLoading(true);
       
-      // Fetch spot details
+      // Fetch spot details - không cần auth
       const spotRes = await api.get(`/spots/${id}`);
       setSpot(spotRes.data.data);
 
-      // Fetch reviews
+      // Fetch reviews - không cần auth
       const reviewsRes = await api.get(`/spots/${id}/reviews`);
       setReviews(reviewsRes.data.data?.reviews || []);
     } catch (error) {
@@ -51,6 +57,8 @@ const SpotDetail = () => {
   };
 
   const checkFavoriteStatus = async () => {
+    if (!isAuthenticated) return;
+    
     try {
       const response = await api.get('/favorites');
       const favorites = response.data.data?.favorites || [];
@@ -61,6 +69,8 @@ const SpotDetail = () => {
   };
 
   const fetchExistingSchedules = async () => {
+    if (!isAuthenticated) return;
+    
     try {
       const response = await api.get('/schedules');
       const allSchedules = response.data.data?.schedules || [];
@@ -75,9 +85,14 @@ const SpotDetail = () => {
   };
 
   const toggleFavorite = async () => {
+    // Check authentication first
+    if (!requireAuth(null, 'お気に入りに追加するにはログインが必要です')) {
+      return;
+    }
+    
     try {
       if (isFavorite) {
-        await api.delete(`/favorites/${id}`);
+        await api.delete(`/favorites/spot/${id}`);
         setIsFavorite(false);
         alert('お気に入りから削除しました');
       } else {
@@ -92,6 +107,11 @@ const SpotDetail = () => {
   };
 
   const handleAddToSchedule = async () => {
+    // Check authentication first
+    if (!requireAuth(null, 'スケジュールを追加するにはログインが必要です')) {
+      return;
+    }
+    
     try {
       if (!scheduleData.date) {
         alert('日付を選択してください');
@@ -133,6 +153,11 @@ const SpotDetail = () => {
   };
 
   const handleSubmitReview = async () => {
+    // Check authentication first
+    if (!requireAuth(null, 'レビューを投稿するにはログインが必要です')) {
+      return;
+    }
+    
     try {
       if (!reviewData.rating || !reviewData.comment) {
         alert('評価とコメントを入力してください');
@@ -278,14 +303,17 @@ const SpotDetail = () => {
 
         {/* Action buttons */}
         <div className="op-row">
-          <button onClick={openRoute} className="btn">
+          <button onClick={openRoute} className="btn btn-route">
             <i className="fa-solid fa-location-arrow"></i> 経路
           </button>
           <button onClick={toggleFavorite} className={`btn ${isFavorite ? 'active' : 'ghost'}`}>
             <i className={`fa-${isFavorite ? 'solid' : 'regular'} fa-heart`}></i> 
             {isFavorite ? 'お気に入り済み' : '保存'}
           </button>
-          <button onClick={() => setScheduleOpen(!scheduleOpen)} className="btn">
+          <button 
+            onClick={() => requireAuth(() => setScheduleOpen(!scheduleOpen), 'スケジュールを追加するにはログインが必要です')} 
+            className="btn"
+          >
             <i className="fa-regular fa-calendar"></i> 追加
           </button>
         </div>
@@ -504,7 +532,12 @@ const SpotDetail = () => {
         <div className="sect reviews">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <strong>レビュー</strong>
-            <button onClick={() => setReviewOpen(!reviewOpen)} className="btn">投稿する</button>
+            <button 
+              onClick={() => requireAuth(() => setReviewOpen(!reviewOpen), 'レビューを投稿するにはログインが必要です')} 
+              className="btn"
+            >
+              投稿する
+            </button>
           </div>
 
           {/* Review form - Full page modal */}
@@ -637,58 +670,6 @@ const SpotDetail = () => {
                       marginTop: '4px'
                     }}>
                       {reviewData.comment.length} / 140
-                    </div>
-                  </div>
-
-                  {/* Review target - radio buttons */}
-                  <div style={{ marginBottom: '32px' }}>
-                    <label style={{ 
-                      display: 'block', 
-                      marginBottom: '12px', 
-                      fontSize: '16px', 
-                      fontWeight: '600',
-                      color: '#111'
-                    }}>
-                      誰について
-                    </label>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                      {[
-                        { value: 'clean', label: '清家' },
-                        { value: 'kids_friendly', label: '子ども達とキレか?' },
-                        { value: 'stroller', label: 'ベビーカーで移動しやすい!' },
-                        { value: 'nursing', label: '授乳室あり?' }
-                      ].map(option => (
-                        <label
-                          key={option.value}
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            cursor: 'pointer',
-                            padding: '12px',
-                            border: '1px solid #e5e7eb',
-                            borderRadius: '8px',
-                            background: reviewData.reviewTarget === option.value ? '#eff6ff' : '#fff',
-                            borderColor: reviewData.reviewTarget === option.value ? '#3b82f6' : '#e5e7eb',
-                            transition: 'all 0.2s'
-                          }}
-                        >
-                          <input
-                            type="radio"
-                            name="reviewTarget"
-                            value={option.value}
-                            checked={reviewData.reviewTarget === option.value}
-                            onChange={(e) => setReviewData({ ...reviewData, reviewTarget: e.target.value })}
-                            style={{
-                              marginRight: '12px',
-                              width: '18px',
-                              height: '18px',
-                              cursor: 'pointer',
-                              accentColor: '#3b82f6'
-                            }}
-                          />
-                          <span style={{ fontSize: '15px', color: '#111' }}>{option.label}</span>
-                        </label>
-                      ))}
                     </div>
                   </div>
 

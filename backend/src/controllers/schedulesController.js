@@ -319,7 +319,7 @@ const updateSchedule = async (req, res) => {
 
     // Check if schedule exists and belongs to user
     const scheduleCheck = await db.query(
-      'SELECT schedule_id, spot_id FROM schedules WHERE schedule_id = ? AND user_id = ?',
+      'SELECT schedule_id, spot_id, scheduled_date FROM schedules WHERE schedule_id = ? AND user_id = ?',
       [scheduleId, userId]
     );
 
@@ -351,12 +351,17 @@ const updateSchedule = async (req, res) => {
     let updateValues = [];
 
     if (scheduled_date !== undefined) {
-      // Validate date
-      const scheduleDate = new Date(scheduled_date);
+      // Validate date - chỉ check nếu date thực sự thay đổi
+      const currentSchedule = scheduleCheck[0];
+      const currentDate = new Date(currentSchedule.scheduled_date || scheduled_date);
+      const newDate = new Date(scheduled_date);
       const today = new Date();
       today.setHours(0, 0, 0, 0);
+      currentDate.setHours(0, 0, 0, 0);
+      newDate.setHours(0, 0, 0, 0);
 
-      if (scheduleDate < today) {
+      // Chỉ check ngày quá khứ nếu đang thay đổi sang ngày mới
+      if (newDate.getTime() !== currentDate.getTime() && newDate < today) {
         return res.status(400).json({
           success: false,
           message: 'Không thể đặt lịch trình cho ngày trong quá khứ'
@@ -405,7 +410,6 @@ const updateSchedule = async (req, res) => {
         sc.schedule_id,
         sc.spot_id,
         DATE_FORMAT(sc.scheduled_date, '%Y-%m-%d') as scheduled_date,
-        sc.time_slot,
         sc.time,
         sc.status,
         sc.notes,
@@ -527,10 +531,9 @@ const getCalendarSchedules = async (req, res) => {
         sc.schedule_id,
         sc.spot_id,
         DATE_FORMAT(sc.scheduled_date, '%Y-%m-%d') as scheduled_date,
-        sc.time_slot,
+        sc.time,
         sc.status,
         s.name as spot_name,
-        s.category,
         (SELECT image_url FROM spot_images WHERE spot_id = s.spot_id AND is_main = TRUE LIMIT 1) as main_image
       FROM schedules sc
       JOIN spots s ON sc.spot_id = s.spot_id
@@ -538,7 +541,7 @@ const getCalendarSchedules = async (req, res) => {
         AND sc.scheduled_date >= ? 
         AND sc.scheduled_date <= ?
         AND sc.status IN ('PLANNED', 'COMPLETED')
-      ORDER BY sc.scheduled_date ASC, sc.time_slot ASC
+      ORDER BY sc.scheduled_date ASC, sc.time ASC
     `;
 
     const schedules = await db.query(query, [

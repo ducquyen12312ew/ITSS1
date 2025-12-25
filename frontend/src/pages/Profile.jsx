@@ -110,6 +110,36 @@ const Profile = () => {
                 </span>
               </div>
             </div>
+
+            {/* Admin Panel Link */}
+            {user?.role === 'ADMIN' && (
+              <div className="form-group">
+                <button 
+                  onClick={() => navigate('/admin/dashboard')}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    background: 'linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    fontSize: '15px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseEnter={(e) => e.target.style.transform = 'translateY(-2px)'}
+                  onMouseLeave={(e) => e.target.style.transform = 'translateY(0)'}
+                >
+                  <i className="fa-solid fa-shield-halved"></i>
+                  管理者パネルを開く
+                </button>
+              </div>
+            )}
           </div>
         </div>
 

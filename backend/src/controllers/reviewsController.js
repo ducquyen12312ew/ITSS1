@@ -107,8 +107,7 @@ const createReview = async (req, res) => {
         r.facilities_check,
         r.created_at,
         s.name as spot_name,
-        s.category,
-        CONCAT(u.first_name, ' ', u.last_name) as user_name,
+        u.name as user_name,
         u.email as user_email
       FROM reviews r
       INNER JOIN spots s ON r.spot_id = s.spot_id
@@ -181,9 +180,7 @@ const getUserReviews = async (req, res) => {
         r.created_at,
         r.updated_at,
         s.name as spot_name,
-        s.category,
         s.address,
-        s.price_range,
         (SELECT image_url FROM spot_images WHERE spot_id = s.spot_id AND is_main = TRUE LIMIT 1) as spot_main_image
       FROM reviews r
       INNER JOIN spots s ON r.spot_id = s.spot_id
@@ -250,12 +247,10 @@ const getReviewById = async (req, res) => {
         r.created_at,
         r.updated_at,
         s.name as spot_name,
-        s.category,
         s.address,
         s.latitude,
         s.longitude,
-        s.price_range,
-        CONCAT(u.first_name, ' ', u.last_name) as user_name,
+        u.name as user_name,
         u.email as user_email,
         (SELECT image_url FROM spot_images WHERE spot_id = s.spot_id AND is_main = TRUE LIMIT 1) as spot_main_image
       FROM reviews r
@@ -414,8 +409,7 @@ const updateReview = async (req, res) => {
         r.created_at,
         r.updated_at,
         s.name as spot_name,
-        s.category,
-        CONCAT(u.first_name, ' ', u.last_name) as user_name
+        u.name as user_name
       FROM reviews r
       INNER JOIN spots s ON r.spot_id = s.spot_id
       INNER JOIN users u ON r.user_id = u.user_id

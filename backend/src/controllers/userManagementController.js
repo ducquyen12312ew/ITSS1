@@ -27,12 +27,12 @@ const getAllUsers = async (req, res) => {
     const conditions = [];
     const params = [];
 
-    // Search by name, email or child's name (first_name + last_name)
+    // Search by name, email or child's name
     if (search) {
       const searchPattern = `%${search.toLowerCase()}%`;
-      // Match first_name, last_name, full name, email and children's name (case-insensitive)
-      conditions.push("((LOWER(u.first_name) LIKE ?) OR (LOWER(u.last_name) LIKE ?) OR (LOWER(CONCAT(u.first_name, ' ', u.last_name)) LIKE ?) OR (LOWER(u.email) LIKE ?) OR EXISTS (SELECT 1 FROM children cc WHERE cc.user_id = u.user_id AND LOWER(cc.name) LIKE ?))");
-      params.push(searchPattern, searchPattern, searchPattern, searchPattern, searchPattern);
+      // Match name, email and children's name (case-insensitive)
+      conditions.push("((LOWER(u.name) LIKE ?) OR (LOWER(u.email) LIKE ?) OR EXISTS (SELECT 1 FROM children cc WHERE cc.user_id = u.user_id AND LOWER(cc.name) LIKE ?))");
+      params.push(searchPattern, searchPattern, searchPattern);
     }
 
     // Filter by role
@@ -73,16 +73,16 @@ const getAllUsers = async (req, res) => {
     if (sort === 'oldest') {
       orderBy = 'u.created_at ASC';
     } else if (sort === 'name') {
-      orderBy = "CONCAT(u.first_name, ' ', u.last_name) ASC";
+      orderBy = 'u.name ASC';
     } else if (sort === 'last_login') {
-      orderBy = 'u.last_login_at DESC NULLS LAST';
+      orderBy = 'u.last_login_at DESC';
     }
 
     // Get users with statistics
     const usersQuery = `
       SELECT 
         u.user_id,
-        CONCAT(u.first_name, ' ', u.last_name) as name,
+        u.name,
         u.email,
         u.role,
         u.status,
@@ -191,7 +191,7 @@ const getUserDetail = async (req, res) => {
     const userQuery = `
       SELECT 
         u.user_id,
-        CONCAT(u.first_name, ' ', u.last_name) as name,
+        u.name,
         u.email,
         u.role,
         u.status,
@@ -246,7 +246,6 @@ const getUserDetail = async (req, res) => {
         f.favorite_id,
         f.spot_id,
         s.name as spot_name,
-        s.category,
         f.created_at
       FROM favorites f
       JOIN spots s ON f.spot_id = s.spot_id
@@ -263,7 +262,7 @@ const getUserDetail = async (req, res) => {
         sc.spot_id,
         s.name as spot_name,
         sc.scheduled_date,
-        sc.time_slot,
+        sc.time,
         sc.status,
         sc.created_at
       FROM schedules sc

@@ -109,10 +109,9 @@ const getAllReviews = async (req, res) => {
     const query = `
       SELECT 
         r.*,
-        CONCAT(u.first_name, ' ', u.last_name) as user_name,
+        u.name as user_name,
         u.email as user_email,
         s.name as spot_name,
-        s.category as spot_category,
         s.average_rating as spot_average_rating
       FROM reviews r
       JOIN users u ON r.user_id = u.user_id
@@ -221,11 +220,10 @@ const getReviewDetail = async (req, res) => {
     const reviewQuery = `
       SELECT 
         r.*,
-        CONCAT(u.first_name, ' ', u.last_name) as user_name,
+        u.name as user_name,
         u.email as user_email,
         u.created_at as user_registered_at,
         s.name as spot_name,
-        s.category as spot_category,
         s.address as spot_address,
         s.average_rating as spot_average_rating,
         s.review_count as spot_review_count
