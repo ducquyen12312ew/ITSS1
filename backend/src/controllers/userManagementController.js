@@ -370,7 +370,7 @@ const toggleUserBan = async (req, res) => {
       [newStatus, userId]
     );
 
-    const message = is_banned ? 'Đã cấm tài khoản (BAN)' : 'Đã kích hoạt lại tài khoản (UNBAN)';
+    const message = is_banned ? 'アカウントがBANされました' : 'アカウントがUNBANされました';
     const status = is_banned ? 'BANNED' : 'ACTIVE';
 
     res.json({

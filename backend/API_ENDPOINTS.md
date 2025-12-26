@@ -2082,7 +2082,7 @@ Authorization: Bearer <admin_token>
 ```json
 {
   "success": true,
-  "message": "Đã cấm tài khoản (BAN)",
+  "message": "アカウントがBANされました",
   "data": {
     "user_id": 2,
     "is_banned": true,
@@ -2102,7 +2102,7 @@ Authorization: Bearer <admin_token>
 ```json
 {
   "success": true,
-  "message": "Đã kích hoạt lại tài khoản (UNBAN)",
+  "message": "アカウントがUNBANされました",
   "data": {
     "user_id": 2,
     "is_banned": false,

@@ -14,6 +14,12 @@ router.use(authenticateToken);
 router.use(requireAdmin);
 
 /**
+ * GET /api/admin/spot-management
+ * Lấy danh sách tất cả spots
+ */
+router.get('/', spotManagementController.getAllSpots);
+
+/**
  * POST /api/admin/spot-management
  * Tạo spot mới (đơn giản)
  */

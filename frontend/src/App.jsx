@@ -15,6 +15,7 @@ import AdminRoute from './components/AdminRoute';
 import AdminDashboard from './pages/AdminDashboard';
 import UserManagement from './pages/UserManagement';
 import ReviewManagement from './pages/ReviewManagement';
+import SpotManagement from './pages/SpotManagement';
 
 function App() {
   return (
@@ -68,6 +69,11 @@ function App() {
         <Route path="/admin/reviews" element={
           <AdminRoute>
             <ReviewManagement />
+          </AdminRoute>
+        } />
+        <Route path="/admin/spots" element={
+          <AdminRoute>
+            <SpotManagement />
           </AdminRoute>
         } />
 
