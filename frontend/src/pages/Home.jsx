@@ -71,52 +71,57 @@ const Home = () => {
     try {
       setLoading(true);
       
-      // Fetch all spots với limit lớn hơn
+      // Fetch all spots với limit lớn hơn để đủ cho 3 sections
       const response = await api.get('/spots/search', {
-        params: { limit: 50 }
+        params: { limit: 100 }
       });
       
       const allSpots = response.data.data?.spots || [];
       
-      // Shuffle array để random hóa
-      const shuffled = [...allSpots].sort(() => Math.random() - 0.5);
+      console.log('Total spots from API:', allSpots.length);
       
-      // Chia thành 3 nhóm không trùng lặp
-      const usedIds = new Set();
+      // Remove duplicates by spot_id
+      const uniqueSpots = allSpots.filter((spot, index, self) => 
+        index === self.findIndex(s => s.spot_id === spot.spot_id)
+      );
       
-      // Nearby spots - lấy những spot có distance gần hoặc random 6 spots đầu
-      let nearby = shuffled.filter(s => s.distance && s.distance < 5);
-      if (nearby.length < 6) {
-        const additional = shuffled
-          .filter(s => !nearby.some(n => n.spot_id === s.spot_id))
-          .slice(0, 6 - nearby.length);
-        nearby = [...nearby, ...additional];
-      }
-      nearby = nearby.slice(0, 6);
-      nearby.forEach(spot => usedIds.add(spot.spot_id));
+      console.log('After deduplication:', uniqueSpots.length);
       
-      // Popular spots - lấy những spot có rating cao và chưa được dùng
-      const popular = shuffled
-        .filter(s => !usedIds.has(s.spot_id))
-        .sort((a, b) => (b.average_rating || 0) - (a.average_rating || 0))
-        .slice(0, 6);
-      popular.forEach(spot => usedIds.add(spot.spot_id));
+      // STRATEGY: Mỗi section lấy spots theo tiêu chí riêng, CÓ THỂ TRÙNG NHAU
       
-      // Rainy day spots - lấy những spot có tag rain/室内 và chưa được dùng
-      let rainy = shuffled.filter(s => {
-        if (usedIds.has(s.spot_id)) return false;
+      // 1. RAINY DAY SPOTS - 6 địa điểm thích hợp cho ngày mưa
+      let rainy = [...uniqueSpots].filter(s => {
         const tags = s.tags || [];
         const tagsStr = Array.isArray(tags) ? tags.join(',') : String(tags);
         return tagsStr.includes('雨OK') || tagsStr.includes('室内');
-      });
+      }).slice(0, 6);
       
-      if (rainy.length < 6) {
-        const additional = shuffled
-          .filter(s => !usedIds.has(s.spot_id))
-          .slice(0, 6 - rainy.length);
-        rainy = [...rainy, ...additional];
+      console.log(`Found ${rainy.length} rainy spots:`, rainy.map(s => s.name));
+      
+      // 2. NEARBY SPOTS - 6 địa điểm gần nhất theo khoảng cách
+      let nearby = [...uniqueSpots]
+        .filter(s => s.distance != null)
+        .sort((a, b) => (a.distance || 999) - (b.distance || 999))
+        .slice(0, 6);
+      
+      // Nếu không đủ, lấy thêm spots bất kỳ
+      if (nearby.length < 6) {
+        const needed = 6 - nearby.length;
+        const additional = uniqueSpots
+          .filter(s => !nearby.some(n => n.spot_id === s.spot_id))
+          .slice(0, needed);
+        nearby = [...nearby, ...additional];
       }
-      rainy = rainy.slice(0, 6);
+      
+      console.log('Nearby spots:', nearby.map(s => s.name));
+      
+      // 3. POPULAR SPOTS - 6 địa điểm có rating cao nhất
+      let popular = [...uniqueSpots]
+        .sort((a, b) => (b.average_rating || 0) - (a.average_rating || 0))
+        .slice(0, 6);
+      
+      console.log('Popular spots:', popular.map(s => `${s.name} - ${s.average_rating}★`));
+      console.log('Popular spots:', popular.map(s => `${s.name} (${s.spot_id}) - ${s.average_rating}★`));
       
       setSpots({
         nearby,

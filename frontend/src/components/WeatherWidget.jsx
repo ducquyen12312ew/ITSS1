@@ -96,7 +96,7 @@ const WeatherWidget = () => {
       </div>
 
       <div className="weather-description">
-        {weatherInfo.desc} / {weatherInfo.descVi}
+        {weatherInfo.desc}
       </div>
 
       <div className="weather-details">
