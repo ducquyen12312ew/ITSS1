@@ -280,11 +280,11 @@ const KidsSwipe = () => {
         >
           {/* Card Counters */}
           <div className="card-counters">
-            <div className="counter-badge like-counter">
-              すき<br/>{swipeHistory.filter(h => h.action === 'like').length}
-            </div>
             <div className="counter-badge skip-counter">
               いや<br/>{swipeHistory.filter(h => h.action === 'skip').length}
+            </div>
+            <div className="counter-badge like-counter">
+              すき<br/>{swipeHistory.filter(h => h.action === 'like').length}
             </div>
           </div>
 
@@ -329,9 +329,9 @@ const KidsSwipe = () => {
               <button
                 onClick={(e) => { e.stopPropagation(); handleSkip(); }}
                 className="action-btn-swipe skip-btn-swipe"
-                title="スキップ"
+                title="いや"
               >
-                <i className="fa-solid fa-xmark"></i> スキップ
+                <i className="fa-solid fa-xmark"></i> いや
               </button>
               <button
                 onClick={(e) => { e.stopPropagation(); handleLike(); }}
